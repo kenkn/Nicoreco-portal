@@ -1,4 +1,3 @@
-// authController.go
 package controllers
 
 import (
@@ -75,8 +74,7 @@ func Register(c *fiber.Ctx) error {
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
 
 	user := models.User {
-		FirstName : data["first_name"],
-		LastName  : data["last_name"],
+		DisplayName : data["display_name"],
 		Email 	  : data["email"],
 		Password  : password,
 	}

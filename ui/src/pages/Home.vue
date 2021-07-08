@@ -18,7 +18,7 @@ export default {
     onMounted(async () => {
       try {
         const { data } = await axios.get("user");
-        message.value = `こんにちは．${data.first_name} ${data.last_name} さん`;
+        message.value = `こんにちは．${data.display_name} さん`;
 
         // index.tsのactionsに設定したパラメータ名を設定
         await store.dispatch("setAuth", true);

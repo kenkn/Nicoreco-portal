@@ -3,15 +3,9 @@
     <form @submit.prevent="submit">
       <h1 class="h3 mb-3 fw-normal">ユーザー登録</h1>
       <input
-        v-model="firstName"
+        v-model="displayName"
         class="form-control"
-        placeholder="First Name"
-        required
-      />
-      <input
-        v-model="lastName"
-        class="form-control"
-        placeholder="Last Name"
+        placeholder="表示名"
         required
       />
 
@@ -51,8 +45,7 @@ import { useRouter } from "vue-router";
 export default {
   name: "Register",
   setup() {
-    const firstName = ref("");
-    const lastName = ref("");
+    const displayName = ref("");
     const email = ref("");
     const password = ref("");
     const passwordConfirm = ref("");
@@ -61,8 +54,7 @@ export default {
     const submit = async () => {
       // Register apiへPOST
       await axios.post("register", {
-        first_name: firstName.value,
-        last_name: lastName.value,
+        display_name: displayName.value,
         email: email.value,
         password: password.value,
         password_confirm: passwordConfirm.value,
@@ -73,8 +65,7 @@ export default {
     };
 
     return {
-      firstName,
-      lastName,
+      displayName,
       email,
       password,
       passwordConfirm,
