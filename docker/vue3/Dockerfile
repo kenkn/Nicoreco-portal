@@ -5,7 +5,8 @@ CMD [ "/bin/sh" ]
 WORKDIR /app
 
 RUN apk update && \
-    npm install -g vue-cli
+    npm install -g vue-cli && \
+    npm i axios
 
 ADD ./ui/package.json /app
 

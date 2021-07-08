@@ -2,7 +2,9 @@ FROM golang:1.15-alpine3.12
 
 RUN apk update && \
     apk upgrade && \
-    apk add git
+    apk add git && \
+    go get -u github.com/gofiber/fiber/v2 && \
+    go get -u github.com/dgrijalva/jwt-go
 
 RUN go get github.com/cespare/reflex
 ENV CGO_ENABLED=0
