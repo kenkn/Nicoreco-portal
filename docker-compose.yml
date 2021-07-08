@@ -1,0 +1,61 @@
+version: "3"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/golang/Dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - ./api:/go/src/api/
+    command: >
+      sh -c "reflex -s -r '\.go$$' go run main.go"
+    depends_on:
+      - mysql
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: go_auth
+    links:
+      - "smtp"
+  ui:
+    build:
+      context: .
+      dockerfile: ./docker/vue3/Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./ui:/app
+    command: npm run serve
+
+  mysql:
+    image: mysql:5.7.22
+    environment:
+        MYSQL_ROOT_PASSWORD: admin
+        MYSQL_USER: admin
+        MYSQL_PASSWORD: admin
+        MYSQL_DATABASE: go_auth
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql/sql:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+        - PMA_ARBITRARY=1
+        - PMA_HOST=mysql
+        - PMA_USER=admin
+        - PMA_PASSWORD=admin
+    links:
+        - mysql
+    ports:
+        - 8888:80
+
+  smtp:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
