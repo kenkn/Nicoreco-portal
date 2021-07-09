@@ -6,7 +6,7 @@
  
 <script>
 import { ref, onMounted } from "vue";
-import { axios } from "axios";
+import axios from "axios";
 import { useStore } from "vuex";
 
 export default {
@@ -23,6 +23,7 @@ export default {
         // index.tsのactionsに設定したパラメータ名を設定
         await store.dispatch("setAuth", true);
       } catch (e) {
+        console.log(e);
         await store.dispatch("setAuth", false);
       }
     });

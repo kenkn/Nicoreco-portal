@@ -41,10 +41,11 @@ export default {
     const router = useRouter();
 
     const login = async () => {
-      await axios.post("login", {
+      const jwt = await axios.post("login", {
         email: email.value,
         password: password.value,
       });
+      console.log(jwt);
 
       await router.push("/");
     };
