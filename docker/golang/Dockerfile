@@ -1,5 +1,7 @@
 FROM golang:1.15-alpine3.12
 
+PROTOCOL := "tcp(nicoreco:3306)"
+
 RUN apk update && \
     apk upgrade && \
     apk add git && \
