@@ -17,5 +17,6 @@ docker-compose up
 
 ### "vue-cli-service: command not found"の解決策
 ```
+cd ui
 rm -rf node_modules package-lock.json && npm install
 ```
