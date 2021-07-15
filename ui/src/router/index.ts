@@ -4,6 +4,7 @@ import Login from '../pages/Login.vue'
 import Register from '../pages/Register.vue'
 import Forgot from '../pages/Forgot.vue'
 import Reset from '../pages/Reset.vue'
+import Question from '../pages/Question.vue'
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', component: Home },
@@ -11,6 +12,7 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/register', component: Register },
   { path: '/forgot', component: Forgot },
   { path: '/reset/:token', component: Reset },
+  { path: '/question', component: Question },
 ]
 
 const router = createRouter({

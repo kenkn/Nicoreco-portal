@@ -10,7 +10,7 @@
       <!-- ログイン済なら表示 -->
       <template v-if="auth">
         <li class="nav-item">
-          <router-link to="/login" class="nav-link">ログアウト</router-link>
+          <router-link to="/login" class="nav-link" @click="logout">ログアウト</router-link>
         </li>
       </template>
       <!-- 未ログインなら表示 -->
@@ -35,17 +35,19 @@ import axios from "axios";
 export default {
   name: "Nav",
   setup() {
-    const store = useStore();
-    const router = useRouter();
-    const auth = computed(() => store.state.auth);
+    const store = useStore()
+    const router = useRouter()
+    const auth = computed(() => store.state.auth)
     const logout = async () => {
-      await axios.post("logout", {});
+      console.log('inkya');
+      await axios.get("logout", {});
       store.dispatch("setAuth", false);
       await router.push("/login");
-    };
+    }
     return {
       auth,
-    };
-  },
-};
+      logout
+    }
+  }
+}
 </script>

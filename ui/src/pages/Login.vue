@@ -36,27 +36,27 @@ import { useRouter } from "vue-router";
 export default {
   name: "Login",
   setup() {
-    const email = ref("");
-    const password = ref("");
-    const router = useRouter();
+    const email = ref("")
+    const password = ref("")
+    const router = useRouter()
 
     const login = async () => {
       const jwt = await axios.post("login", {
         email: email.value,
-        password: password.value,
-      });
-      console.log(jwt);
+        password: password.value
+      })
+      console.log(jwt)
 
-      await router.push("/");
-    };
+      await router.push("/")
+    }
 
     return {
       email,
       password,
-      login,
-    };
-  },
-};
+      login
+    }
+  }
+}
 </script>
  
 <style>
