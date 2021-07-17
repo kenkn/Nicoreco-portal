@@ -38,18 +38,18 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
+import { ref } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 export default {
   name: "Register",
   setup() {
-    const displayName = ref("");
-    const email = ref("");
-    const password = ref("");
-    const passwordConfirm = ref("");
-    const router = useRouter();
+    const displayName = ref("")
+    const email = ref("")
+    const password = ref("")
+    const passwordConfirm = ref("")
+    const router = useRouter()
 
     const submit = async () => {
       // Register apiへPOST
@@ -57,22 +57,22 @@ export default {
         display_name: displayName.value,
         email: email.value,
         password: password.value,
-        password_confirm: passwordConfirm.value,
-      });
+        password_confirm: passwordConfirm.value
+      })
 
       // Login画面に戻る
-      await router.push("/login");
-    };
+      await router.push("/login")
+    }
 
     return {
       displayName,
       email,
       password,
       passwordConfirm,
-      submit,
-    };
-  },
-};
+      submit
+    }
+  }
+}
 </script>
 
 <style>

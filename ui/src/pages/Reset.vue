@@ -2,6 +2,7 @@
   <main class="form-reset">
     <form @submit.prevent="submit">
       <h1 class="h3 mb-3 fw-normal">Please Reset Your Password</h1>
+
       <input
         v-model="password"
         type="password"
@@ -23,36 +24,36 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default {
   name: "Reset",
   setup() {
-    const password = ref("");
-    const passwordConfirm = ref("");
-    const route = useRoute();
-    const router = useRouter();
+    const password = ref("")
+    const passwordConfirm = ref("")
+    const route = useRoute()
+    const router = useRouter()
 
     const submit = async () => {
       await axios.post("reset", {
         // urlからtokenを取得
         token: route.params.token,
         password: password.value,
-        password_confirm: passwordConfirm.value,
-      });
+        password_confirm: passwordConfirm.value
+      })
 
-      await router.push("/login");
-    };
+      await router.push("/login")
+    }
 
     return {
       password,
       passwordConfirm,
-      submit,
-    };
-  },
-};
+      submit
+    }
+  }
+}
 </script>
 
 <style>

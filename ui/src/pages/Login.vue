@@ -28,9 +28,9 @@
 </template>
  
 <script>
-import { ref } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 // TODO ログイン失敗時の挙動を設定する
 export default {

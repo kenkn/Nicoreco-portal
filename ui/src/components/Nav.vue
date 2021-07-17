@@ -27,10 +27,10 @@
 </template>
 
 <script>
-import { computed } from "vue";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
-import axios from "axios";
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default {
   name: "Nav",
@@ -39,10 +39,9 @@ export default {
     const router = useRouter()
     const auth = computed(() => store.state.auth)
     const logout = async () => {
-      console.log('inkya');
-      await axios.get("logout", {});
-      store.dispatch("setAuth", false);
-      await router.push("/login");
+      await axios.get("logout", {})
+      store.dispatch("setAuth", false)
+      await router.push("/login")
     }
     return {
       auth,

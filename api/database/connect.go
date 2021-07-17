@@ -1,3 +1,8 @@
+//
+// connect.go
+// DBに接続
+//
+
 package database
 
 import (
@@ -20,6 +25,7 @@ var (
 
 func Connect() {
 	connection, err := gorm.Open(mysql.Open(datasourceName), &gorm.Config{})
+	// DNSサーバが見つからなかった場合
 	if err != nil {
 		panic("Could not connect to the database")
 	}

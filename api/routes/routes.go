@@ -1,8 +1,12 @@
+//
+// routes.go
+// ルータ
+//
+
 package routes
 
 import (
 	"auth-api/controllers"
-
 	"github.com/gofiber/fiber/v2"
 )
 

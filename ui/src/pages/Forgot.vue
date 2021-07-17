@@ -13,45 +13,45 @@
         required
       />
 
-      <button class="w-100 btn-lg btn-primary" type="submit">ログイン</button>
+      <button class="w-100 btn-lg btn-primary" type="submit">送信</button>
     </form>
   </main>
 </template>
 
 <script>
-import { reactive, ref } from "vue";
-import axios from "axios";
+import { reactive, ref } from 'vue'
+import axios from 'axios'
 
 export default {
   name: "Forgot",
   setup() {
-    const email = ref("");
+    const email = ref("")
     // メール送信結果を格納
     const notify = reactive({
       cls: "",
-      message: "",
-    });
+      message: ""
+    })
     const forgot = () => {
       try {
         // forgot apiへリクエスト送信
         axios.post("forgot", {
-          email: email.value,
-        });
-        notify.cls = "success";
-        notify.message = "Email was sent!!";
+          email: email.value
+        })
+        notify.cls = "success"
+        notify.message = "Email was sent!!"
       } catch (e) {
-        notify.cls = "danger";
-        notify.message = "Email does not exit!!";
+        notify.cls = "danger"
+        notify.message = "Email does not exit!!"
       }
-    };
+    }
 
     return {
       email,
       notify,
-      forgot,
-    };
-  },
-};
+      forgot
+    }
+  }
+}
 </script>
 
 <style>
