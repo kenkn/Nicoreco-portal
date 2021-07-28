@@ -1,35 +1,35 @@
 <template>
   <aside class="main-sidebar">
-    <!-- sidebar: style can be found in sidebar.less -->
+    <!-- サイドバー -->
     <section class="sidebar">
-      <!-- Sidebar user panel (optional) -->
+      <!-- ユーザ情報 -->
       <div class="user-panel">
-        <div class="pull-left image">
-          <img :src="user.avatar" />
-        </div>
+        <!-- <div class="pull-left image"> -->
+          <!-- <img :src="user.avatar" /> -->
+        <!-- </div> -->
         <div class="pull-left info">
+          <!-- TODO ユーザのdisplayNameに置き換える -->
           <div>
-            <p class="white">{{ user.displayName }}</p>
+            <p class="white">陰キャワイ</p>
           </div>
           <a href="javascript:;">
-            <i class="fa fa-circle text-success"></i> INKYA
+            <i class="fa fa-circle text-success"></i> ONLINE
           </a>
         </div>
       </div>
 
-      <!-- search form (Optional) -->
+      <!-- 検索ウインドウ -->
       <form v-on:submit.prevent class="sidebar-form" id="searchForm">
         <div class="input-group" id="searchContainer">
           <span class="input-group-btn">
-            <input type="text" name="search" id="search" class="search form-control" data-toggle="hideseek" p
-              laceholder="Search Menus" data-list=".sidebar-menu" />
+            <input type="text" name="search" id="search" class="search form-control" data-toggle="hideseek"
+              placeholder="検索" data-list=".sidebar-menu" />
             <button type="submit" name="search" id="search-btn" class="btn btn-flat">
               <i class="fa fa-search"></i>
             </button>
           </span>
         </div>
       </form>
-      <!-- /.search form -->
 
       <!-- Sidebar Menu -->
       <sidebar-menu />

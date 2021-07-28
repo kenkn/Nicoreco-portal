@@ -25,7 +25,6 @@
     </router-link>
 
     <li class="header">プライベート</li>
-
     <!-- TODO 動的スレッド表示にする(もしくはなくす？) -->
     <li class="treeview">
       <a href="#">

@@ -2,23 +2,24 @@
   <div :class="{'wrapper': classes}">
     <!-- Horizontal bar at top. Contains messages, notifications, tasks and user menu -->
     <!-- <dash-header :user="user"></dash-header> -->
+    <sidebar/>
     <Nav/>
     <!-- Left side column. contains the logo and sidebar -->
-    <sidebar/>
+    
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
       <section class="content-header">
         <h1>
-          {{ $route.name.toUpperCase() }}
+          {{ $route.name }}
           <small>{{ $route.meta.description }}</small>
         </h1>
         <ol class="breadcrumb">
           <li>
             <a href="javascript:;"> <i class="fa fa-home"></i>Home</a>
           </li>
-          <li class="active">{{ $route.name.toUpperCase() }}</li>
+          <li class="active">{{ $route.name }}</li>
         </ol>
       </section>
 
@@ -29,7 +30,7 @@
     <!-- /.content-wrapper -->
 
     <!-- Horizontal bar at bottom. Contains copy right -->
-    <dash-footer/>
+    <!-- <dash-footer/> -->
   </div>
 </template>
 
