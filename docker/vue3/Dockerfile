@@ -10,4 +10,6 @@ RUN apk update && \
 
 ADD ./ui/package.json /app
 
-RUN npm install
+
+RUN npm install --save --legacy-peer-deps sass-loader@10.1.1 sass webpack && \
+    npm install
