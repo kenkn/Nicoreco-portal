@@ -1,6 +1,7 @@
-FROM golang:1.15-alpine3.12
+FROM golang:1.17
 
-PROTOCOL := "tcp(nicoreco:3306)"
+# Mac用?
+# PROTOCOL := "tcp(nicoreco:3306)"
 
 RUN apk update && \
     apk upgrade && \
@@ -11,7 +12,7 @@ RUN apk update && \
 RUN go get github.com/cespare/reflex
 ENV CGO_ENABLED=0
 
-WORKDIR /go/src/api
+WORKDIR /go/src/api                                                                                             
 COPY ./api ./
 
 RUN go mod download

@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	schema = "%s:%s@tcp(mysql:3306)/%s?charset=utf8&parseTime=True&loc=Local"
+	schema = "%s:%s@tcp(mysql:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local"
 	// docker-compose.ymlに設定した環境変数を取得
 	username       = os.Getenv("MYSQL_USER")
 	password       = os.Getenv("MYSQL_PASSWORD")

@@ -10,10 +10,35 @@
       />
 
       <input
+        v-model="userID"
+        class="form-control"
+        placeholder="ユーザID"
+        required
+      />
+
+      <select
+        v-model="grade"
+        class="form-control"
+        required
+      >
+        <option disabled value="">学年</option>
+        <option>学部1年</option>
+        <option>学部2年</option>
+        <option>学部3年</option>
+        <option>学部4年</option>
+        <option>修士1年</option>
+        <option>修士2年</option>
+        <option>博士1年</option>
+        <option>博士2年</option>
+        <option>博士3年</option>
+      </select>
+
+      <!-- TODO 山口大学メールアドレスのみを許容するバリデーションの実装 -->
+      <input
         v-model="email"
         type="email"
         class="form-control"
-        placeholder="Email"
+        placeholder="山口大学メールアドレス"
         required
       />
 
@@ -21,14 +46,15 @@
         v-model="password"
         type="password"
         class="form-control"
-        placeholder="Password"
+        placeholder="パスワード"
         required
       />
+      
       <input
         v-model="passwordConfirm"
         type="password"
         class="form-control"
-        placeholder="Password Confirm"
+        placeholder="パスワード(確認)"
         required
       />
 
@@ -45,19 +71,23 @@ import { useRouter } from 'vue-router'
 export default {
   name: "Register",
   setup() {
-    const displayName = ref("")
-    const email = ref("")
-    const password = ref("")
+    const displayName     = ref("")
+    const userID          = ref("")
+    const grade           = ref("")
+    const email           = ref("")
+    const password        = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
 
     const submit = async () => {
       // Register apiへPOST
       await axios.post("register", {
-        display_name: displayName.value,
-        email: email.value,
-        password: password.value,
-        password_confirm: passwordConfirm.value
+        display_name     : displayName.value,
+        user_id          : userID.value,
+        grade            : grade.value,
+        email            : email.value,
+        password         : password.value,
+        password_confirm : passwordConfirm.value
       })
 
       // Login画面に戻る
@@ -66,6 +96,8 @@ export default {
 
     return {
       displayName,
+      userID,
+      grade,
       email,
       password,
       passwordConfirm,
