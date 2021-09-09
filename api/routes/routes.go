@@ -11,10 +11,14 @@ import (
 )
 
 func Setup(app *fiber.App) {
-	app.Post("/api/register", controllers.Register)	
-	app.Post("/api/login", controllers.Login)
-	app.Get("/api/user", controllers.User)
-	app.Get("/api/logout", controllers.Logout)
-	app.Post("/api/forgot", controllers.Forgot)
-	app.Post("/api/reset", controllers.Reset)
+	route := app.Group("/api")
+
+	route.Post("/register", controllers.Register)	
+	route.Post("/login", controllers.Login)
+	route.Get("/user", controllers.User)
+	route.Get("/logout", controllers.Logout)
+	route.Post("/forgot", controllers.Forgot)
+	route.Post("/reset", controllers.Reset)
+	route.Get("/question/:subject", controllers.Question)
+	route.Post("/qpost", controllers.PostQuestion)
 }
