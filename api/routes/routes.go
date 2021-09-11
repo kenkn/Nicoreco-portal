@@ -22,4 +22,8 @@ func Setup(app *fiber.App) {
 	route.Get("/question/:subject", controllers.Question)
 	route.Post("/post/question", controllers.PostQuestion)
 	route.Post("/lgtm", controllers.Lgtm)
+	route.Get("/answer/:parent_id", controllers.Answer)
+	route.Post("/answer/post", controllers.PostAnswer)
+	route.Get("/reply/:parent_id", controllers.Reply)
+	route.Post("/reply/post", controllers.PostReply)
 }

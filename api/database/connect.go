@@ -37,5 +37,7 @@ func Connect() {
 		&models.User{}, 
 		&models.PasswordReset{}, 
 		&models.Question{},
+		&models.Answer{},
+		&models.Reply{},
 	)
 }
