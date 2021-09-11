@@ -20,5 +20,6 @@ func Setup(app *fiber.App) {
 	route.Post("/forgot", controllers.Forgot)
 	route.Post("/reset", controllers.Reset)
 	route.Get("/question/:subject", controllers.Question)
-	route.Post("/qpost", controllers.PostQuestion)
+	route.Post("/post/question", controllers.PostQuestion)
+	route.Post("/lgtm", controllers.Lgtm)
 }

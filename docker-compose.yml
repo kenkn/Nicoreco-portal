@@ -29,7 +29,7 @@ services:
     command: npm run serve
 
   mysql:
-    # platform: linux/x86_64 # M1 Mac用
+    platform: linux/x86_64 # M1 Mac用
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: admin

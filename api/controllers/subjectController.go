@@ -8,6 +8,7 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -41,6 +42,23 @@ func PostQuestion(c *fiber.Ctx) error {
 	}
 
 	database.DB.Create(&question)
+
+	return c.JSON(question)
+
+}
+
+func Lgtm(c *fiber.Ctx) error {
+
+	var data map[string]string
+	// リクエストデータをパース
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	lgtm, _ := strconv.Atoi(data["id"])
+
+	var question models.Question
+	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", lgtm+1)
 
 	return c.JSON(question)
 
