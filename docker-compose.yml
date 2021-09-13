@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   api:
     build:
@@ -17,7 +17,7 @@ services:
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: go_auth
     links:
-      - "smtp"
+      - 'smtp'
   ui:
     build:
       context: .
@@ -29,14 +29,15 @@ services:
     command: npm run serve
 
   mysql:
-    image: mysql:5.7.22
+    platform: linux/x86_64 # M1 Mac用
+    image: mysql:5.7
     environment:
-        MYSQL_ROOT_PASSWORD: admin
-        MYSQL_USER: admin
-        MYSQL_PASSWORD: admin
-        MYSQL_DATABASE: go_auth
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: go_auth
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - ./mysql/data:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
@@ -45,17 +46,17 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-        - PMA_ARBITRARY=1
-        - PMA_HOST=mysql
-        - PMA_USER=admin
-        - PMA_PASSWORD=admin
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=admin
+      - PMA_PASSWORD=admin
     links:
-        - mysql
+      - mysql
     ports:
-        - 8888:80
+      - 8888:80
 
   smtp:
     image: mailhog/mailhog
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - '1025:1025'
+      - '8025:8025'

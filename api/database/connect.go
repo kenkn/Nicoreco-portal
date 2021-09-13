@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	schema = "%s:%s@tcp(mysql:3306)/%s?charset=utf8&parseTime=True&loc=Local"
+	schema = "%s:%s@tcp(mysql:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local"
 	// docker-compose.ymlに設定した環境変数を取得
 	username       = os.Getenv("MYSQL_USER")
 	password       = os.Getenv("MYSQL_PASSWORD")
@@ -33,6 +33,11 @@ func Connect() {
 	// コネクション情報を追加
 	DB = connection
 
-	connection.AutoMigrate(&models.User{})
-	connection.AutoMigrate(&models.User{}, &models.PasswordReset{})
+	connection.AutoMigrate(
+		&models.User{}, 
+		&models.PasswordReset{}, 
+		&models.Question{},
+		&models.Answer{},
+		&models.Reply{},
+	)
 }

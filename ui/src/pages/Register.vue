@@ -35,7 +35,6 @@
         <option>博士3年</option>
       </select>
 
-      <!-- TODO 山口大学メールアドレスのみを許容するバリデーションの実装 -->
       <VeeField
         name="email"
         v-model="email"
@@ -85,9 +84,11 @@ export default {
       ErrorMessage,
   },
   setup() {
-    const displayName = ref("")
-    const email = ref("")
-    const password = ref("")
+    const displayName     = ref("")
+    const userID          = ref("")
+    const grade           = ref("")
+    const email           = ref("")
+    const password        = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
     // バリデーション
@@ -105,10 +106,12 @@ export default {
     const submit = async () => {
       // Register apiへPOST
       await axios.post("register", {
-        display_name: displayName.value,
-        email: email.value,
-        password: password.value,
-        password_confirm: passwordConfirm.value
+        display_name     : displayName.value,
+        user_id          : userID.value,
+        grade            : grade.value,
+        email            : email.value,
+        password         : password.value,
+        password_confirm : passwordConfirm.value
       })
 
       // Login画面に戻る
@@ -117,6 +120,8 @@ export default {
 
     return {
       displayName,
+      userID,
+      grade,
       email,
       password,
       passwordConfirm,

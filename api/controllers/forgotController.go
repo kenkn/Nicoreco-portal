@@ -24,8 +24,11 @@ import (
 // 例外処理 : 
 // 	* リクエストデータのパースに失敗した場合に例外を発行
 //	* メール送信失敗時に例外を発行
+// TODO :
+// 	Tokenの被りをはじく
 func Forgot(c *fiber.Ctx) error {
-
+	
+	RandStringWordCount := 12
 	var data map[string]string
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
@@ -33,7 +36,7 @@ func Forgot(c *fiber.Ctx) error {
 	}
 
 	// 12文字のランダム文字列を生成
-	token := RandStringRunes(12)
+	token := RandStringRunes(RandStringWordCount)
 	passwordReset := models.PasswordReset {
 		Email : data["email"],
 		Token : token,
@@ -43,6 +46,7 @@ func Forgot(c *fiber.Ctx) error {
 	database.DB.Create(&passwordReset)
  
 	// メール受信側の情報
+	// TODO 送信元アドレスの変更
 	from := "skt7tp@gmail.com"
 	to := []string{
 		data["email"],
@@ -117,7 +121,7 @@ func Reset(c *fiber.Ctx) error {
 	}
 
 	var passwordReset = models.PasswordReset{}
-	// JWT Tokenからデータを取得
+	// Tokenからデータを取得
 	err := database.DB.Where("token = ?", data["token"]).Last(&passwordReset)
 	// 未発行トークンだった場合
 	if err.Error != nil {

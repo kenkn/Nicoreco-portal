@@ -105,8 +105,10 @@ func Register(c *fiber.Ctx) error {
 	
 	user := models.User {
 		DisplayName : data["display_name"],
-		Email 	  : data["email"],
-		Password  : password,
+		UserID		: data["user_id"],
+		Grade		: data["grade"],
+		Email 	  	: data["email"],
+		Password  	: password,
 	}
 
 	// データ登録(CreateはGORMメソッド)
