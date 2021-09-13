@@ -2,5 +2,20 @@
     "files.associations": {
         "*.ttml": "xml",
         "*.ttss": "css"
-    }
+    },
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "nicoreco",
+            "username": "admin",
+            "password": "admin",
+            "database": "go_auth"
+        }
+    ]
 }
