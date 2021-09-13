@@ -1,6 +1,6 @@
 FROM golang:1.17
 
-# Mac用?
+# Mac用
 # PROTOCOL := "tcp(nicoreco:3306)"
 
 RUN apk update && \
