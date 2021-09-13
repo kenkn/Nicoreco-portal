@@ -4,6 +4,8 @@ import Login from '../pages/Login.vue'
 import Register from '../pages/Register.vue'
 import Forgot from '../pages/Forgot.vue'
 import Reset from '../pages/Reset.vue'
+import Subjects from '../pages/Subjects.vue'
+import Questions from '../pages/Questions.vue'
 import Question from '../pages/Question.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -12,7 +14,14 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/register', component: Register },
   { path: '/forgot', component: Forgot },
   { path: '/reset/:token', component: Reset },
-  { path: '/question', component: Question },
+  // 講義一覧ページ
+  { path: '/question', component: Subjects },
+  // 講義の質問一覧ページ
+  { path: '/question/:subject', component: Questions },
+  // 質問の詳細ページ
+  { path: '/question/:subject/:question_id', component: Question },
+  
+
 ]
 
 const router = createRouter({

@@ -1,32 +1,14 @@
 <template>
-  <aside class="main-sidebar">
+  <aside class="main-sidebar p-2">
     <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
-      <!-- Sidebar user panel (optional) -->
-      <div class="user-panel">
-        <div class="pull-left image">
-          <img :src="user.avatar" />
-        </div>
-        <div class="pull-left info">
-          <div>
-            <p class="white">{{ user.displayName }}</p>
-          </div>
-          <a href="javascript:;">
-            <i class="fa fa-circle text-success"></i> INKYA
-          </a>
-        </div>
-      </div>
+    <nav class="sidebar ">
 
       <!-- search form (Optional) -->
-      <form v-on:submit.prevent class="sidebar-form" id="searchForm">
+      <form v-on:submit.prevent class="sidebar-form p-2 pb-2 border-bottom" id="searchForm">
         <div class="input-group" id="searchContainer">
-          <span class="input-group-btn">
-            <input type="text" name="search" id="search" class="search form-control" data-toggle="hideseek" p
-              laceholder="Search Menus" data-list=".sidebar-menu" />
-            <button type="submit" name="search" id="search-btn" class="btn btn-flat">
-              <i class="fa fa-search"></i>
-            </button>
-          </span>
+          <input type="text" name="search" id="search" class="search form-control" data-toggle="hideseek" 
+          placeholder="Search Menus" data-list=".sidebar-menu" />
+          <!-- <button type="submit" name="search" id="search-btn" class="btn bbtn-primary">Search</button> -->
         </div>
       </form>
       <!-- /.search form -->
@@ -34,7 +16,7 @@
       <!-- Sidebar Menu -->
       <sidebar-menu />
       <!-- /.sidebar-menu -->
-    </section>
+    </nav>
     <!-- /.sidebar -->
   </aside>
 </template>

@@ -1,39 +1,73 @@
 <template>
   <main class="form-register">
-    <form @submit.prevent="submit">
+    <VeeForm @submit.prevent="submit" :validation-schema="schema">
       <h1 class="h3 mb-3 fw-normal">ユーザー登録</h1>
-      <input
+      <VeeField
+        name="displayName"
         v-model="displayName"
         class="form-control"
         placeholder="表示名"
-        required
       />
+      <ErrorMessage name="displayName" />
 
-      <input
+      <VeeField
+        name="userID"
+        v-model="userID"
+        class="form-control"
+        placeholder="ユーザID"
+      />
+      <ErrorMessage name="userID" />
+
+      <select
+        v-model="grade"
+        class="form-control"
+        required
+      >
+        <option disabled value="">学年</option>
+        <option>学部1年</option>
+        <option>学部2年</option>
+        <option>学部3年</option>
+        <option>学部4年</option>
+        <option>修士1年</option>
+        <option>修士2年</option>
+        <option>博士1年</option>
+        <option>博士2年</option>
+        <option>博士3年</option>
+      </select>
+
+      <!-- TODO 山口大学メールアドレスのみを許容するバリデーションの実装 -->
+      <VeeField
+        name="email"
         v-model="email"
         type="email"
         class="form-control"
-        placeholder="Email"
+        placeholder="山口大学メールアドレス"
         required
       />
+      <ErrorMessage name="email" />
 
-      <input
+      <VeeField
+        name="password"
         v-model="password"
         type="password"
         class="form-control"
-        placeholder="Password"
+        placeholder="パスワード"
         required
       />
-      <input
+      <ErrorMessage name="password" />
+      
+      <VeeField
+        name="passwordConfirm"
         v-model="passwordConfirm"
         type="password"
         class="form-control"
-        placeholder="Password Confirm"
+        placeholder="パスワード(確認)"
         required
       />
+      <ErrorMessage name="passwordConfirm" />
 
       <button class="w-100 btn btn-lg btn-primary" type="submit">登録</button>
-    </form>
+    </VeeForm>
   </main>
 </template>
 
@@ -41,15 +75,32 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-
+import { Form as VeeForm, Field as VeeField, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 export default {
   name: "Register",
+    components: {
+      VeeForm,
+      VeeField,
+      ErrorMessage,
+  },
   setup() {
     const displayName = ref("")
     const email = ref("")
     const password = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
+    // バリデーション
+    const schema = yup.object({
+      displayName: yup.string().required("この項目は必須です"),
+      userID: yup.string().required("この項目は必須です")
+        .matches("^[0-9a-zA-Z]+$", "ユーザーIDは半角英数で入力してください").min(8, "ユーザIDは8文字以上で入力してください"),
+      email: yup.string().required("この項目は必須です")
+        .matches("^[0-9a-zA-Z]+@yamaguchi-u.ac.jp$", "山口大学のメールアドレスを入力してください"),
+      password: yup.string().required("この項目は必須です").min(8, "パスワードは8文字以上で入力してください"),
+      passwordConfirm: yup.string().required("この項目は必須です")
+        .oneOf([yup.ref("password")], "パスワードが一致しません")
+    });
 
     const submit = async () => {
       // Register apiへPOST
@@ -69,6 +120,7 @@ export default {
       email,
       password,
       passwordConfirm,
+      schema,
       submit
     }
   }
