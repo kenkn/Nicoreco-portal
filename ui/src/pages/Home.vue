@@ -18,6 +18,7 @@ export default {
     onMounted(async () => {
       try {
         const { data } = await axios.get("user")
+        console.log(data)
         message.value = `こんにちは．${data.display_name} さん`
 
         // index.tsのactionsに設定したパラメータ名を設定

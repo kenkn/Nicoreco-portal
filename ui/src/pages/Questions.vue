@@ -3,17 +3,17 @@
     <h1 class="p-3">{{ subject }}の質問一覧</h1>
     <div v-if="questions">
       <ul class="list-group">
-        <li v-for="question in questions" :key="question.pk" class="list-group-item">
+        <li v-for="question in questions" :key="question.id" class="list-group-item">
           <div class="row">
             <div class="col-6 col-md-8 col-lg-10 btn">
-              <router-link tag="li" class="pageLink" v-bind:to="'/question/' + subject  + '/' + question.pk">
+              <router-link tag="li" class="pageLink" v-bind:to="'/question/' + subject  + '/' + question.id">
                 <p>{{ question.title }}</p>
               </router-link>
-              <p class="text-right text-secondary m-0">更新日時:{{ question.updated_at }}</p>
+              <p class="text-right text-secondary m-0">更新日時:{{ question.created_at }}</p>
             </div>
             <div class="col-3 col-md-2 col-lg-1">
               <div>
-                <p class="text-center text-secondary m-0 p-2">{{ question.good }}</p>
+                <p class="text-center text-secondary m-0 p-2">{{ question.lgtm }}</p>
               </div>
               <div>
                 <p class="text-center text-secondary m-0 p-2">Good</p>
@@ -21,7 +21,7 @@
             </div>
             <div class="col-3 col-md-2 col-lg-1">
               <div>
-                <p class="text-center text-secondary m-0 p-2">{{ question.answers }}</p>
+                <p class="text-center text-secondary m-0 p-2">{{ answer }}</p>
               </div>
               <div>
                 <p class="text-center text-secondary m-0 p-2">回答数</p>
@@ -46,33 +46,40 @@
 </template>
  
 <script>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import subjectData from '../data/subject-data.json'
 
 export default {
   name: "Questions",
-  setup() {
-    const subject = "高度ものづくり創成演習Ⅰ"
-    const questions = []
-    const question = {
-      pk: 1,
-      title: "～について",
-      good: 3,
-      answers: 5,
-      created_at: Date.now(),
-      updated_at: Date(1999, 11, 31, 23, 59, 59),
+  data() {
+    let code = ''
+    const subject = ref("")
+    const questions = ref({})
+    const answer = ref()
+    for (const d of subjectData) {
+      if (d.code === this.$route.params.subject) {
+        subject.value = d.name
+        code = d.code
+      }
     }
-    questions.push(question) 
-    questions.push({
-      pk: 2,
-      title: "～~~~~~~~~~~~~~~について",
-      good: 3,
-      answers: 5,
-      created_at: Date.now(),
-      updated_at: Date.now(),
+    onMounted(async () => {
+      try {
+        const url = "question/" + code
+        const { data } = await axios.get(url)
+        questions.value = data
+      } catch (e) {
+        console.log(e)
+      }
     })
+
+    // TODO 回答数をモデルに追加した後実装する
+    answer.value = 77777
 
     return {
       subject,
-      questions
+      questions,
+      answer
     }
   }
 };
