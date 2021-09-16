@@ -8,7 +8,7 @@
             <span>タイトル:</span>
             <input v-model="title" type="text" class="form-control w-100" required />
             <p class="m-0 py-2">本文:</p>
-            <textarea v-model="Body" class="form-control p-1 my-2 mb-4" rows="4" required />
+            <textarea v-model="body" class="form-control p-1 my-2 mb-4" rows="4" required />
             <button class="btn btn-outline-primary w-100" type="submit">質問を送信</button>
           </div>
         </form>
@@ -28,8 +28,8 @@ export default {
     let code = ""
     let Subject = ""
     const QuestionerID = ""
-    const Title = ref("")
-    const Body = ref("")
+    const title = ref("")
+    const body = ref("")
     const Lgtm = 0
     const router = useRouter()
     // URLから講義codeを取得しjsonから講義名を取得
@@ -39,25 +39,25 @@ export default {
         code = d.code
       }
     }
+
     const submit = async () => {
+      const userData = await axios.get("user")
       // 確認(いらんかったら消してください) 
       if(window.confirm('送信します')) {
-      // apiに送信
-      // await axios.post("register", {
-      //   questioner_id    : QuestionerID,
-      //   subject          : Subject,
-      //   title            : Title.value,
-      //   body             : Body.value,
-      //   lgtm             : Lgtm
-      // })
+        await axios.post("/question/post", {
+          questioner_id : userData.user_id,
+          subject       : this.$route.params.subject,
+          title         : title.value,
+          body          : body.value
+        })
         await router.push("/question/" + code + "/")
       }
       else { return false; }
     }  
     return {
       Subject,
-      Title,
-      Body,
+      title,
+      body,
       submit
     }
   },

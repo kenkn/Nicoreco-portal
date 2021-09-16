@@ -2,17 +2,20 @@
   <div class="container">
     <div class="">
       <h1 class="p-3 d-inline-block">{{ subject }}の質問一覧</h1>
-      <router-link class="pageLink d-inline p-3" :to="'/question/' + code + '/create'">
+      <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
+        <button type="button" class="btn btn-primary">ログインして質問する</button>
+      </router-link>
+      <router-link v-else class="pageLink d-inline p-3" :to="'/question/' + code + '/create'">
         <button type="button" class="btn btn-primary">質問する</button>
       </router-link>
     </div>
     
-    <div v-if="questions==null">
+    <div v-if="questions!=null">
       <ul class="list-group">
-        <li v-for="question in questions" :key="question.id" class="list-group-item">
+        <li v-for="question in questions" :key="question.ID" class="list-group-item">
           <div class="row">
             <div class="col-6 col-md-8 col-lg-10 btn">
-              <router-link tag="li" class="pageLink" v-bind:to="'/question/' + subject  + '/' + question.id">
+              <router-link tag="li" class="pageLink" v-bind:to="$route.path  + '/' + question.ID">
                 <p>{{ question.title }}</p>
               </router-link>
               <p class="text-right text-secondary m-0">更新日時:{{ question.created_at }}</p>
@@ -52,13 +55,18 @@
 </template>
  
 <script>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { useStore } from 'vuex'
 import axios from 'axios'
 import subjectData from '../data/subject-data.json'
+import { useRouter } from 'vue-router';
 
 export default {
   name: "Questions",
   data() {
+    const store = useStore()
+    const router = useRouter()
+    const auth = computed(() => store.state.auth)
     let code = ''
     const subject = ref("")
     const questions = ref({})
@@ -83,6 +91,7 @@ export default {
     answer.value = 77777
 
     return {
+      auth,
       subject,
       code,
       questions,

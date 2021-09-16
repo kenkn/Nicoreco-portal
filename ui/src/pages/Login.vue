@@ -22,7 +22,7 @@
         <router-link to="/forgot">パスワードを忘れましたか？</router-link>
       </div>
 
-      <button class="w-100 btn-lg btn-primary" type="submit">Login</button>
+      <button class="w-100 btn-lg btn-primary" type="submit">ログイン</button>
     </form>
   </main>
 </template>
@@ -41,11 +41,10 @@ export default {
     const router = useRouter()
 
     const login = async () => {
-      const jwt = await axios.post("login", {
+      await axios.post("login", {
         email: email.value,
         password: password.value
       })
-      console.log(jwt)
 
       await router.push("/")
     }
