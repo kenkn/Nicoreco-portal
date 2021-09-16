@@ -1,5 +1,5 @@
 <template>
-  <aside class="main-sidebar p-2">
+  <aside class="main-sidebar p-2 pt-5 pt-md-2">
     <!-- sidebar: style can be found in sidebar.less -->
     <nav class="sidebar ">
 
