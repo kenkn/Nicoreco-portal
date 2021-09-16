@@ -27,7 +27,7 @@ export default {
   data() {
     let code = ""
     let Subject = ""
-    const QuestionerID = "syouhei"
+    const QuestionerID = ""
     const Title = ref("")
     const Body = ref("")
     const Lgtm = 0
@@ -44,11 +44,11 @@ export default {
       if(window.confirm('送信します')) {
       // apiに送信
       // await axios.post("register", {
-      //   questioner_id    : QuestionerID.value,
+      //   questioner_id    : QuestionerID,
       //   subject          : Subject,
       //   title            : Title.value,
       //   body             : Body.value,
-      //   lgtm             : Lgtm.value
+      //   lgtm             : Lgtm
       // })
         await router.push("/question/" + code + "/")
       }
