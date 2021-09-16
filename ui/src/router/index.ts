@@ -7,6 +7,7 @@ import Reset from '../pages/Reset.vue'
 import Subjects from '../pages/Subjects.vue'
 import Questions from '../pages/Questions.vue'
 import Question from '../pages/Question.vue'
+import CreateQuestion from '../pages/CreateQuestion.vue'
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', component: Home },
@@ -18,6 +19,8 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/question', component: Subjects },
   // 講義の質問一覧ページ
   { path: '/question/:subject', component: Questions },
+  // 新規質問の作成ページ
+  { path: '/question/:subject/create', component: CreateQuestion },
   // 質問の詳細ページ
   { path: '/question/:subject/:question_id', component: Question },
 ]
