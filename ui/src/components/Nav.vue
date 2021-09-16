@@ -1,12 +1,12 @@
 <template>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
         <router-link to="/" class="nav-link">Nicoreco</router-link>
       </li>
     </ul>
 
-    <ul class="navbar-nav my-2 my-lg-0">
+    <ul class="navbar-nav my-sm-0">
       <!-- ログイン済なら表示 -->
       <template v-if="auth">
         <li class="nav-item">

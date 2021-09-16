@@ -41,7 +41,6 @@
         type="email"
         class="form-control"
         placeholder="山口大学メールアドレス"
-        required
       />
       <ErrorMessage name="email" />
 
@@ -51,7 +50,6 @@
         type="password"
         class="form-control"
         placeholder="パスワード"
-        required
       />
       <ErrorMessage name="password" />
       
@@ -61,7 +59,6 @@
         type="password"
         class="form-control"
         placeholder="パスワード(確認)"
-        required
       />
       <ErrorMessage name="passwordConfirm" />
 
@@ -95,7 +92,7 @@ export default {
     const schema = yup.object({
       displayName: yup.string().required("この項目は必須です"),
       userID: yup.string().required("この項目は必須です")
-        .matches("^[0-9a-zA-Z]+$", "ユーザーIDは半角英数で入力してください").min(8, "ユーザIDは8文字以上で入力してください"),
+        .matches("^[0-9a-zA-Z]+$", "ユーザーIDは半角英数で入力してください").min(3, "ユーザIDは3文字以上で入力してください"),
       email: yup.string().required("この項目は必須です")
         .matches("^[0-9a-zA-Z]+@yamaguchi-u.ac.jp$", "山口大学のメールアドレスを入力してください"),
       password: yup.string().required("この項目は必須です").min(8, "パスワードは8文字以上で入力してください"),
