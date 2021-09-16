@@ -20,8 +20,6 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/question/:subject', component: Questions },
   // 質問の詳細ページ
   { path: '/question/:subject/:question_id', component: Question },
-  
-
 ]
 
 const router = createRouter({
