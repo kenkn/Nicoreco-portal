@@ -1,7 +1,13 @@
 <template>
   <div class="container">
-    <h1 class="p-3">{{ subject }}の質問一覧</h1>
-    <div v-if="questions">
+    <div class="">
+      <h1 class="p-3 d-inline-block">{{ subject }}の質問一覧</h1>
+      <router-link class="pageLink d-inline p-3" :to="'/question/' + code + '/create'">
+        <button type="button" class="btn btn-primary">質問する</button>
+      </router-link>
+    </div>
+    
+    <div v-if="questions==null">
       <ul class="list-group">
         <li v-for="question in questions" :key="question.id" class="list-group-item">
           <div class="row">
@@ -33,7 +39,7 @@
       </ul>
     </div>
     <div v-else>
-      <h3 class="m-5">
+      <h3 class="p-3">
         質問はまだありません
       </h3>
     </div>
@@ -78,6 +84,7 @@ export default {
 
     return {
       subject,
+      code,
       questions,
       answer
     }

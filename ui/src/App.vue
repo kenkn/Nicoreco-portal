@@ -1,12 +1,14 @@
 <template>
   <div class="h-100">
     <Nav />
-    <main class="container-fluid h-auto row p-0 pt-5 m-0">
-      <div class="col-12 col-md-2">
-        <Sidebar />
-      </div>
-      <div class="container col-12 col-md-10 h-auto border-left overflow-auto">
-        <router-view />
+    <main class="container-fluid h-100 pt-5 m-0">
+      <div class="row h-100">
+        <div class="col-md-2 h-auto">
+          <Sidebar />
+        </div>
+        <div class="col-md-10 h-100 border-left">
+          <router-view />
+        </div>
       </div>
     </main>
   </div>
