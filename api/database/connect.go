@@ -6,11 +6,12 @@
 package database
 
 import (
+	"auth-api/models"
 	"fmt"
 	"os"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"auth-api/models"
 )
 
 var (
@@ -20,7 +21,7 @@ var (
 	password       = os.Getenv("MYSQL_PASSWORD")
 	dbName         = os.Getenv("MYSQL_DATABASE")
 	datasourceName = fmt.Sprintf(schema, username, password, dbName)
-	DB *gorm.DB		// DBインスタンス
+	DB             *gorm.DB // DBインスタンス
 )
 
 func Connect() {
@@ -34,10 +35,11 @@ func Connect() {
 	DB = connection
 
 	connection.AutoMigrate(
-		&models.User{}, 
-		&models.PasswordReset{}, 
+		&models.User{},
+		&models.PasswordReset{},
 		&models.Question{},
 		&models.Answer{},
 		&models.Reply{},
+		&models.Lgtm{},
 	)
 }
