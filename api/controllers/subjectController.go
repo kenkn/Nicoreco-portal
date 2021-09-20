@@ -68,6 +68,7 @@ func PostQuestion(c *fiber.Ctx) error {
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
 //  * id : LGTMする質問のID
+//  * user_id : LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
@@ -79,12 +80,26 @@ func Lgtm(c *fiber.Ctx) error {
 		return err
 	}
 
-	// リクエストデータをint型にキャスト
-	lgtm, _ := strconv.Atoi(data["id"])
+	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	pressed := []models.Lgtm{}
+	database.DB.Where("user_id = ?", data["user_id"]).Find(&pressed)
+	if len(pressed) == 1 {
+		database.DB.Where("user_id = ?", data["user_id"]).Delete(&pressed[0])
+	} else {
+		parent_id, _ := strconv.Atoi(data["id"])
+		parent_id_uint := uint(parent_id)
+		lgtm := models.Lgtm{
+			ParentID: parent_id_uint,
+			UserID:   data["user_id"],
+		}
+		database.DB.Create(&lgtm)
+	}
 
-	// 元のLGTM数に1加算して更新
+	// LGTMの更新
+	lgtms := []models.Lgtm{}
+	database.DB.Where("parent_id = ?", data["id"]).Find(&lgtms)
 	var question models.Question
-	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", lgtm+1)
+	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
 
 	return c.JSON(question)
 
