@@ -40,9 +40,9 @@
           </div>
         </div>
       </template>
-      <form action="" @submit.prevent="confirm">
+      <form action="" @submit.prevent="submitReply(answer.ID)">
         <div class="form-group ml-2">
-          <textarea class="form-control p-1 my-4" placeholder='回答に返信' required />
+          <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
           <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
 
         </div>
@@ -50,7 +50,7 @@
     </div>
     <div>
       <h2 class="p-3">回答する</h2>
-      <form action="" @submit.prevent="answerSubmit">
+      <form action="" @submit.prevent="submitAnswer">
         <div class="form-group">
         <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
         <button class="btn btn-outline-primary w-100" type="submit">回答を送信</button>
@@ -72,6 +72,7 @@ export default {
     const question = ref({})
     const answers = ref({})
     const replys = ref({})
+    const replyBody = ref([])
 
     onMounted(async () => {
       try {
@@ -97,7 +98,7 @@ export default {
       }
     })
 
-    const answerSubmit = async () => {
+    const submitAnswer = async () => {
       try {
         const userData = await axios.get("user")
         await axios.post("answer/post", {
@@ -105,6 +106,24 @@ export default {
           user_id : userData.data.user_id,
           body : answerBody.value
         })
+        // リロード
+        this.$router.go({path: this.$router.currentRoute.path, force: true})
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    const submitReply = async (id) => {
+      try {
+        const userData = await axios.get("user")
+        await axios.post("reply/post", {
+          question_id : this.$route.params.question_id,
+          parent_id : String(id),
+          user_id : userData.data.user_id,
+          body : replyBody.value[id]
+        })
+        // リロード
+        this.$router.go({path: this.$router.currentRoute.path, force: true})
       } catch (e) {
         console.log(e)
       }
@@ -115,7 +134,9 @@ export default {
       answers,
       replys,
       answerBody,
-      answerSubmit
+      replyBody,
+      submitAnswer,
+      submitReply
     }
   }
 };
