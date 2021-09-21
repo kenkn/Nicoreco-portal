@@ -27,10 +27,8 @@ export default {
   data() {
     let code = ""
     let Subject = ""
-    const QuestionerID = ""
     const title = ref("")
     const body = ref("")
-    const Lgtm = 0
     const router = useRouter()
     // URLから講義codeを取得しjsonから講義名を取得
     for (const d of subjectData) {
