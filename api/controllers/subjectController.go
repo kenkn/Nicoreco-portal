@@ -170,10 +170,12 @@ func PostReply(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
-	parent_id, _ := strconv.Atoi(data["parent_id"])
-	parent_id_uint := uint(parent_id)
+
 	question_id, _ := strconv.Atoi(data["question_id"])
 	question_id_uint := uint(question_id)
+	parent_id, _ := strconv.Atoi(data["parent_id"])
+	parent_id_uint := uint(parent_id)
+
 	var replyInfo models.Reply
 	database.DB.Where("id = ?", parent_id_uint).First(&replyInfo)
 
