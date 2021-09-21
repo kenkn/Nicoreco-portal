@@ -28,7 +28,22 @@ func Question(c *fiber.Ctx) error {
 
 }
 
-// /post/question (POST)
+// /question/detail/:id (GET)
+// 機能 : 質問の詳細情報取得
+// 戻り値 : 質問の詳細情報のJSON
+func QuestionDetail(c *fiber.Ctx) error {
+
+	// GETの内容を取得
+	id := c.Params("id")
+
+	var detail models.Question
+	database.DB.Where("id = ?", id).First(&detail)
+
+	return c.JSON(detail)
+
+}
+
+// /question/post (POST)
 // 機能 : 質問の投稿
 // 受信するJSON :
 //  * questioner_id : 質問者のユーザID
@@ -141,9 +156,9 @@ func PostAnswer(c *fiber.Ctx) error {
 
 func Reply(c *fiber.Ctx) error {
 
-	parent := c.Params("parent_id")
+	parent := c.Params("question_id")
 	replys := []models.Reply{}
-	database.DB.Where("parent_id = ?", parent).Find(&replys)
+	database.DB.Where("question_id = ?", parent).Find(&replys)
 	return c.JSON(replys)
 
 }
@@ -157,14 +172,17 @@ func PostReply(c *fiber.Ctx) error {
 	}
 	parent_id, _ := strconv.Atoi(data["parent_id"])
 	parent_id_uint := uint(parent_id)
+	question_id, _ := strconv.Atoi(data["question_id"])
+	question_id_uint := uint(question_id)
 	var replyInfo models.Reply
 	database.DB.Where("id = ?", parent_id_uint).First(&replyInfo)
 
 	reply := models.Reply{
-		ParentID: parent_id_uint,
-		UserID:   data["user_id"],
-		Body:     data["body"],
-		Lgtm:     0,
+		QuestionID: question_id_uint,
+		ParentID:   parent_id_uint,
+		UserID:     data["user_id"],
+		Body:       data["body"],
+		Lgtm:       0,
 	}
 
 	database.DB.Create(&reply)

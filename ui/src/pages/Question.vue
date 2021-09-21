@@ -1,43 +1,42 @@
 <template>
   <div>
-    <h1 class="p-3">{{ question.subject }}の質問</h1>
     <div id="question" class="p-3 border">
       <h2>{{ question.title }}</h2>
             <p>
-        {{ question.Body }}
+        {{ question.body }}
       </p>
-      <span class="text-secondary m-0">質問者: {{ question.QuestionerID }} </span>
-      <span class="text-secondary m-0 pl-3">質問日時: {{ question.created_at }} </span><br>
+      <span class="text-secondary m-0">質問者: {{ question.questionerID }} </span>
+      <span class="text-secondary m-0 pl-3">質問日時: {{ question.CreatedAt }} </span><br>
       <div class="mt-1">
         <button id="lgtm" class="btn btn-outline-primary">
           私も知りたい
         </button>
-        <span class="pl-2">{{ question.Lgtm }}件</span>
+        <span class="pl-2">{{ question.lgtm }}件</span>
       </div>
     </div>
-    <h1 class="p-3">{{ question.answers }}件の回答</h1>
+    <h1 class="p-3">{{ answers.length }}件の回答</h1>
   
-    <div v-for="answer in answers" :key="answer.pk" class="border p-3 mt-4">
-      <p>{{answer.Body}}</p>
-      <span class="text-secondary m-0">回答者: {{ answer.UserID }} </span>
-      <span class="text-secondary m-0 pl-3">回答日時: {{ answer.created_at }} </span><br>
+    <div v-for="answer in answers" :key="answer.ID" class="border p-3 mt-4">
+      <p>{{ answer.body }}</p>
+      <span class="text-secondary m-0">回答者: {{ answer.user_id }} </span>
+      <span class="text-secondary m-0 pl-3">回答日時: {{ answer.CreatedAt }} </span><br>
       <div class="mt-1">
         <button id="lgtm" class="btn btn-outline-primary">
           参考になった
         </button>
-        <span class="pl-2">{{ question.Lgtm }}件</span>
+        <span class="pl-2">{{ question.lgtm }}件</span>
       </div>
       <hr>
-      <template v-for="reply in replys" :key="reply.pk">
-        <div v-if="reply.ParentID==answer.pk" class="border p-2 ml-2">
-          <p>{{ reply.Body }}</p>
-          <span class="text-secondary m-0">返信者: {{ reply.UserID }} </span>
-          <span class="text-secondary m-0 pl-3">返信日時: {{ reply.created_at }} </span><br>
+      <template v-for="reply in replys" :key="reply.ID">
+        <div v-if="reply.parent_id==answer.ID" class="border p-2 ml-2">
+          <p>{{ reply.body }}</p>
+          <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
+          <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
           <div class="mt-1">
             <button id="lgtm" class="btn btn-outline-primary">
             参考になった
             </button>
-            <span class="pl-2">{{ reply.Lgtm }}件</span>
+            <span class="pl-2">{{ reply.lgtm }}件</span>
           </div>
         </div>
       </template>
@@ -51,9 +50,9 @@
     </div>
     <div>
       <h2 class="p-3">回答する</h2>
-      <form action="" @submit.prevent="confirm">
+      <form action="" @submit.prevent="answerSubmit">
         <div class="form-group">
-        <textarea class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
+        <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
         <button class="btn btn-outline-primary w-100" type="submit">回答を送信</button>
         </div>
       </form>
@@ -61,82 +60,62 @@
 
   </div>
 
-
-
 </template>
  
 <script>
+import { onMounted, ref } from 'vue'
+import axios from 'axios';
 export default {
   name: "Question",
-  setup() {
-    const question = {
-      pk: 1,
-      QuestionerID: 123456,
-      subject: "高度ものづくり創成演習Ⅰ",
-      title: "～について",
-      Body: "質問の内容ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
-      Lgtm: 3,
-      answers: 5,
-      created_at: Date.now(),
-      updated_at: Date(1999, 11, 31, 23, 59, 59),
-    }
-    // 回答(仮置き)
-    const answers = []
-    answers.push({
-      pk: 1,
-      ParentID: "1",
-      UserID: "tarou",
-      Body: "アンサー1ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
-      Lgtm: 5,
-      created_at: Date(2021, 9, 14, 15, 12, 59),
-    })
-    answers.push({
-      pk: 2,
-      ParentID: "1",
-      UserID: "jirou",
-      Body: "アンサー2ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
-      Lgtm: 100,
-      created_at: Date(2021, 9, 18, 15, 10, 59),
-    })
-    // 回答へのリプライ(仮置き)
-    const replys = []
-    replys.push({
-      pk: 1,
-      ParentID: "1",
-      UserID: "ripupu",
-      Body: "アンサー1へのリプライ1",
-      Lgtm: 5,
-      created_at: Date(2021, 9, 14, 15, 12, 59),
-    })
-    replys.push({
-      pk: 2,
-      ParentID: "1",
-      UserID: "ouou",
-      Body: "アンサー1へのリプライ2",
-      Lgtm: 100,
-      created_at: Date(2021, 9, 18, 15, 10, 59),
-    })
-    replys.push({
-      pk: 2,
-      ParentID: "2",
-      UserID: "jirou",
-      Body: "アンサー2へのリプライ1",
-      Lgtm: 100,
-      created_at: Date(2021, 9, 18, 15, 10, 59),
+  data() {
+    const answerBody = ref("")
+    const question = ref({})
+    const answers = ref({})
+    const replys = ref({})
+
+    onMounted(async () => {
+      try {
+        // 質問情報の取得
+        const questionData = await axios.get(
+          "/question/detail/" + this.$route.params.question_id
+        )
+        question.value = questionData.data
+
+        // 回答情報の取得
+        const answerData = await axios.get(
+          "/answer/" + questionData.data.ID
+        )
+        answers.value = answerData.data
+
+        // リプライ情報の取得
+        const replyData = await axios.get(
+          "/reply/" + questionData.data.ID
+        )
+        replys.value = replyData.data
+      } catch (e) {
+        console.log(e)
+      }
     })
 
-    // 送信しますかの確認
-    const confirm = () => {
-      if(window.confirm('送信します')) { return true; }
-      else { return false; }
+    const answerSubmit = async () => {
+      try {
+        const userData = await axios.get("user")
+        await axios.post("answer/post", {
+          parent_id : this.$route.params.question_id,
+          user_id : userData.data.user_id,
+          body : answerBody.value
+        })
+      } catch (e) {
+        console.log(e)
+      }
     }
-
 
     return {
       question,
       answers,
       replys,
-      confirm
+      answerBody,
+      answerSubmit
     }
   }
 };
