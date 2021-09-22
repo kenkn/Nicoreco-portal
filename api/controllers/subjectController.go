@@ -28,7 +28,22 @@ func Question(c *fiber.Ctx) error {
 
 }
 
-// /post/question (POST)
+// /question/detail/:id (GET)
+// 機能 : 質問の詳細情報取得
+// 戻り値 : 質問の詳細情報のJSON
+func QuestionDetail(c *fiber.Ctx) error {
+
+	// GETの内容を取得
+	id := c.Params("id")
+
+	var detail models.Question
+	database.DB.Where("id = ?", id).First(&detail)
+
+	return c.JSON(detail)
+
+}
+
+// /question/post (POST)
 // 機能 : 質問の投稿
 // 受信するJSON :
 //  * questioner_id : 質問者のユーザID
@@ -68,6 +83,7 @@ func PostQuestion(c *fiber.Ctx) error {
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
 //  * id : LGTMする質問のID
+//  * user_id : LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
@@ -79,12 +95,26 @@ func Lgtm(c *fiber.Ctx) error {
 		return err
 	}
 
-	// リクエストデータをint型にキャスト
-	lgtm, _ := strconv.Atoi(data["id"])
+	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	pressed := []models.Lgtm{}
+	database.DB.Where("user_id = ?", data["user_id"]).Find(&pressed)
+	if len(pressed) == 1 {
+		database.DB.Where("user_id = ?", data["user_id"]).Delete(&pressed[0])
+	} else {
+		parent_id, _ := strconv.Atoi(data["id"])
+		parent_id_uint := uint(parent_id)
+		lgtm := models.Lgtm{
+			ParentID: parent_id_uint,
+			UserID:   data["user_id"],
+		}
+		database.DB.Create(&lgtm)
+	}
 
-	// 元のLGTM数に1加算して更新
+	// LGTMの更新
+	lgtms := []models.Lgtm{}
+	database.DB.Where("parent_id = ?", data["id"]).Find(&lgtms)
 	var question models.Question
-	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", lgtm+1)
+	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
 
 	return c.JSON(question)
 
@@ -126,9 +156,9 @@ func PostAnswer(c *fiber.Ctx) error {
 
 func Reply(c *fiber.Ctx) error {
 
-	parent := c.Params("parent_id")
+	parent := c.Params("question_id")
 	replys := []models.Reply{}
-	database.DB.Where("parent_id = ?", parent).Find(&replys)
+	database.DB.Where("question_id = ?", parent).Find(&replys)
 	return c.JSON(replys)
 
 }
@@ -140,16 +170,21 @@ func PostReply(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
+
+	question_id, _ := strconv.Atoi(data["question_id"])
+	question_id_uint := uint(question_id)
 	parent_id, _ := strconv.Atoi(data["parent_id"])
 	parent_id_uint := uint(parent_id)
+
 	var replyInfo models.Reply
 	database.DB.Where("id = ?", parent_id_uint).First(&replyInfo)
 
 	reply := models.Reply{
-		ParentID: parent_id_uint,
-		UserID:   data["user_id"],
-		Body:     data["body"],
-		Lgtm:     0,
+		QuestionID: question_id_uint,
+		ParentID:   parent_id_uint,
+		UserID:     data["user_id"],
+		Body:       data["body"],
+		Lgtm:       0,
 	}
 
 	database.DB.Create(&reply)

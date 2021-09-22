@@ -1,4 +1,4 @@
-FROM golang:1.17
+FROM golang:1.15-alpine
 
 # Mac用
 # PROTOCOL := "tcp(nicoreco:3306)"

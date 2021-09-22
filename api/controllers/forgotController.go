@@ -8,8 +8,8 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
-	"math/rand"
 	"fmt"
+	"math/rand"
 	"net/smtp"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,13 +21,13 @@ import (
 // 受信するJSON :
 //  * email : 入力されたメールアドレス
 // 戻り値 : 成功メッセージ(JSON)
-// 例外処理 : 
+// 例外処理 :
 // 	* リクエストデータのパースに失敗した場合に例外を発行
 //	* メール送信失敗時に例外を発行
 // TODO :
 // 	Tokenの被りをはじく
 func Forgot(c *fiber.Ctx) error {
-	
+
 	RandStringWordCount := 12
 	var data map[string]string
 	// リクエストデータをパース
@@ -37,14 +37,14 @@ func Forgot(c *fiber.Ctx) error {
 
 	// 12文字のランダム文字列を生成
 	token := RandStringRunes(RandStringWordCount)
-	passwordReset := models.PasswordReset {
-		Email : data["email"],
-		Token : token,
+	passwordReset := models.PasswordReset{
+		Email: data["email"],
+		Token: token,
 	}
 
 	// DBに保存
 	database.DB.Create(&passwordReset)
- 
+
 	// メール受信側の情報
 	// TODO 送信元アドレスの変更
 	from := "skt7tp@gmail.com"
@@ -64,13 +64,13 @@ func Forgot(c *fiber.Ctx) error {
 		nil,
 		from,
 		to,
-		[]byte(sendFrom + subject + mime + message),
+		[]byte(sendFrom+subject+mime+message),
 	)
- 
+
 	if err != nil {
 		return err
 	}
- 
+
 	return c.JSON(fiber.Map{
 		"message": "成功",
 	})
@@ -101,7 +101,7 @@ func RandStringRunes(n int) string {
 // 戻り値 :
 // 	* 成功時 : 成功メッセージ(JSON)
 // 	* 失敗時 : ステータスコード400とエラー文(JSON)
-// 例外処理 : 
+// 例外処理 :
 // 	* リクエストデータのパースに失敗した場合に例外を発行
 func Reset(c *fiber.Ctx) error {
 
@@ -116,7 +116,7 @@ func Reset(c *fiber.Ctx) error {
 	if data["password"] != data["password_confirm"] {
 		c.Status(400)
 		return c.JSON(fiber.Map{
-			"message" : "パスワードが一致しません．",
+			"message": "パスワードが一致しません．",
 		})
 	}
 
@@ -127,7 +127,7 @@ func Reset(c *fiber.Ctx) error {
 	if err.Error != nil {
 		c.Status(400)
 		return c.JSON(fiber.Map{
-			"message" : "違法なトークンです",
+			"message": "違法なトークンです",
 		})
 	}
 
@@ -137,7 +137,7 @@ func Reset(c *fiber.Ctx) error {
 	database.DB.Model(&models.User{}).Where("email = ?", passwordReset.Email).Update("password", password)
 
 	return c.JSON(fiber.Map{
-		"message" : "成功.",
+		"message": "成功.",
 	})
 
 }
