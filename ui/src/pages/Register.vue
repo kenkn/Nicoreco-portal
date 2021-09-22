@@ -1,6 +1,6 @@
 <template>
   <main class="form-register">
-    <VeeForm @submit.prevent="submit" :validation-schema="schema">
+    <VeeForm @submit="submit" :validation-schema="schema">
       <h1 class="h3 mb-3 fw-normal">ユーザー登録</h1>
       <VeeField
         name="displayName"
@@ -112,7 +112,7 @@ export default {
       })
 
       // Login画面に戻る
-      await router.push("/login")
+      // await router.push("/login")
     }
 
     return {
