@@ -79,7 +79,8 @@ func PostQuestion(c *fiber.Ctx) error {
 
 }
 
-// /lgtm (POST)
+// /lgtm/question (POST)
+// /lgtm/answer (POST)
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
 //  * id : LGTMする質問のID
@@ -87,7 +88,7 @@ func PostQuestion(c *fiber.Ctx) error {
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
-func Lgtm(c *fiber.Ctx) error {
+func LgtmQuestion(c *fiber.Ctx) error {
 
 	var data map[string]string
 	// リクエストデータをパース
@@ -96,14 +97,14 @@ func Lgtm(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	pressed := []models.Lgtm{}
-	database.DB.Where("user_id = ?", data["user_id"]).Find(&pressed)
+	pressed := []models.LgtmQuestion{}
+	database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Find(&pressed)
 	if len(pressed) == 1 {
-		database.DB.Where("user_id = ?", data["user_id"]).Delete(&pressed[0])
+		database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Delete(&pressed[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["id"])
 		parent_id_uint := uint(parent_id)
-		lgtm := models.Lgtm{
+		lgtm := models.LgtmQuestion{
 			ParentID: parent_id_uint,
 			UserID:   data["user_id"],
 		}
@@ -111,12 +112,45 @@ func Lgtm(c *fiber.Ctx) error {
 	}
 
 	// LGTMの更新
-	lgtms := []models.Lgtm{}
+	lgtms := []models.LgtmQuestion{}
 	database.DB.Where("parent_id = ?", data["id"]).Find(&lgtms)
 	var question models.Question
 	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
 
 	return c.JSON(question)
+
+}
+
+func LgtmAnswer(c *fiber.Ctx) error {
+
+	var data map[string]string
+	// リクエストデータをパース
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	pressed := []models.LgtmAnswer{}
+	database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Find(&pressed)
+	if len(pressed) == 1 {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Delete(&pressed[0])
+	} else {
+		parent_id, _ := strconv.Atoi(data["id"])
+		parent_id_uint := uint(parent_id)
+		lgtm := models.LgtmAnswer{
+			ParentID: parent_id_uint,
+			UserID:   data["user_id"],
+		}
+		database.DB.Create(&lgtm)
+	}
+
+	// LGTMの更新
+	lgtms := []models.LgtmAnswer{}
+	database.DB.Where("parent_id = ?", data["id"]).Find(&lgtms)
+	var answer models.Answer
+	database.DB.Model(&answer).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
+
+	return c.JSON(answer)
 
 }
 
