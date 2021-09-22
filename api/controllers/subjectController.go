@@ -99,7 +99,7 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	pressed := []models.LgtmQuestion{}
 	database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Find(&pressed)
-	if len(pressed) == 1 {
+	if len(pressed) >= 1 {
 		database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Delete(&pressed[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["id"])
@@ -132,7 +132,7 @@ func LgtmAnswer(c *fiber.Ctx) error {
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	pressed := []models.LgtmAnswer{}
 	database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Find(&pressed)
-	if len(pressed) == 1 {
+	if len(pressed) >= 1 {
 		database.DB.Where("user_id = ?", data["user_id"]).Where("parent_id = ?", data["id"]).Delete(&pressed[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["id"])
