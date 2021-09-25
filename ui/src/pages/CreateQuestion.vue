@@ -48,7 +48,7 @@ export default {
           title         : title.value,
           body          : body.value
         })
-        await router.push("/question/" + code + "/")
+        await router.push("/question/" + code)
       }
       else { return false; }
     }  
