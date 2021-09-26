@@ -31,6 +31,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 // TODO ログイン失敗時の挙動を設定する
 export default {
@@ -39,12 +40,14 @@ export default {
     const email = ref("")
     const password = ref("")
     const router = useRouter()
+    const store = useStore()
 
     const login = async () => {
       await axios.post("login", {
         email: email.value,
         password: password.value
       })
+      store.dispatch("setAuth", true)
       // 前のページに遷移する
       await router.push(this.prevRoute.path)
     }
