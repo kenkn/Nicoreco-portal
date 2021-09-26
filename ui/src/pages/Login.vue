@@ -47,6 +47,7 @@ export default {
         email: email.value,
         password: password.value
       })
+      localStorage.isLogin = true
       store.dispatch("setAuth", true)
       // 前のページに遷移する
       await router.push(this.prevRoute.path)
