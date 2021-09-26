@@ -9,6 +9,6 @@ import "gorm.io/gorm"
 
 type LgtmQuestion struct {
 	gorm.Model
-	ParentID uint   `json:"parent_id"`
-	UserID   string `json:"user_id"`
+	QuestionID uint   `json:"question_id"`
+	UserID     string `json:"user_id"`
 }
