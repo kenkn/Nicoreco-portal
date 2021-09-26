@@ -112,7 +112,7 @@ export default {
       })
 
       // Login画面に戻る
-      // await router.push("/login")
+      await router.push("/login")
     }
 
     return {
