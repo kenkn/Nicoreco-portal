@@ -1,5 +1,5 @@
 //
-// lgtm.go
+// LgtmAnswer.go
 // LGTMstruct
 //
 
@@ -7,8 +7,8 @@ package models
 
 import "gorm.io/gorm"
 
-type Lgtm struct {
+type LgtmAnswer struct {
 	gorm.Model
-	ParentID uint   `json:"parent_id"`
+	AnswerID uint   `json:"answer_id"`
 	UserID   string `json:"user_id"`
 }

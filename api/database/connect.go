@@ -40,6 +40,7 @@ func Connect() {
 		&models.Question{},
 		&models.Answer{},
 		&models.Reply{},
-		&models.Lgtm{},
+		&models.LgtmQuestion{},
+		&models.LgtmAnswer{},
 	)
 }

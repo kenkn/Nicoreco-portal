@@ -79,7 +79,38 @@ func PostQuestion(c *fiber.Ctx) error {
 
 }
 
-// /lgtm (POST)
+// /lgtm/question/:question_id:user_id (GET)
+// 機能 : LGTMされたどうかの判定(question用)
+// 戻り値 : LGTM情報のJSON
+func IsQuestionLgtmed(c *fiber.Ctx) error {
+
+	// GETの内容を取得
+	question_id := c.Params("question_id")
+	user_id := c.Params("user_id")
+
+	// 質問を全検索してリストで取得
+	var lgtm models.LgtmQuestion
+	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", question_id).First(&lgtm)
+	return c.JSON(lgtm)
+}
+
+// /lgtm/answer/:answer_id:user_id (GET)
+// 機能 : LGTMされたどうかの判定(answer用)
+// 戻り値 : LGTM情報のJSON
+func IsAnswerLgtmed(c *fiber.Ctx) error {
+
+	// GETの内容を取得
+	answer_id := c.Params("answer_id")
+	user_id := c.Params("user_id")
+
+	// 質問を全検索してリストで取得
+	var lgtm models.LgtmAnswer
+	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", answer_id).First(&lgtm)
+	return c.JSON(lgtm)
+}
+
+// /lgtm/question (POST)
+// /lgtm/answer (POST)
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
 //  * id : LGTMする質問のID
@@ -87,7 +118,7 @@ func PostQuestion(c *fiber.Ctx) error {
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
-func Lgtm(c *fiber.Ctx) error {
+func LgtmQuestion(c *fiber.Ctx) error {
 
 	var data map[string]string
 	// リクエストデータをパース
@@ -96,27 +127,58 @@ func Lgtm(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	pressed := []models.Lgtm{}
-	database.DB.Where("user_id = ?", data["user_id"]).Find(&pressed)
-	if len(pressed) == 1 {
-		database.DB.Where("user_id = ?", data["user_id"]).Delete(&pressed[0])
+	var pressed models.LgtmQuestion
+	if data["lgtmed"] == "True" {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["id"]).Delete(&pressed)
 	} else {
 		parent_id, _ := strconv.Atoi(data["id"])
-		parent_id_uint := uint(parent_id)
-		lgtm := models.Lgtm{
-			ParentID: parent_id_uint,
+		question_id_uint := uint(parent_id)
+		lgtm := models.LgtmQuestion{
+			QuestionID: question_id_uint,
+			UserID:     data["user_id"],
+		}
+		database.DB.Create(&lgtm)
+	}
+
+	// LGTMの更新
+	lgtms := []models.LgtmQuestion{}
+	database.DB.Where("question_id = ?", data["id"]).Find(&lgtms)
+	var question models.Question
+	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
+
+	return c.JSON(question)
+
+}
+
+func LgtmAnswer(c *fiber.Ctx) error {
+
+	var data map[string]string
+	// リクエストデータをパース
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	var pressed models.LgtmAnswer
+	if data["lgtmed"] == "True" {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["id"]).Delete(&pressed)
+	} else {
+		parent_id, _ := strconv.Atoi(data["id"])
+		answer_id_uint := uint(parent_id)
+		lgtm := models.LgtmAnswer{
+			AnswerID: answer_id_uint,
 			UserID:   data["user_id"],
 		}
 		database.DB.Create(&lgtm)
 	}
 
 	// LGTMの更新
-	lgtms := []models.Lgtm{}
-	database.DB.Where("parent_id = ?", data["id"]).Find(&lgtms)
-	var question models.Question
-	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
+	lgtms := []models.LgtmAnswer{}
+	database.DB.Where("answer_id = ?", data["id"]).Find(&lgtms)
+	var answer models.Answer
+	database.DB.Model(&answer).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
 
-	return c.JSON(question)
+	return c.JSON(answer)
 
 }
 

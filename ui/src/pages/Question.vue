@@ -40,20 +40,28 @@
           </div>
         </div>
       </template>
-      <button class="btn btn-outline-primary form-control w-100" @click="displayReplyForm(answer.ID)" v-bind:id='"reply-button-" + answer.ID'>返信を追加</button>
-        <form action="" @submit.prevent="submitReply(answer.ID)" v-bind:id='"reply-form-" + answer.ID' style="display: none;">
-          <div class="form-group ml-2">
+      <form action="" @submit.prevent="submitReply(answer.ID)">
+        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
+          <button class="btn btn-outline-primary form-control w-100">ログインして返信</button>
+        </router-link>
+        <div v-else class="form-group ml-2">
+          <button class="btn btn-outline-primary form-control w-100" @click="displayReplyForm(answer.ID)" v-bind:id='"reply-disply-button-" + answer.ID'>返信を追加</button>
+          <div v-bind:id='"reply-form-" + answer.ID' style="display: none;">
             <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
             <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
           </div>
-        </form>
+        </div>
+      </form>
     </div>
     <div>
       <h2 class="p-3">回答する</h2>
       <form action="" @submit.prevent="submitAnswer">
-        <div class="form-group">
-        <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
-        <button class="btn btn-outline-primary w-100" type="submit">回答を送信</button>
+        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
+          <button class="btn btn-outline-primary w-100">ログインして回答を送信</button>
+        </router-link>
+        <div v-else class="form-group">
+          <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
+          <button class="btn btn-outline-primary w-100" type="submit">回答を送信</button>
         </div>
       </form>
     </div>
@@ -63,11 +71,14 @@
 </template>
  
 <script>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import axios from 'axios';
+import { useStore } from 'vuex';
 export default {
   name: "Question",
   data() {
+    const store = useStore()
+    const auth = computed(() => store.state.auth)
     const answerBody = ref("")
     const question = ref({})
     const answers = ref({})
@@ -129,12 +140,14 @@ export default {
       }
     }
 
+    // 「返信を追加」ボタンを非表示にし, リプライフォームを表示する
     const displayReplyForm = (answerid) => {
-      document.getElementById("reply-button-" + answerid).style.display = "none";
+      document.getElementById("reply-disply-button-" + answerid).style.display = "none";
       document.getElementById("reply-form-" + answerid).style.display = "block";
     }
 
     return {
+      auth,
       question,
       answers,
       replys,

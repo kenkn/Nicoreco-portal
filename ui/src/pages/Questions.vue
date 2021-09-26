@@ -54,13 +54,11 @@ import { computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import axios from 'axios'
 import subjectData from '../data/subject-data.json'
-import { useRouter } from 'vue-router';
 
 export default {
   name: "Questions",
   data() {
     const store = useStore()
-    const router = useRouter()
     const auth = computed(() => store.state.auth)
     let code = ''
     const subject = ref("")
