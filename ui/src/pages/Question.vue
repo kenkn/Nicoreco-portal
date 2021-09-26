@@ -40,13 +40,13 @@
           </div>
         </div>
       </template>
-      <form action="" @submit.prevent="submitReply(answer.ID)">
-        <div class="form-group ml-2">
-          <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
-          <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
-
-        </div>
-      </form>
+      <button class="btn btn-outline-primary form-control w-100" @click="displayReplyForm(answer.ID)" v-bind:id='"reply-button-" + answer.ID'>返信を追加</button>
+        <form action="" @submit.prevent="submitReply(answer.ID)" v-bind:id='"reply-form-" + answer.ID' style="display: none;">
+          <div class="form-group ml-2">
+            <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
+            <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
+          </div>
+        </form>
     </div>
     <div>
       <h2 class="p-3">回答する</h2>
@@ -129,6 +129,11 @@ export default {
       }
     }
 
+    const displayReplyForm = (answerid) => {
+      document.getElementById("reply-button-" + answerid).style.display = "none";
+      document.getElementById("reply-form-" + answerid).style.display = "block";
+    }
+
     return {
       question,
       answers,
@@ -136,7 +141,8 @@ export default {
       answerBody,
       replyBody,
       submitAnswer,
-      submitReply
+      submitReply,
+      displayReplyForm
     }
   }
 };
