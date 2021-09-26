@@ -11,3 +11,14 @@ axios.defaults.baseURL = 'http://localhost:80/api/'
 axios.defaults.withCredentials = true
 
 createApp(App).use(store).use(router).mount('#app')
+
+const loginCheck = async () => {
+    try {
+        await axios.get(axios.defaults.baseURL + "user")
+        localStorage.isLogin = true
+    } catch (e) {
+        localStorage.isLogin = false
+    }
+}
+
+loginCheck()
