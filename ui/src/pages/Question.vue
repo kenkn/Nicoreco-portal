@@ -41,19 +41,24 @@
         </div>
       </template>
       <form action="" @submit.prevent="submitReply(answer.ID)">
-        <div class="form-group ml-2">
+        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
+          <button class="btn btn-outline-primary form-control w-100">ログインして返信</button>
+        </router-link>
+        <div v-else class="form-group ml-2">
           <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
           <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
-
         </div>
       </form>
     </div>
     <div>
       <h2 class="p-3">回答する</h2>
       <form action="" @submit.prevent="submitAnswer">
-        <div class="form-group">
-        <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
-        <button class="btn btn-outline-primary w-100" type="submit">回答を送信</button>
+        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
+          <button class="btn btn-outline-primary w-100">ログインして回答を送信</button>
+        </router-link>
+        <div v-else class="form-group">
+          <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />
+          <button class="btn btn-outline-primary w-100" type="submit">回答を送信</button>
         </div>
       </form>
     </div>
@@ -63,11 +68,14 @@
 </template>
  
 <script>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import axios from 'axios';
+import { useStore } from 'vuex';
 export default {
   name: "Question",
   data() {
+    const store = useStore()
+    const auth = computed(() => store.state.auth)
     const answerBody = ref("")
     const question = ref({})
     const answers = ref({})
@@ -130,6 +138,7 @@ export default {
     }
 
     return {
+      auth,
       question,
       answers,
       replys,

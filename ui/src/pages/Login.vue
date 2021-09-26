@@ -35,7 +35,7 @@ import { useRouter } from 'vue-router'
 // TODO ログイン失敗時の挙動を設定する
 export default {
   name: "Login",
-  setup() {
+  data() {
     const email = ref("")
     const password = ref("")
     const router = useRouter()
@@ -45,15 +45,21 @@ export default {
         email: email.value,
         password: password.value
       })
-
-      await router.push("/")
+      // 前のページに遷移する
+      await router.push(this.prevRoute.path)
     }
 
     return {
+      prevRoute : null,
       email,
       password,
       login
     }
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.prevRoute = from
+    })
   }
 }
 </script>
