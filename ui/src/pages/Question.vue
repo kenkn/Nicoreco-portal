@@ -45,8 +45,11 @@
           <button class="btn btn-outline-primary form-control w-100">ログインして返信</button>
         </router-link>
         <div v-else class="form-group ml-2">
-          <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
-          <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
+          <button class="btn btn-outline-primary form-control w-100" @click="displayReplyForm(answer.ID)" v-bind:id='"reply-disply-button-" + answer.ID'>返信を追加</button>
+          <div v-bind:id='"reply-form-" + answer.ID' style="display: none;">
+            <textarea v-model="replyBody[answer.ID]" class="form-control p-1 my-4" placeholder='回答に返信' required />
+            <button class="btn btn-outline-primary form-control w-100" type="submit">返信</button>
+          </div>
         </div>
       </form>
     </div>
@@ -137,6 +140,12 @@ export default {
       }
     }
 
+    // 「返信を追加」ボタンを非表示にし, リプライフォームを表示する
+    const displayReplyForm = (answerid) => {
+      document.getElementById("reply-disply-button-" + answerid).style.display = "none";
+      document.getElementById("reply-form-" + answerid).style.display = "block";
+    }
+
     return {
       auth,
       question,
@@ -145,7 +154,8 @@ export default {
       answerBody,
       replyBody,
       submitAnswer,
-      submitReply
+      submitReply,
+      displayReplyForm
     }
   }
 };
