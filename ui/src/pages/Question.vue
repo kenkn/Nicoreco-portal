@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="question" class="p-3 border">
+    <div id="question" class="p-3 mt-2 border">
       <h2>{{ question.title }}</h2>
             <p>
         {{ question.body }}
@@ -41,8 +41,8 @@
         </div>
       </template>
       <form action="" @submit.prevent="submitReply(answer.ID)">
-        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
-          <button class="btn btn-outline-primary form-control w-100">ログインして返信</button>
+        <router-link v-if="!auth" class="pageLink d-inline form-control btn btn-outline-primary" to="/login">
+          ログインして返信
         </router-link>
         <div v-else class="form-group ml-2">
           <button class="btn btn-outline-primary form-control w-100" @click="displayReplyForm(answer.ID)" v-bind:id='"reply-disply-button-" + answer.ID'>返信を追加</button>
@@ -56,8 +56,8 @@
     <div>
       <h2 class="p-3">回答する</h2>
       <form action="" @submit.prevent="submitAnswer">
-        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
-          <button class="btn btn-outline-primary w-100">ログインして回答を送信</button>
+        <router-link v-if="!auth" class="pageLink d-inline btn btn-outline-primary" to="/login">
+          ログインして回答を送信
         </router-link>
         <div v-else class="form-group">
           <textarea v-model="answerBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='回答を追加' required />

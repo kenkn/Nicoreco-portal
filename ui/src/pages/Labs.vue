@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="p-3">講義一覧</h1>
+    <h1 class="p-3">研究室一覧</h1>
   <div class="row">
     <div v-for="subject in subjects" :key="subject.name" class="col col-12 col-md-3 col-lg-2 m-2 text-center border border-3">
       <router-link tag="li" class="pageLink btn btn-link" v-bind:to="'/question/' + subject.code">
@@ -12,9 +12,9 @@
 </template>
  
 <script>
-import data from '../data/subject-data.json'
+import data from '../data/lab-data.json'
 export default {
-  name: "Subjects",
+  name: "Labs",
   data() {
     return {
       subjects: data
