@@ -17,7 +17,7 @@ const loginCheck = async () => {
         const userData = await axios.get(axios.defaults.baseURL + "user")
         localStorage.displayName = await userData.data.display_name
         localStorage.userID      = await userData.data.user_id
-        localStorage.grade       = await userData.data.grade
+        localStorage.grade       = await userData.data.Grade
         localStorage.email       = await userData.data.email
         localStorage.isLogin     = true
     } catch (e) {
