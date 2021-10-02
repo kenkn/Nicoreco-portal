@@ -5,10 +5,18 @@
             <p>
         {{ question.body }}
       </p>
+      <!-- デバッグ用 TODO 消す -->
+      <span class="text-secondary m-0">ID: {{ question.ID }} </span>
       <span class="text-secondary m-0">質問者: {{ question.questionerID }} </span>
       <span class="text-secondary m-0 pl-3">質問日時: {{ question.CreatedAt }} </span><br>
-      <div class="mt-1">
-        <button id="lgtm" class="btn btn-outline-primary">
+      <div v-if='!questionLgtm' class="mt-1">
+        <button @click="updateQuestionLgtm(false)" id="lgtm" class="btn btn-outline-primary">
+          私も知りたい
+        </button>
+        <span class="pl-2">{{ question.lgtm }}件</span>
+      </div>
+      <div v-else class="mt-1">
+        <button @click="updateQuestionLgtm(true)" id="lgtm" class="btn btn-primary">
           私も知りたい
         </button>
         <span class="pl-2">{{ question.lgtm }}件</span>
@@ -18,13 +26,21 @@
   
     <div v-for="answer in answers" :key="answer.ID" class="border p-3 mt-4">
       <p>{{ answer.body }}</p>
+      <!-- デバッグ用 TODO 消す -->
+      <span class="text-secondary m-0">ID: {{ answer.ID }} </span>
       <span class="text-secondary m-0">回答者: {{ answer.user_id }} </span>
       <span class="text-secondary m-0 pl-3">回答日時: {{ answer.CreatedAt }} </span><br>
-      <div class="mt-1">
-        <button id="lgtm" class="btn btn-outline-primary">
+      <div v-if="!answerLgtm[answer.ID]" class="mt-1">
+        <button @click="updateAnswerLgtm(false, answer.ID)" id="lgtm" class="btn btn-outline-primary">
           参考になった
         </button>
-        <span class="pl-2">{{ question.lgtm }}件</span>
+        <span class="pl-2">{{ answerLgtmCount[answer.ID] }}件</span>
+      </div>
+      <div v-else class="mt-1">
+        <button @click="updateAnswerLgtm(true, answer.ID)" id="lgtm" class="btn btn-primary">
+          参考になった
+        </button>
+        <span class="pl-2">{{ answerLgtmCount[answer.ID] }}件</span>
       </div>
       <hr>
       <template v-for="reply in replys" :key="reply.ID">
@@ -32,12 +48,6 @@
           <p>{{ reply.body }}</p>
           <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
           <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
-          <div class="mt-1">
-            <button id="lgtm" class="btn btn-outline-primary">
-            参考になった
-            </button>
-            <span class="pl-2">{{ reply.lgtm }}件</span>
-          </div>
         </div>
       </template>
       <form action="" @submit.prevent="submitReply(answer.ID)">
@@ -65,9 +75,7 @@
         </div>
       </form>
     </div>
-
   </div>
-
 </template>
  
 <script>
@@ -77,13 +85,16 @@ import { useStore } from 'vuex';
 export default {
   name: "Question",
   data() {
-    const store = useStore()
-    const auth = computed(() => store.state.auth)
-    const answerBody = ref("")
-    const question = ref({})
-    const answers = ref({})
-    const replys = ref({})
-    const replyBody = ref([])
+    const store           = useStore()
+    const auth            = computed(() => store.state.auth)
+    const question        = ref({}) // questionの内容
+    const answers         = ref({}) // 投稿されているanswerの集合
+    const answerBody      = ref("") // 投稿時のanswerの文章
+    const answerLgtmCount = ref([]) // answerのLGTM数
+    const replys          = ref({}) // 投稿されているreplyの集合
+    const replyBody       = ref([]) // 投稿時のreplyの文章
+    const questionLgtm    = ref()   // ユーザがquestionをLGTMしているかどうか
+    const answerLgtm      = ref([]) // ユーザがquestionをLGTMしているかどうか
 
     onMounted(async () => {
       try {
@@ -98,12 +109,41 @@ export default {
           "/answer/" + questionData.data.ID
         )
         answers.value = answerData.data
+        for (const i in answerData.data) {
+          answerLgtmCount.value[answerData.data[i].ID] = answerData.data[i].lgtm
+        }
 
         // リプライ情報の取得
         const replyData = await axios.get(
           "/reply/" + questionData.data.ID
         )
         replys.value = replyData.data
+
+        // LGTM情報の取得
+        if (localStorage.isLogin) {
+          const questionLgtmData = await axios.get(
+            "/lgtm/question/" + questionData.data.ID + "/" + localStorage.userID
+          )
+          // ユーザはLGTMしているか?
+          if (questionLgtmData.data.user_id == "") {
+            questionLgtm.value = false
+          } else {
+            questionLgtm.value = true
+          }
+
+          // answerに対してユーザがLGTMしているか?
+          for (const d in answerData.data) {
+            const id = answerData.data[d].ID
+            const answerLgtmData = await axios.get(
+              "/lgtm/answer/" + id + "/" + localStorage.userID
+            )
+            if (answerLgtmData.data.user_id == "") {
+              answerLgtm.value[id] = false
+            } else {
+              answerLgtm.value[id] = true
+            }
+          }
+        }
       } catch (e) {
         console.log(e)
       }
@@ -111,10 +151,9 @@ export default {
 
     const submitAnswer = async () => {
       try {
-        const userData = await axios.get("user")
         await axios.post("answer/post", {
           parent_id : this.$route.params.question_id,
-          user_id : userData.data.user_id,
+          user_id : localStorage.userID,
           body : answerBody.value
         })
         // リロード
@@ -126,15 +165,51 @@ export default {
 
     const submitReply = async (id) => {
       try {
-        const userData = await axios.get("user")
         await axios.post("reply/post", {
           question_id : this.$route.params.question_id,
           parent_id : String(id),
-          user_id : userData.data.user_id,
+          user_id : localStorage.userID,
           body : replyBody.value[id]
         })
         // リロード
         this.$router.go({path: this.$router.currentRoute.path, force: true})
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    // questionのLGTMボタンが押された時
+    // TODO destroy時までLGTM情報を持っておいて，一度に送信させる
+    const updateQuestionLgtm = async (lgtmed) => {
+      questionLgtm.value = !questionLgtm.value
+      if (!lgtmed) {
+        question.value.lgtm++
+      } else {
+        question.value.lgtm--
+      }
+      try {
+        await axios.post("/lgtm/question", {
+          question_id : this.$route.params.question_id,
+          user_id : localStorage.userID
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    // answerのLGTMボタンが押された時
+    const updateAnswerLgtm = async (lgtmed, id) => {
+      answerLgtm.value[id] = !answerLgtm.value[id]
+      if (!lgtmed) {
+        answerLgtmCount.value[id]++
+      } else {
+        answerLgtmCount.value[id]--
+      }
+      try {
+        await axios.post("/lgtm/answer", {
+          answer_id : String(id),
+          user_id : localStorage.userID
+        })
       } catch (e) {
         console.log(e)
       }
@@ -150,11 +225,16 @@ export default {
       auth,
       question,
       answers,
+      answerLgtmCount,
       replys,
       answerBody,
       replyBody,
+      questionLgtm,
+      answerLgtm,
       submitAnswer,
       submitReply,
+      updateQuestionLgtm,
+      updateAnswerLgtm,
       displayReplyForm
     }
   }
