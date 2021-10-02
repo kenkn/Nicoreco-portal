@@ -91,10 +91,12 @@ func IsQuestionLgtmed(c *fiber.Ctx) error {
 	// 質問を全検索してリストで取得
 	var lgtm models.LgtmQuestion
 	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", question_id).First(&lgtm)
+
 	return c.JSON(lgtm)
+
 }
 
-// /lgtm/answer/:answer_id:user_id (GET)
+// /lgtm/answer/:answer_id/:user_id (GET)
 // 機能 : LGTMされたどうかの判定(answer用)
 // 戻り値 : LGTM情報のJSON
 func IsAnswerLgtmed(c *fiber.Ctx) error {
@@ -105,8 +107,9 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 
 	// 質問を全検索してリストで取得
 	var lgtm models.LgtmAnswer
-	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", answer_id).First(&lgtm)
+	database.DB.Where("user_id = ?", user_id).Where("answer_id = ?", answer_id).Find(&lgtm)
 	return c.JSON(lgtm)
+
 }
 
 // /lgtm/question (POST)
@@ -127,11 +130,14 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	var lgtm models.LgtmQuestion
+	database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).First(&lgtm)
+
 	var pressed models.LgtmQuestion
-	if data["lgtmed"] == "True" {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["id"]).Delete(&pressed)
+	if lgtm.UserID != "" {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).Delete(&pressed)
 	} else {
-		parent_id, _ := strconv.Atoi(data["id"])
+		parent_id, _ := strconv.Atoi(data["question_id"])
 		question_id_uint := uint(parent_id)
 		lgtm := models.LgtmQuestion{
 			QuestionID: question_id_uint,
@@ -142,9 +148,9 @@ func LgtmQuestion(c *fiber.Ctx) error {
 
 	// LGTMの更新
 	lgtms := []models.LgtmQuestion{}
-	database.DB.Where("question_id = ?", data["id"]).Find(&lgtms)
+	database.DB.Where("question_id = ?", data["question_id"]).Find(&lgtms)
 	var question models.Question
-	database.DB.Model(&question).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
+	database.DB.Model(&question).Where("id = ?", data["question_id"]).Update("lgtm", len(lgtms))
 
 	return c.JSON(question)
 
@@ -159,11 +165,14 @@ func LgtmAnswer(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	var lgtm models.LgtmAnswer
+	database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).First(&lgtm)
+
 	var pressed models.LgtmAnswer
-	if data["lgtmed"] == "True" {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["id"]).Delete(&pressed)
+	if lgtm.UserID != "" {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Delete(&pressed)
 	} else {
-		parent_id, _ := strconv.Atoi(data["id"])
+		parent_id, _ := strconv.Atoi(data["answer_id"])
 		answer_id_uint := uint(parent_id)
 		lgtm := models.LgtmAnswer{
 			AnswerID: answer_id_uint,
@@ -174,9 +183,9 @@ func LgtmAnswer(c *fiber.Ctx) error {
 
 	// LGTMの更新
 	lgtms := []models.LgtmAnswer{}
-	database.DB.Where("answer_id = ?", data["id"]).Find(&lgtms)
+	database.DB.Where("answer_id = ?", data["answer_id"]).Find(&lgtms)
 	var answer models.Answer
-	database.DB.Model(&answer).Where("id = ?", data["id"]).Update("lgtm", len(lgtms))
+	database.DB.Model(&answer).Where("id = ?", data["answer_id"]).Update("lgtm", len(lgtms))
 
 	return c.JSON(answer)
 
