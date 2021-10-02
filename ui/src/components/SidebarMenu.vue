@@ -1,7 +1,7 @@
 <template>
   <ul class="list-group pt-2">
     <router-link tag="li" class="pageLink list-group-item" to="/question">講義質問</router-link>
-    <router-link tag="li" class="pageLink list-group-item" to="/">研究室</router-link>
+    <router-link tag="li" class="pageLink list-group-item" to="/lab">研究室</router-link>
     <router-link tag="li" class="pageLink list-group-item" to="/">雑談</router-link>
   </ul>
 </template>

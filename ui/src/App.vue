@@ -1,12 +1,12 @@
 <template>
   <div class="h-100">
     <Nav />
-    <main class="container-fluid h-100 pt-5 m-0">
+    <main class="container-fluid h-100 m-0">
       <div class="row h-100">
-        <div class="col-md-2 h-auto">
+        <div class="col-md-2 h-auto sidebar">
           <Sidebar />
         </div>
-        <div class="col-md-10 h-100 border-left">
+        <div class="col-md-10 h-100 border-left overflow-auto">
           <router-view />
         </div>
       </div>
@@ -29,10 +29,16 @@ export default {
   html {
     height: 100%;
   }
-  body{
+  body {
     height: 100%;
   }
   #app {
     height: 100%;
+  }
+  main > div {
+    padding-top: 3.5em;
+  }
+  .sidebar {
+    background-color: #f6fff9;
   }
 </style>

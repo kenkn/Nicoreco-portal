@@ -1,0 +1,74 @@
+[
+    {
+        "name" : "伊藤研究室",
+        "code" : "akito"
+    },
+    {
+        "name": "井田研究室",
+        "code" : "y.ida"
+    },
+    {
+        "name": "福士研究室",
+        "code" : "mfukushi"
+    },
+    {
+        "name": "山口研究室",
+        "code" : "shingo"
+    },
+    {
+        "name": "アヌアル研究室",
+        "code" : "anuar"
+    },
+    {
+        "name": "中正研究室",
+        "code" : "nakasho"
+    },
+    {
+        "name": "王研究室",
+        "code" : "y.wang"
+    },
+    {
+        "name": "藤田研究室",
+        "code" : "y-fujita"
+    },
+    {
+        "name": "間普研究室",
+        "code" : "mabu"
+    },
+    {
+        "name": "佐村研究室",
+        "code" : "samura"
+    },
+    {
+        "name": "佐伯研究室",
+        "code" : "tsaeki"
+    },
+    {
+        "name": "河村研究室",
+        "code" : "kay"
+    },
+    {
+        "name": "中村研究室",
+        "code" : "nakahide"
+    },
+    {
+        "name": "瀧本研究室",
+        "code" : "dpslpage"
+    },
+    {
+        "name": "多田村研究室",
+        "code" : "tadamura"
+    },
+    {
+        "name": "長研究室",
+        "code" : "osaa"
+    },
+    {
+        "name": "相田研究室",
+        "code" : "saoaida"
+    },
+    {
+        "name": "水上研究室",
+        "code" : "mizu"
+    }
+]
