@@ -13,10 +13,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// /question/:subject (GET)
+// /questions/:subject (GET)
 // 機能 : 科目の質問の全取得
 // 戻り値 : 質問のJSON
-func Question(c *fiber.Ctx) error {
+func Questions(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	sbj := c.Params("subject")
@@ -28,18 +28,18 @@ func Question(c *fiber.Ctx) error {
 
 }
 
-// /question/detail/:id (GET)
+// /question/:id (GET)
 // 機能 : 質問の詳細情報取得
 // 戻り値 : 質問の詳細情報のJSON
-func QuestionDetail(c *fiber.Ctx) error {
+func Question(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	id := c.Params("id")
 
-	var detail models.Question
-	database.DB.Where("id = ?", id).First(&detail)
+	var question models.Question
+	database.DB.Where("id = ?", id).First(&question)
 
-	return c.JSON(detail)
+	return c.JSON(question)
 
 }
 

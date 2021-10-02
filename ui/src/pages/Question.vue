@@ -100,7 +100,7 @@ export default {
       try {
         // 質問情報の取得
         const questionData = await axios.get(
-          "/question/detail/" + this.$route.params.question_id
+          "/question/" + this.$route.params.question_id
         )
         question.value = questionData.data
 

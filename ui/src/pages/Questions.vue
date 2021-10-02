@@ -72,7 +72,7 @@ export default {
     }
     onMounted(async () => {
       try {
-        const url = "question/" + code
+        const url = "questions/" + code
         const { data } = await axios.get(url)
         questions.value = data
       } catch (e) {
