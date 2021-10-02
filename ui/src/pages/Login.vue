@@ -43,13 +43,15 @@ export default {
     const store = useStore()
 
     const login = async () => {
-      const userData = await axios.post("login", {
+      await axios.post("login", {
         email: email.value,
         password: password.value
       })
+      const userData = await axios.get("user")
+      console.log(userData.data)
       localStorage.displayName = await userData.data.display_name
       localStorage.userID = await userData.data.user_id
-      localStorage.grade = await userData.data.grade
+      localStorage.grade = await userData.data.Grade
       localStorage.email = await userData.data.email
       localStorage.isLogin = true
       store.dispatch("setAuth", true)
