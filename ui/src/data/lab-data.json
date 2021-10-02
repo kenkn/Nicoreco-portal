@@ -1,70 +1,74 @@
 [
     {
-        "name" : "計算基礎学研究室",
+        "name" : "伊藤研究室",
         "code" : "akito"
     },
     {
-        "name": "情報通信研究室",
-        "code" : "matugen"
+        "name": "井田研究室",
+        "code" : "y.ida"
     },
     {
-        "name": "計算機システム工学研究室",
+        "name": "福士研究室",
         "code" : "mfukushi"
     },
     {
-        "name": "ソフトウェアシステム工学研究室",
+        "name": "山口研究室",
         "code" : "shingo"
     },
     {
-        "name": "高信頼システム研究室",
+        "name": "アヌアル研究室",
+        "code" : "anuar"
+    },
+    {
+        "name": "中正研究室",
         "code" : "nakasho"
     },
     {
-        "name": "Web情報工学研究室",
+        "name": "王研究室",
         "code" : "y.wang"
     },
     {
-        "name": "情報認識工学研究室",
+        "name": "藤田研究室",
         "code" : "y-fujita"
     },
     {
-        "name": "生体情報システム工学研究室",
+        "name": "間普研究室",
         "code" : "mabu"
     },
     {
-        "name": "神経回路情報処理研究室",
+        "name": "佐村研究室",
         "code" : "samura"
     },
     {
-        "name": "システム基礎工学研究室",
+        "name": "佐伯研究室",
         "code" : "tsaeki"
     },
     {
-        "name": "システム設計工学研究室",
+        "name": "河村研究室",
         "code" : "kay"
     },
     {
-        "name": "計画工学研究室",
+        "name": "中村研究室",
         "code" : "nakahide"
     },
     {
-        "name": "防災システム工学研究室",
+        "name": "瀧本研究室",
         "code" : "dpslpage"
     },
     {
-        "name": "情報メディア表現学研究室",
+        "name": "多田村研究室",
         "code" : "tadamura"
     },
     {
-        "name": "映像情報科学研究室",
+        "name": "長研究室",
         "code" : "osaa"
     },
     {
-        "name": "視覚情報研究室",
+        "name": "相田研究室",
         "code" : "saoaida"
     },
     {
-        "name": "計算機視覚工学研究室",
+        "name": "水上研究室",
         "code" : "mizu"
     }
 ]

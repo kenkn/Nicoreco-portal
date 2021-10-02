@@ -9,6 +9,7 @@ import Questions from '../pages/Questions.vue'
 import Question from '../pages/Question.vue'
 import CreateQuestion from '../pages/CreateQuestion.vue'
 import Labs from '../pages/Labs.vue'
+import LabReview from '../pages/LabReview.vue'
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', component: Home },
@@ -26,6 +27,8 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/question/:subject/:question_id', component: Question },
   // ラボの一覧ページ
   { path: '/lab', component: Labs },
+  // ラボのレビューページ
+  { path: '/lab/:professor', component: LabReview }
 ]
 
 const router = createRouter({
