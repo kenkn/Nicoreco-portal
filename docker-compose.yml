@@ -32,11 +32,16 @@ services:
 
   mysql:
     image: mysql/mysql-server:5.7.28
+    command: 
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: go_auth
+      TZ: "Asia/Tokyo"
     ports:
       - '3306:3306'
     volumes:
