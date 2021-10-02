@@ -39,11 +39,10 @@ export default {
     }
 
     const submit = async () => {
-      const userData = await axios.get("user")
       // 確認(いらんかったら消してください) 
       if(window.confirm('送信します')) {
         await axios.post("/question/post", {
-          questioner_id : userData.user_id,
+          questioner_id : localStorage.userID,
           subject       : this.$route.params.subject,
           title         : title.value,
           body          : body.value
