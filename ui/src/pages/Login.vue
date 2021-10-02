@@ -43,10 +43,14 @@ export default {
     const store = useStore()
 
     const login = async () => {
-      await axios.post("login", {
+      const userData = await axios.post("login", {
         email: email.value,
         password: password.value
       })
+      localStorage.displayName = await userData.data.display_name
+      localStorage.userID = await userData.data.user_id
+      localStorage.grade = await userData.data.grade
+      localStorage.email = await userData.data.email
       localStorage.isLogin = true
       store.dispatch("setAuth", true)
       // 前のページに遷移する
