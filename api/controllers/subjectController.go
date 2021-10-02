@@ -61,9 +61,6 @@ func PostQuestion(c *fiber.Ctx) error {
 		return err
 	}
 
-	var userInfo models.User
-	database.DB.Where("user_id = ?", data["questioner_id"]).First(&userInfo)
-
 	question := models.Question{
 		QuestionerID: data["questioner_id"],
 		Subject:      data["subject"],
