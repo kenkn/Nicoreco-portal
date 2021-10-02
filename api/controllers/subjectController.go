@@ -206,8 +206,6 @@ func PostAnswer(c *fiber.Ctx) error {
 	}
 	parent_id, _ := strconv.Atoi(data["parent_id"])
 	parent_id_uint := uint(parent_id)
-	var questionInfo models.Question
-	database.DB.Where("id = ?", parent_id).First(&questionInfo)
 
 	answer := models.Answer{
 		ParentID: parent_id_uint,
@@ -243,9 +241,6 @@ func PostReply(c *fiber.Ctx) error {
 	question_id_uint := uint(question_id)
 	parent_id, _ := strconv.Atoi(data["parent_id"])
 	parent_id_uint := uint(parent_id)
-
-	var replyInfo models.Reply
-	database.DB.Where("id = ?", parent_id_uint).First(&replyInfo)
 
 	reply := models.Reply{
 		QuestionID: question_id_uint,
