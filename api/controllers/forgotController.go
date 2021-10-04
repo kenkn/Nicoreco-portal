@@ -57,7 +57,7 @@ func Forgot(c *fiber.Ctx) error {
 
 	// パスワードリセット用のURL
 	// TODO サーバにデプロイする際に変更
-	url := "http://localhost:8080/reset/" + token
+	url := "http://localhost:80/reset/" + token
 	message := fmt.Sprintf("Click <a href=\"%s\">here</a> to reset password!", url)
 	err := smtp.SendMail(
 		"smtp:1025",
