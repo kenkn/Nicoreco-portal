@@ -1,5 +1,12 @@
 version: '3'
 services:
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - 8081:81
+    volumes:
+      - ./ui:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
   api:
     build:
       context: .
@@ -7,7 +14,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./api:/go/src/api/
+      - ./api:/go/src/api
       # wsl2の環境によって最後の/がいらない
       # - ./api:/go/src/api
     command: >
@@ -21,22 +28,31 @@ services:
     links:
       - 'smtp'
   ui:
-    build:
-      context: .
-      dockerfile: ./docker/vue3/Dockerfile
-    ports:
-      - 8080:8080
+    build: ./docker/vue3
     volumes:
       - ./ui:/app
-    command: npm run serve
+    tty: true
+    # build:
+    #   context: .
+    #   dockerfile: ./docker/vue3/Dockerfile
+    # ports:
+    #   - 8080:8080
+    # volumes:
+    #   - ./ui:/app
+    # command: npm run serve
 
   mysql:
     image: mysql/mysql-server:5.7.28
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: go_auth
+      TZ: 'Asia/Tokyo'
     ports:
       - '3306:3306'
     volumes:
