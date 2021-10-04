@@ -9,7 +9,7 @@
                 "authProtocol": "default"
             },
             "previewLimit": 50,
-            "server": "localhost",
+            "server": "0.0.0.0",
             "port": 3306,
             "driver": "MySQL",
             "name": "nicoreco",
