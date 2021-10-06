@@ -5,7 +5,7 @@
   
     <div v-for="review in reviews" :key="review.ID" class="border p-3 mt-4">
       <p>{{ review.body }}</p>
-      <span class="text-secondary m-0">レビュー者: {{ review.user_id }} </span>
+      <span class="text-secondary m-0">レビュー者: {{ review.lab_reviewer_id }} </span>
       <span class="text-secondary m-0 pl-3">レビュー日時: {{ review.CreatedAt }} </span><br>
       <div class="mt-1">
         <button id="lgtm" class="btn btn-outline-primary lgtm">
@@ -16,8 +16,8 @@
         <span class="pl-2">{{ review.lgtm }}件</span>
       </div>
       <hr>
-      <template v-for="reply in replys" :key="reply.ID">
-        <div v-if="reply.parent_id==review.ID" class="border p-2 ml-2">
+      <template v-for="reply in replys[review.ID]" :key="reply.ID">
+        <div v-if="reply.lab_review_id==review.ID" class="border p-2 ml-2">
           <p>{{ reply.body }}</p>
           <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
           <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
@@ -65,25 +65,25 @@ export default {
     const auth = computed(() => store.state.auth)
     let lab = ref({})
     const reviewBody = ref("")
-    // const reviews = ref({})
-    const replys = ref({})
+    const reviews = ref({})
+    const replys = ref([])
     const replyBody = ref([])
 
     // テスト用
-    const reviews = []
-    reviews.push(
-        {
-            ID: 1,
-            body: "ああああ",
-            lgtm: 5,
-            user_id: "aaa",
-            CreatedAt: Date()
-        }
-    )
+    // const reviews = []
+    // reviews.push(
+    //     {
+    //         ID: 1,
+    //         body: "ああああ",
+    //         lgtm: 5,
+    //         user_id: "aaa",
+    //         CreatedAt: Date()
+    //     }
+    // )
 
     onMounted(async () => {
       try {
-        // ラボ名の取得
+        // // ラボ名の取得
         for (const d of labData) {
           if (d.code === this.$route.params.professor) {
             lab.value = {
@@ -93,6 +93,18 @@ export default {
           }
         }
 
+        const labReviewData = await axios.get(
+          "/lab/reviews/" + this.$route.params.professor
+        )
+        reviews.value = labReviewData.data
+
+        for (const d in labReviewData.data) {
+          const labReplyData = await axios.get(
+            "/lab/reply/" + labReviewData.data[d].ID
+          )
+          replys.value[labReviewData.data[d].ID] = labReplyData.data
+        }
+        console.log(replys.value[1])
         // 情報の取得
         // const answerData = await axios.get(
         //   "/answer/" + questionData.data.ID
@@ -119,6 +131,17 @@ export default {
     })
 
     const submitReview = async () => {
+      try {
+        await axios.post("lab/review/post", {
+          lab : this.$route.params.professor,
+          lab_reviewer_id : localStorage.userID,
+          body : reviewBody.value
+        })
+        // リロード
+        // this.$router.go({path: this.$router.currentRoute.path, force: true})
+      } catch (e) {
+        console.log(e)
+      }
       // try {
       //   const userData = await axios.get("user")
       //   await axios.post("answer/post", {
@@ -134,6 +157,17 @@ export default {
     }
 
     const submitReply = async (id) => {
+      try {
+        await axios.post("lab/reply/post", {
+          lab_review_id : String(id),
+          user_id : localStorage.userID,
+          body : replyBody.value[id]
+        })
+        // リロード
+        this.$router.go({path: this.$router.currentRoute.path, force: true})
+      } catch (e) {
+        console.log(e)
+      }
       // try {
       //   const userData = await axios.get("user")
       //   await axios.post("reply/post", {

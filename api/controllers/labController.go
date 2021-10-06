@@ -24,6 +24,7 @@ func LabReviews(c *fiber.Ctx) error {
 	database.DB.Where("lab = ?", lab).Find(&reviews)
 
 	return c.JSON(reviews)
+
 }
 
 // /lab/review/:id (GET)
@@ -38,6 +39,7 @@ func LabReview(c *fiber.Ctx) error {
 	database.DB.Where("id = ?", id).First(&review)
 
 	return c.JSON(review)
+
 }
 
 // /lab/review/post (POST)
@@ -50,6 +52,7 @@ func LabReview(c *fiber.Ctx) error {
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReview(c *fiber.Ctx) error {
+
 	var data map[string]string
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
@@ -65,6 +68,7 @@ func PostLabReview(c *fiber.Ctx) error {
 	database.DB.Create(&review)
 
 	return c.JSON(review)
+
 }
 
 // /lab/reply/:id (GET)
@@ -79,6 +83,7 @@ func LabReply(c *fiber.Ctx) error {
 	database.DB.Where("lab_review_id = ?", lab_review_id).Find(&replys)
 
 	return c.JSON(replys)
+
 }
 
 // /lab/reply/post (POST)
@@ -91,6 +96,7 @@ func LabReply(c *fiber.Ctx) error {
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReply(c *fiber.Ctx) error {
+
 	var data map[string]string
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
@@ -105,4 +111,5 @@ func PostLabReply(c *fiber.Ctx) error {
 	database.DB.Create(&reply)
 
 	return c.JSON(reply)
+
 }
