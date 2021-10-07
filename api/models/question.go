@@ -14,4 +14,5 @@ type Question struct {
 	Title        string `json:"title"`
 	Body         string `json:"body"`
 	Lgtm         uint   `json:"lgtm"`
+	AnswerCount  uint   `json:"answer_count"`
 }
