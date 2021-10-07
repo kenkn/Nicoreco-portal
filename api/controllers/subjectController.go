@@ -44,7 +44,7 @@ func Question(c *fiber.Ctx) error {
 }
 
 // /question/post (POST)
-// 機能 : 質問の投稿
+// 機能 : 質問をDBに追加する
 // 受信するJSON :
 //  * questioner_id : 質問者のユーザID
 //  * subject       : 質問の科目
@@ -113,7 +113,7 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 // /lgtm/answer (POST)
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
-//  * id : LGTMする質問のID
+//  * id 	  : LGTMする質問のID
 //  * user_id : LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
@@ -188,6 +188,9 @@ func LgtmAnswer(c *fiber.Ctx) error {
 
 }
 
+// /answer/:parent_id (GET)
+// 機能 : 該当のquestionに対するanswer一覧を取得する
+// 戻り値 : Answer一覧のJSON
 func Answer(c *fiber.Ctx) error {
 
 	parent := c.Params("parent_id")
@@ -197,6 +200,15 @@ func Answer(c *fiber.Ctx) error {
 
 }
 
+// /answer/post (POST)
+// 機能 : 質問に対する回答をDBに追加する
+// 受信するJSON :
+//  * parent_id : 回答のquestionのID
+//  * user_id 	: 回答したユーザーID
+//  * body 		: 回答の本文
+// 戻り値 : 回答のJSON
+// 例外発行 :
+//  * リクエストデータのパースに失敗した場合に例外を発行
 func PostAnswer(c *fiber.Ctx) error {
 
 	var data map[string]string
@@ -220,6 +232,10 @@ func PostAnswer(c *fiber.Ctx) error {
 
 }
 
+// /reply/:question_id (GET)
+// 機能 : 該当のquestionに対するreply一覧を取得する
+// 戻り値 : reply一覧のJSON
+// TODO labControllerと同じようにanswerに対してreplyJSONを返すようにする(ページング実装のため)
 func Reply(c *fiber.Ctx) error {
 
 	parent := c.Params("question_id")
@@ -229,6 +245,15 @@ func Reply(c *fiber.Ctx) error {
 
 }
 
+// /reply/post (POST)
+// 機能 : 回答に対するリプライをDBに追加する
+// 受信するJSON :
+//  * parent_id : questionのID
+//  * user_id 	: リプライを送信したユーザーID
+//  * body 		: リプライの本文
+// 戻り値 : リプライのJSON
+// 例外発行 :
+//  * リクエストデータのパースに失敗した場合に例外を発行
 func PostReply(c *fiber.Ctx) error {
 
 	var data map[string]string
