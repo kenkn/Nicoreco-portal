@@ -42,6 +42,7 @@ func Connect() {
 		&models.Reply{},
 		&models.LgtmQuestion{},
 		&models.LgtmAnswer{},
+		&models.LgtmLabReview{},
 		&models.LabReview{},
 		&models.LabReply{},
 	)
