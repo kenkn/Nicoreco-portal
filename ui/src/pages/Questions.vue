@@ -30,7 +30,7 @@
             </div>
             <div class="col-3 col-md-2 col-lg-1">
               <div>
-                <p class="text-center text-secondary m-0 p-2">{{ answer }}</p>
+                <p class="text-center text-secondary m-0 p-2">{{ question.answer_count }}</p>
               </div>
               <div>
                 <p class="text-center text-secondary m-0 p-2">回答数</p>
@@ -79,10 +79,7 @@ export default {
         console.log(e)
       }
     })
-
-    // TODO 回答数をモデルに追加した後実装する
-    answer.value = 77777
-
+    
     return {
       auth,
       subject,

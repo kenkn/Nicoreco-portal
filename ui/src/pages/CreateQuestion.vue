@@ -45,7 +45,8 @@ export default {
           questioner_id : localStorage.userID,
           subject       : this.$route.params.subject,
           title         : title.value,
-          body          : body.value
+          body          : body.value,
+          answer_count  : 0
         })
         await router.push("/question/" + code)
       }
