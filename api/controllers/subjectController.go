@@ -216,6 +216,7 @@ func PostAnswer(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
+
 	parent_id, _ := strconv.Atoi(data["parent_id"])
 	parent_id_uint := uint(parent_id)
 
@@ -227,6 +228,12 @@ func PostAnswer(c *fiber.Ctx) error {
 	}
 
 	database.DB.Create(&answer)
+
+	// questionの回答数の加算
+	answers := []models.Answer{}
+	database.DB.Where("parent_id = ?", data["parent_id"]).First(&answers)
+	var question models.Question
+	database.DB.Model(&question).Where("id = ?", data["parent_id"]).Update("answer_count", len(answers))
 
 	return c.JSON(answer)
 
