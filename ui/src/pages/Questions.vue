@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="">
-      <h1 class="p-3 d-inline-block">{{ subject }}の質問一覧</h1>
+      <h1 class="pb-3 d-inline-block display-5">{{ subject }}の質問一覧</h1>
       <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
         <button type="button" class="btn btn-primary">ログインして質問する</button>
       </router-link>
@@ -11,35 +11,30 @@
     </div>
     
     <div v-if="questions!=null">
-      <ul class="list-group">
-        <li v-for="question in questions" :key="question.ID" class="list-group-item">
-          <div class="row">
-            <div class="col-6 col-md-8 col-lg-10 btn">
-              <router-link tag="li" class="pageLink" v-bind:to="$route.path  + '/' + question.ID">
-                <p>{{ question.title }}</p>
-              </router-link>
-              <p class="text-right text-secondary m-0">更新日時:{{ question.created_at }}</p>
+      <router-link v-for="question in questions" :key="question.ID" v-bind:to="$route.path  + '/' + question.ID" class="list-group-item link-box p-0">
+        <div class="row m-0">
+          <div class="col-6 col-md-8 col-lg-10 btn">
+            <p class="fw-bolder">{{ question.title }}</p>
+            <p class="text-right text-secondary m-0">更新日時:{{ question.created_at }}</p>
+          </div>
+          <div class="col-3 col-md-2 col-lg-1">
+            <div>
+              <p class="text-center text-secondary m-0 p-2">{{ question.lgtm }}</p>
             </div>
-            <div class="col-3 col-md-2 col-lg-1">
-              <div>
-                <p class="text-center text-secondary m-0 p-2">{{ question.lgtm }}</p>
-              </div>
-              <div>
-                <p class="text-center text-secondary m-0 p-2">Good</p>
-              </div>
-            </div>
-            <div class="col-3 col-md-2 col-lg-1">
-              <div>
-                <p class="text-center text-secondary m-0 p-2">{{ question.answer_count }}</p>
-              </div>
-              <div>
-                <p class="text-center text-secondary m-0 p-2">回答数</p>
-              </div>
+            <div>
+              <p class="text-center text-secondary m-0 p-2">Good</p>
             </div>
           </div>
-
-        </li>
-      </ul>
+          <div class="col-3 col-md-2 col-lg-1 p-0">
+            <div>
+              <p class="text-center text-secondary m-0 p-2">{{ question.answer_count }}</p>
+            </div>
+            <div>
+              <p class="text-center text-secondary m-0 p-2">回答数</p>
+            </div>
+          </div>
+        </div>
+      </router-link>
     </div>
     <div v-else>
       <h3 class="p-3">
@@ -90,3 +85,14 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .link-box {
+    border-width: 2px;
+    border-color: black;
+    background-color: white;
+  }
+  .link-box :hover{
+    background: rgb(230, 229, 227);
+  }
+</style>

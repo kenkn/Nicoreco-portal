@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="p-3">{{ message }}</h1>
+    <h1 class="p-b3 display-5">{{ message }}</h1>
   </div>
 </template>
  
