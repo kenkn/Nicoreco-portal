@@ -22,7 +22,7 @@ export default {
 </script>
 <style scoped>
   .link-box {
-    border-width: 2px;
+    border-width: 1px;
     border-color: black;
     background-color: white;
   }

@@ -42,6 +42,6 @@ export default {
     background-color: rgba(227, 225, 230, 0.555);
   }
   #contents {
-    background-color: rgba(213, 236, 236, 0.726);
+    background-color: rgba(255, 255, 255, 0.966);
   }
 </style>
