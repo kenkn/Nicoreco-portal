@@ -37,7 +37,7 @@ import { useStore } from 'vuex'
 export default {
   name: "Login",
   data() {
-    const email = ref("")
+    const email = ref("@yamaguchi-u.ac.jp")
     const password = ref("")
     const router = useRouter()
     const store = useStore()

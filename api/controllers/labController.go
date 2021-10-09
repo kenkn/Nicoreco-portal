@@ -8,6 +8,7 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -111,5 +112,65 @@ func PostLabReply(c *fiber.Ctx) error {
 	database.DB.Create(&reply)
 
 	return c.JSON(reply)
+
+}
+
+// /lgtm/lab/:lab_review_id/:user_id (GET)
+// 機能 : LGTMされたどうかの判定(labReview用)
+// 戻り値 : LGTM情報のJSON
+func IsLabReviewLgtmed(c *fiber.Ctx) error {
+
+	// GETの内容を取得
+	lab_review_id := c.Params("lab_review_id")
+	user_id := c.Params("user_id")
+
+	// 質問を全検索してリストで取得
+	var lgtm models.LgtmLabReview
+	database.DB.Where("user_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).First(&lgtm)
+
+	return c.JSON(lgtm)
+
+}
+
+// /lgtm/lab (POST)
+// 機能 : 研究室レビューのLGTM数を加算する
+// 受信するJSON :
+//  * id 	  : LGTMする研究室レビューのID
+//  * user_id : LGTMしたユーザーID
+// 戻り値 : LGTMした質問のJSON
+// 例外発行 :
+//  * リクエストデータのパースに失敗した場合に例外を発行
+func LgtmLabReview(c *fiber.Ctx) error {
+
+	var data map[string]string
+	// リクエストデータをパース
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
+	var lgtm models.LgtmLabReview
+	database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).First(&lgtm)
+
+	var pressed models.LgtmLabReview
+	if lgtm.UserID != "" {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&pressed)
+	} else {
+		parent_id, _ := strconv.Atoi(data["lab_review_id"])
+		lab_review_id_uint := uint(parent_id)
+		lgtm := models.LgtmLabReview{
+			LabReviewID: lab_review_id_uint,
+			UserID:      data["user_id"],
+		}
+		database.DB.Create(&lgtm)
+	}
+
+	// LGTMの更新
+	lgtms := []models.LgtmLabReview{}
+	database.DB.Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtms)
+	var labReview models.LabReview
+	database.DB.Model(&labReview).Where("id = ?", data["lab_review_id"]).Update("lgtm", len(lgtms))
+
+	return c.JSON(labReview)
 
 }
