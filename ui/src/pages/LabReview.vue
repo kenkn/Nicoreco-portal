@@ -83,18 +83,6 @@ export default {
     const replys = ref([])
     const replyBody = ref([])
 
-    // テスト用
-    // const reviews = []
-    // reviews.push(
-    //     {
-    //         ID: 1,
-    //         body: "ああああ",
-    //         lgtm: 5,
-    //         user_id: "aaa",
-    //         CreatedAt: Date()
-    //     }
-    // )
-
     onMounted(async () => {
       try {
         // // ラボ名の取得
@@ -118,18 +106,6 @@ export default {
           )
           replys.value[labReviewData.data[d].ID] = labReplyData.data
         }
-        console.log(replys.value[1])
-        // 情報の取得
-        // const answerData = await axios.get(
-        //   "/answer/" + questionData.data.ID
-        // )
-        // answers.value = answerData.data
-
-        // リプライ情報の取得
-        // const replyData = await axios.get(
-        //   "/reply/" + questionData.data.ID
-        // )
-        // replys.value = replyData.data
 
         // ログインしていない場合LGTMボタンをdisabledにする
         if(!store.state.auth){
@@ -152,22 +128,10 @@ export default {
           body : reviewBody.value
         })
         // リロード
-        // this.$router.go({path: this.$router.currentRoute.path, force: true})
+        this.$router.go({path: this.$router.currentRoute.path, force: true})
       } catch (e) {
         console.log(e)
       }
-      // try {
-      //   const userData = await axios.get("user")
-      //   await axios.post("answer/post", {
-      //     parent_id : this.$route.params.question_id,
-      //     user_id : userData.data.user_id,
-      //     body : reviewBody.value
-      //   })
-      //   // リロード
-      //   this.$router.go({path: this.$router.currentRoute.path, force: true})
-      // } catch (e) {
-      //   console.log(e)
-      // }
     }
 
     const submitReply = async (id) => {
@@ -182,19 +146,6 @@ export default {
       } catch (e) {
         console.log(e)
       }
-      // try {
-      //   const userData = await axios.get("user")
-      //   await axios.post("reply/post", {
-      //     question_id : this.$route.params.question_id,
-      //     parent_id : String(id),
-      //     user_id : userData.data.user_id,
-      //     body : replyBody.value[id]
-      //   })
-      //   // リロード
-      //   this.$router.go({path: this.$router.currentRoute.path, force: true})
-      // } catch (e) {
-      //   console.log(e)
-      // }
     }
 
     // 「返信を追加」ボタンを非表示にし, リプライフォームを表示する
