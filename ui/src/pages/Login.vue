@@ -56,7 +56,11 @@ export default {
       localStorage.isLogin = true
       store.dispatch("setAuth", true)
       // 前のページに遷移する
-      await router.push(this.prevRoute.path)
+      if (this.prevRoute.path == '/register') {
+        await router.push('/')
+      } else {
+        await router.push(this.prevRoute.path)
+      }
     }
 
     return {
