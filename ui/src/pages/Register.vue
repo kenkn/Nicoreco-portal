@@ -84,7 +84,7 @@ export default {
     const displayName     = ref("")
     const userID          = ref("")
     const grade           = ref("")
-    const email           = ref("")
+    const email           = ref("@yamaguchi-u.ac.jp")
     const password        = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
