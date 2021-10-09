@@ -3,10 +3,10 @@
     <Nav />
     <main class="container-fluid h-100 m-0">
       <div class="row h-100">
-        <div class="col-md-2 h-auto sidebar">
+        <div id="sidebar" class="col-md-2 h-auto">
           <Sidebar />
         </div>
-        <div class="col-md-10 h-100 border-left overflow-auto">
+        <div id="contents" class="col-md-10 h-100 border-left border-dark overflow-auto px-5 pt-5">
           <router-view />
         </div>
       </div>
@@ -38,7 +38,10 @@ export default {
   main > div {
     padding-top: 3.5em;
   }
-  .sidebar {
-    background-color: #f6fff9;
+  #sidebar {
+    background-color: rgba(227, 225, 230, 0.555);
+  }
+  #contents {
+    background-color: rgba(213, 236, 236, 0.726);
   }
 </style>

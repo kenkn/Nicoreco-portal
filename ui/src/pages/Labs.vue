@@ -1,12 +1,10 @@
 <template>
   <div class="container">
-    <h1 class="p-3">研究室一覧</h1>
+    <h1 class="pb-3 display-5">研究室一覧</h1>
   <div class="row">
-    <div v-for="lab in labs" :key="lab.code" class="col col-12 col-md-3 col-lg-2 m-2 text-center border border-3">
-      <router-link tag="li" class="pageLink btn btn-link" v-bind:to="'/lab/' + lab.code">
-        <p>{{ lab.name }}</p>
-      </router-link>
-    </div>
+    <router-link v-for="lab in labs" :key="lab.code"  v-bind:to="'/lab/' + lab.code" tag="li" class="btn btn-link col col-12 col-md-3 col-lg-2 m-3 p-0 text-center text-dark rounded shadow-sm link-box">
+      <p class="text-center fw-bolder p-3 mt-0 my-2 w-100 h-100">{{ lab.name }}</p>
+    </router-link>
   </div>
   </div>
 </template>
@@ -22,3 +20,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .link-box {
+    border-width: 2px;
+    border-color: black;
+    background-color: white;
+  }
+  .link-box :hover{
+    background: rgb(230, 229, 227);
+  }
+</style>
