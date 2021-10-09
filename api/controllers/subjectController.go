@@ -86,8 +86,8 @@ func IsQuestionLgtmed(c *fiber.Ctx) error {
 	user_id := c.Params("user_id")
 
 	// 質問を全検索してリストで取得
-	var lgtm models.LgtmQuestion
-	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", question_id).First(&lgtm)
+	lgtm := []models.LgtmQuestion{}
+	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", question_id).Find(&lgtm)
 
 	return c.JSON(lgtm)
 
@@ -103,7 +103,7 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 	user_id := c.Params("user_id")
 
 	// 質問を全検索してリストで取得
-	var lgtm models.LgtmAnswer
+	lgtm := []models.LgtmAnswer{}
 	database.DB.Where("user_id = ?", user_id).Where("answer_id = ?", answer_id).Find(&lgtm)
 	return c.JSON(lgtm)
 
@@ -127,12 +127,11 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	var lgtm models.LgtmQuestion
-	database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).First(&lgtm)
+	lgtmData := []models.LgtmQuestion{}
+	database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).Find(&lgtmData)
 
-	var pressed models.LgtmQuestion
-	if lgtm.UserID != "" {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).Delete(&pressed)
+	if len(lgtmData) > 0 {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).Delete(&lgtmData[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["question_id"])
 		question_id_uint := uint(parent_id)
@@ -162,12 +161,11 @@ func LgtmAnswer(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	var lgtm models.LgtmAnswer
-	database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).First(&lgtm)
+	lgtmData := []models.LgtmAnswer{}
+	database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Find(&lgtmData)
 
-	var pressed models.LgtmAnswer
-	if lgtm.UserID != "" {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Delete(&pressed)
+	if len(lgtmData) > 0 {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Delete(&lgtmData[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["answer_id"])
 		answer_id_uint := uint(parent_id)

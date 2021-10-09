@@ -133,7 +133,7 @@ export default {
             "/lgtm/question/" + questionData.data.ID + "/" + localStorage.userID
           )
           // ユーザはLGTMしているか?
-          if (questionLgtmData.data.user_id == "") {
+          if (questionLgtmData.data.length == 0) {
             questionLgtm.value = false
           } else {
             questionLgtm.value = true
@@ -145,7 +145,7 @@ export default {
             const answerLgtmData = await axios.get(
               "/lgtm/answer/" + id + "/" + localStorage.userID
             )
-            if (answerLgtmData.data.user_id == "") {
+            if (answerLgtmData.data.length == 0) {
               answerLgtm.value[id] = false
             } else {
               answerLgtm.value[id] = true

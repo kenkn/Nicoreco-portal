@@ -125,8 +125,8 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 	user_id := c.Params("user_id")
 
 	// 質問を全検索してリストで取得
-	var lgtm models.LgtmLabReview
-	database.DB.Where("user_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).First(&lgtm)
+	lgtm := []models.LgtmLabReview{}
+	database.DB.Where("user_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).Find(&lgtm)
 
 	return c.JSON(lgtm)
 
@@ -149,12 +149,11 @@ func LgtmLabReview(c *fiber.Ctx) error {
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	var lgtm models.LgtmLabReview
-	database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).First(&lgtm)
+	lgtmData := []models.LgtmLabReview{}
+	database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtmData)
 
-	var pressed models.LgtmLabReview
-	if lgtm.UserID != "" {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&pressed)
+	if len(lgtmData) > 0 {
+		database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&lgtmData[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["lab_review_id"])
 		lab_review_id_uint := uint(parent_id)
