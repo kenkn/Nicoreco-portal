@@ -231,7 +231,7 @@ func PostAnswer(c *fiber.Ctx) error {
 
 	// questionの回答数の加算
 	answers := []models.Answer{}
-	database.DB.Where("parent_id = ?", data["parent_id"]).First(&answers)
+	database.DB.Where("parent_id = ?", data["parent_id"]).Find(&answers)
 	var question models.Question
 	database.DB.Model(&question).Where("id = ?", data["parent_id"]).Update("answer_count", len(answers))
 

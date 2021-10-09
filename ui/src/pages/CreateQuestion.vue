@@ -46,7 +46,6 @@ export default {
           subject       : this.$route.params.subject,
           title         : title.value,
           body          : body.value,
-          answer_count  : 0
         })
         await router.push("/question/" + code)
       }
