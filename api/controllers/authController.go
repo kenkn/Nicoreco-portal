@@ -8,12 +8,13 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
+	"log"
 	"strconv"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
 )
 
 // Claimsの型
@@ -28,16 +29,16 @@ type Claims struct {
 func Logout(c *fiber.Ctx) error {
 
 	// Cookieを設定
-	cookie := fiber.Cookie {
-		Name     : "jwt",
-		Value    : "",							// ログアウトの為tokenを空にする
-		Expires  : time.Now().Add(-time.Hour),	// 期限切れに設定する
-		HTTPOnly : true,
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",                         // ログアウトの為tokenを空にする
+		Expires:  time.Now().Add(-time.Hour), // 期限切れに設定する
+		HTTPOnly: true,
 	}
 	c.Cookie(&cookie)
 
 	return c.JSON(fiber.Map{
-		"message" : "成功",
+		"message": "成功",
 	})
 
 }
@@ -48,7 +49,7 @@ func Logout(c *fiber.Ctx) error {
 // 	* 成功時 : 該当ユーザのユーザ情報(JSON)
 // 	* 失敗時 : エラー文(JSON)
 func User(c *fiber.Ctx) error {
-	
+
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
@@ -58,7 +59,7 @@ func User(c *fiber.Ctx) error {
 	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
-			"message" : "認証されていません．",
+			"message": "認証されていません．",
 		})
 	}
 
@@ -95,20 +96,20 @@ func Register(c *fiber.Ctx) error {
 	if data["password"] != data["password_confirm"] {
 		c.Status(400)
 		return c.JSON(fiber.Map{
-			"message" : "パスワードが違います",
+			"message": "パスワードが違います",
 		})
 	}
 
 	// パスワードをエンコード(暗号の強度: 14)
 	// 暗号の強度は，高いほどセキュリティ性は高いがパフォーマンス低下に繋がる
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
-	
-	user := models.User {
-		DisplayName : data["display_name"],
-		UserID		: data["user_id"],
-		Grade		: data["grade"],
-		Email 	  	: data["email"],
-		Password  	: password,
+
+	user := models.User{
+		DisplayName: data["display_name"],
+		UserID:      data["user_id"],
+		Grade:       data["grade"],
+		Email:       data["email"],
+		Password:    password,
 	}
 
 	// データ登録(CreateはGORMメソッド)
@@ -141,12 +142,12 @@ func Login(c *fiber.Ctx) error {
 	// emailに紐づくユーザーを取得
 	// &userを指定することでDBから取得したデータを直接格納できる
 	database.DB.Where("email = ?", data["email"]).First(&user)
-	
+
 	// ユーザが見つからなかったとき
 	if user.ID == 0 {
 		c.Status(404)
 		return c.JSON(fiber.Map{
-			"message" : "メールアドレスまたはユーザ名が違います",	
+			"message": "メールアドレスまたはユーザ名が違います",
 		})
 	}
 
@@ -155,16 +156,16 @@ func Login(c *fiber.Ctx) error {
 		c.Status(404)
 		return c.JSON(fiber.Map{
 			// messageの内容はユーザが見つからなかった時と一緒にする(安全性確保のため)
-			"message" : "メールアドレスまたはユーザ名が違います",	
+			"message": "メールアドレスまたはユーザ名が違います",
 		})
 	}
 
 	// JWT Claimsの発行
-	claims := jwt.StandardClaims {
-		Issuer    : strconv.Itoa(int(user.ID)),				// ユーザIDをstringに変換
-		ExpiresAt : time.Now().Add(time.Hour*24).Unix(),	// JWTトークンの有効期限
+	claims := jwt.StandardClaims{
+		Issuer:    strconv.Itoa(int(user.ID)),            // ユーザIDをstringに変換
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // JWTトークンの有効期限
 	}
-	
+
 	// JWT tokenの発行
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := jwtToken.SignedString([]byte("secret"))
@@ -173,16 +174,20 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	// Cookieを設定
-	cookie := fiber.Cookie {
-		Name     : "jwt",
-		Value    : token,
-		Expires  : time.Now().Add(time.Hour*24),
-		HTTPOnly : true,
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+		Secure:   true,
+		SameSite: "none",
 	}
 	c.Cookie(&cookie)
 
+	log.Println(cookie)
+
 	return c.JSON(fiber.Map{
-		"jwt" : token,
+		"jwt": token,
 	})
 
 }
