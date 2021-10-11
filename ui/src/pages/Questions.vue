@@ -11,13 +11,13 @@
     </div>
     
     <div v-if="questions!=null">
-      <router-link v-for="question in questions" :key="question.ID" v-bind:to="$route.path  + '/' + question.ID" class="list-group-item link-box p-0">
+      <router-link v-for="question in questions" :key="question.ID" v-bind:to="$route.path  + '/' + question.ID" class="list-group-item link-box p-0 text-dark">
         <div class="row m-0">
-          <div class="col-6 col-md-8 col-lg-10 btn">
+          <div class="col-6 col-md-8 col-xl-10 btn">
             <p class="fw-bolder">{{ question.title }}</p>
             <p class="text-right text-secondary m-0">更新日時:{{ question.created_at }}</p>
           </div>
-          <div class="col-3 col-md-2 col-lg-1">
+          <div class="col-3 col-md-2 col-xl-1">
             <div>
               <p class="text-center text-secondary m-0 p-2">{{ question.lgtm }}</p>
             </div>
@@ -25,7 +25,7 @@
               <p class="text-center text-secondary m-0 p-2">Good</p>
             </div>
           </div>
-          <div class="col-3 col-md-2 col-lg-1 p-0">
+          <div class="col-3 col-md-2 col-xl-1 p-0">
             <div>
               <p class="text-center text-secondary m-0 p-2">{{ question.answer_count }}</p>
             </div>

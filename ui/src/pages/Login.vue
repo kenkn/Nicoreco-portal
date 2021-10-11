@@ -4,11 +4,14 @@
       <h1 class="h3 mb-3 fw-normal">ログイン</h1>
       <input
         v-model="email"
-        type="email"
-        class="form-control"
+        name="email"
+        class="form-control email d-inline"
         placeholder="Email"
         required
       />
+      <span class="d-inline lead borde">
+        @yamaguchi-u.ac.jp
+      </span>
 
       <input
         v-model="password"
@@ -37,14 +40,15 @@ import { useStore } from 'vuex'
 export default {
   name: "Login",
   data() {
-    const email = ref("@yamaguchi-u.ac.jp")
+    const email = ref("")
     const password = ref("")
     const router = useRouter()
     const store = useStore()
 
     const login = async () => {
+      const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
       await axios.post("login", {
-        email: email.value,
+        email: emailYamaguchi,
         password: password.value
       })
       const userData = await axios.get("user")
@@ -96,7 +100,8 @@ export default {
 .form-login .form-control:focus {
   z-index: 2;
 }
-.form-login input[type="email"] {
+.form-login input[name="email"] {
+  width: 40%;
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;

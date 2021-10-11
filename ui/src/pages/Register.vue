@@ -39,10 +39,14 @@
         name="email"
         v-model="email"
         type="email"
-        class="form-control"
+        class="form-control d-inline"
         placeholder="山口大学メールアドレス"
       />
+      <span class="d-inline lead borde">
+        @yamaguchi-u.ac.jp
+      </span>
       <ErrorMessage name="email" />
+
 
       <VeeField
         name="password"
@@ -84,7 +88,7 @@ export default {
     const displayName     = ref("")
     const userID          = ref("")
     const grade           = ref("")
-    const email           = ref("@yamaguchi-u.ac.jp")
+    const email           = ref("")
     const password        = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
@@ -93,20 +97,20 @@ export default {
       displayName: yup.string().required("この項目は必須です"),
       userID: yup.string().required("この項目は必須です")
         .matches("^[0-9a-zA-Z]+$", "ユーザーIDは半角英数で入力してください").min(3, "ユーザIDは3文字以上で入力してください"),
-      email: yup.string().required("この項目は必須です")
-        .matches("^[0-9a-zA-Z]+@yamaguchi-u.ac.jp$", "山口大学のメールアドレスを入力してください"),
+      email: yup.string().required("この項目は必須です"),
       password: yup.string().required("この項目は必須です").min(8, "パスワードは8文字以上で入力してください"),
       passwordConfirm: yup.string().required("この項目は必須です")
         .oneOf([yup.ref("password")], "パスワードが一致しません")
     });
 
     const submit = async () => {
+      const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
       // Register apiへPOST
       await axios.post("register", {
         display_name     : displayName.value,
         user_id          : userID.value,
         grade            : grade.value,
-        email            : email.value,
+        email            : emailYamaguchi,
         password         : password.value,
         password_confirm : passwordConfirm.value
       })
@@ -147,7 +151,8 @@ export default {
 .form-register .form-control:focus {
   z-index: 2;
 }
-.form-register input[type="email"] {
+.form-register input[name="email"] {
+  width: 40%;
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
