@@ -4,8 +4,8 @@
     <div class="mt-5 border border-dark bg-white rounded">
       <p class="p-4 display-6 border-bottom border-dark">{{ reviews.length }}件のレビュー</p>
       <div v-for="review in reviews" :key="review.ID" class="border-bottom border-dark p-4 mt-2">
-        <div class="border p-2 mb-2 shadow-sm">
-          <p>{{ review.body }}</p>
+        <div class="border p-3 mb-2 shadow-sm">
+          <h4>{{ review.body }}</h4>
           <span class="text-secondary m-0">レビュー者: {{ review.lab_reviewer_id }} </span>
           <span class="text-secondary m-0 pl-3">レビュー日時: {{ review.CreatedAt }} </span>
           <!-- ここにlgtmボタンの分岐 -->
@@ -21,10 +21,10 @@
         </div>
         <template v-for="reply in replys[review.ID]" :key="reply.ID">
           <div v-if="reply.lab_review_id==review.ID">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical  my-2 ml-4" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical  my-2 ml-5" viewBox="0 0 16 16">
               <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
             </svg>
-            <div class="border p-2 ml-3 mb-2 shadow-sm">
+            <div class="border p-2 ml-5 mb-2 shadow-sm">
               <p>{{ reply.body }}</p>
               <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
               <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span>
