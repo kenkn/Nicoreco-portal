@@ -13,7 +13,7 @@ export default {
   name: "Home",
   setup() {
     const message = ref("ログインしていません")
-    const store = useStore()
+    const store   = useStore()
 
     onMounted(async () => {
       try {

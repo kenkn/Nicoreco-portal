@@ -75,13 +75,13 @@ import labData from '../data/lab-data.json'
 export default {
   name: "LabReview",
   data() {
-    const store = useStore()
-    const auth = computed(() => store.state.auth)
-    let lab = ref({})
-    const reviewBody = ref("")
-    const reviews = ref({})
-    const replys = ref([])
-    const replyBody = ref([])
+    const store      = useStore()
+    const auth       = computed(() => store.state.auth)
+    let lab          = ref({}) // 研究室名，コード
+    const reviews    = ref({}) // 投稿されているreviewの集合
+    const reviewBody = ref("") // reviewの文章
+    const replys     = ref([]) // 投稿されているreplyの集合
+    const replyBody  = ref([]) // replyの文章
 
     onMounted(async () => {
       try {
@@ -95,11 +95,13 @@ export default {
           }
         }
 
+        // 研究室レビューの取得
         const labReviewData = await axios.get(
           "/lab/reviews/" + this.$route.params.professor
         )
         reviews.value = labReviewData.data
 
+        // 研究室レビューに対するリプライの取得
         for (const d in labReviewData.data) {
           const labReplyData = await axios.get(
             "/lab/reply/" + labReviewData.data[d].ID
@@ -119,7 +121,6 @@ export default {
         console.log(e)
       }
     })
-
     const submitReview = async () => {
       try {
         await axios.post("lab/review/post", {

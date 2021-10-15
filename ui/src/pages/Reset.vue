@@ -31,10 +31,10 @@ import axios from 'axios'
 export default {
   name: "Reset",
   setup() {
-    const password = ref("")
+    const password        = ref("")
     const passwordConfirm = ref("")
-    const route = useRoute()
-    const router = useRouter()
+    const route           = useRoute()
+    const router          = useRouter()
 
     const submit = async () => {
       await axios.post("reset", {

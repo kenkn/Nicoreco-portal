@@ -92,6 +92,7 @@ export default {
     const password        = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
+    
     // バリデーション
     const schema = yup.object({
       displayName: yup.string().required("この項目は必須です"),

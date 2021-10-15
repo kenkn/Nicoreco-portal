@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="">
-      <h1 class="pb-3 d-inline-block display-5">{{ subject }}の質問一覧</h1>
+      <h1 class="pb-3 d-inline-block display-5">{{ subjectName }}の質問一覧</h1>
       <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
         <button type="button" class="btn btn-primary">ログインして質問する</button>
       </router-link>
@@ -15,7 +15,7 @@
         <div class="row m-0">
           <div class="col-6 col-md-8 col-xl-10 btn">
             <p class="fw-bolder">{{ question.title }}</p>
-            <p class="text-right text-secondary m-0">更新日時:{{ question.created_at }}</p>
+            <p class="text-right text-secondary m-0">更新日時:{{ question.CreatedAt }}</p>
           </div>
           <div class="col-3 col-md-2 col-xl-1">
             <div>
@@ -55,16 +55,20 @@ export default {
   data() {
     const store = useStore()
     const auth = computed(() => store.state.auth)
-    let code = ''
-    const subject = ref("")
+    let code = '' // 授業コード
+    const subjectName = ref("")
     const questions = ref({})
     const answer = ref()
+
+    // URLから科目名を取得
     for (const d of subjectData) {
       if (d.code === this.$route.params.subject) {
-        subject.value = d.name
+        subjectName.value = d.name
         code = d.code
       }
     }
+
+    // 科目に対する質問一覧を取得
     onMounted(async () => {
       try {
         const url = "questions/" + code
@@ -77,13 +81,13 @@ export default {
     
     return {
       auth,
-      subject,
+      subjectName,
       code,
       questions,
       answer
     }
   }
-};
+}
 </script>
 
 <style scoped>
