@@ -17,10 +17,10 @@
         v-model="password"
         type="password"
         class="form-control"
-        placeholder="Password"
+        placeholder="パスワード"
         required
       />
-
+      <p>{{ errMessage }}</p>
       <div class="mb-2">
         <router-link to="/forgot">パスワードを忘れましたか？</router-link>
       </div>
@@ -36,29 +36,36 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
-// TODO ログイン失敗時の挙動を設定する
 export default {
   name: "Login",
   data() {
-    const email = ref("")
-    const password = ref("")
-    const router = useRouter()
-    const store = useStore()
+    const email      = ref("")
+    const password   = ref("")
+    const router     = useRouter()
+    const store      = useStore()
+    const errMessage = ref("")
 
     const login = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
-      await axios.post("login", {
-        email: emailYamaguchi,
-        password: password.value
-      })
+      try {
+        await axios.post("login", {
+          email: emailYamaguchi,
+          password: password.value
+        })
+      } catch (e) {
+        errMessage.value = "メールアドレスかパスワードが間違っています．"
+        console.log(e)
+      }
       const userData = await axios.get("user")
-      console.log(userData.data)
+      
+      // localStorageの情報を更新
       localStorage.displayName = await userData.data.display_name
       localStorage.userID = await userData.data.user_id
       localStorage.grade = await userData.data.Grade
       localStorage.email = await userData.data.email
       localStorage.isLogin = true
       store.dispatch("setAuth", true)
+
       // 前のページに遷移する
       if (this.prevRoute.path == '/register') {
         await router.push('/')
@@ -69,6 +76,7 @@ export default {
 
     return {
       prevRoute : null,
+      errMessage,
       email,
       password,
       login
