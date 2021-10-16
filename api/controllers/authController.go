@@ -8,7 +8,6 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
-	"log"
 	"strconv"
 	"time"
 
@@ -50,10 +49,14 @@ func Logout(c *fiber.Ctx) error {
 // 	* 失敗時 : エラー文(JSON)
 func User(c *fiber.Ctx) error {
 
-	// CookieからJWTを取得(Loginにて保存したユーザ情報)
-	cookie := c.Cookies("jwt")
+	var data map[string]string
+	// リクエストデータをパース
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -174,17 +177,17 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	// Cookieを設定
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24),
-		HTTPOnly: true,
-		Secure:   true,
-		SameSite: "none",
-	}
-	c.Cookie(&cookie)
+	// cookie := fiber.Cookie{
+	// 	Name:     "jwt",
+	// 	Value:    token,
+	// 	Expires:  time.Now().Add(time.Hour * 24),
+	// 	HTTPOnly: true,
+	// 	Secure:   true,
+	// 	SameSite: "none",
+	// }
+	// c.Cookie(&cookie)
 
-	log.Println(cookie)
+	// log.Println(cookie)
 
 	return c.JSON(fiber.Map{
 		"jwt": token,

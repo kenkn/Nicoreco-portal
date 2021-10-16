@@ -48,24 +48,31 @@ export default {
     const login = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
       try {
-        await axios.post("login", {
+        const jwtToken = await axios.post("login", {
           email: emailYamaguchi,
           password: password.value
         })
+        localStorage.authToken = jwtToken.data.jwt
       } catch (e) {
         errMessage.value = "メールアドレスかパスワードが間違っています．"
         console.log(e)
       }
-      const userData = await axios.get("user")
-      
-      // localStorageの情報を更新
-      localStorage.displayName = await userData.data.display_name
-      localStorage.userID = await userData.data.user_id
-      localStorage.grade = await userData.data.Grade
-      localStorage.email = await userData.data.email
-      localStorage.isLogin = true
-      store.dispatch("setAuth", true)
 
+      try {
+        const userData = await axios.post("user", {
+          jwt: localStorage.authToken
+        })
+        // localStorageの情報を更新
+        localStorage.displayName = await userData.data.display_name
+        localStorage.userID = await userData.data.user_id
+        localStorage.grade = await userData.data.Grade
+        localStorage.email = await userData.data.email
+        localStorage.isLogin = true
+        store.dispatch("setAuth", true)
+      } catch (e) {
+        console.log(e)
+      }
+      
       // 前のページに遷移する
       if (this.prevRoute.path == '/register') {
         await router.push('/')
