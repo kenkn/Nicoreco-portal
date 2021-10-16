@@ -21,29 +21,10 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-// /logout (GET)
-// 機能 : ログイン中のユーザのログアウト
-// 戻り値 : 成功メッセージ(JSON)
-// TODO : 失敗時の処理を追加する?(メリットは薄い)
-func Logout(c *fiber.Ctx) error {
-
-	// Cookieを設定
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    "",                         // ログアウトの為tokenを空にする
-		Expires:  time.Now().Add(-time.Hour), // 期限切れに設定する
-		HTTPOnly: true,
-	}
-	c.Cookie(&cookie)
-
-	return c.JSON(fiber.Map{
-		"message": "成功",
-	})
-
-}
-
-// /user (GET)
+// /user (POST)
 // 機能 : ユーザ情報の取得
+// 受信するJSON :
+//  * jwt : JWTトークン
 // 戻り値 :
 // 	* 成功時 : 該当ユーザのユーザ情報(JSON)
 // 	* 失敗時 : エラー文(JSON)

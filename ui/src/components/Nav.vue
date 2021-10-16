@@ -40,7 +40,6 @@ export default {
     const auth = computed(() => store.state.auth)
     store.dispatch("setAuth", localStorage.isLogin)
     const logout = async () => {
-      await axios.get("logout", {})
       localStorage.isLogin = false
       localStorage.displayName = null
       localStorage.userID = null
