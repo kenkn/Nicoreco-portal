@@ -66,7 +66,12 @@
       />
       <ErrorMessage name="passwordConfirm" />
 
-      <button class="w-100 btn btn-lg btn-primary" type="submit">登録</button>
+      <button v-if="!loading" class="w-100 btn-lg btn-primary" type="submit">登録</button>
+      <button v-else class="w-100 btn-lg btn-primary disabled" disabled>
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </button>
     </VeeForm>
   </main>
 </template>
@@ -84,7 +89,7 @@ export default {
       VeeField,
       ErrorMessage,
   },
-  setup() {
+  data() {
     const displayName     = ref("")
     const userID          = ref("")
     const grade           = ref("")
@@ -92,6 +97,7 @@ export default {
     const password        = ref("")
     const passwordConfirm = ref("")
     const router = useRouter()
+    let loading = false 
     
     // バリデーション
     const schema = yup.object({
@@ -106,15 +112,21 @@ export default {
 
     const submit = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
-      // Register apiへPOST
-      await axios.post("register", {
-        display_name     : displayName.value,
-        user_id          : userID.value,
-        grade            : grade.value,
-        email            : emailYamaguchi,
-        password         : password.value,
-        password_confirm : passwordConfirm.value
-      })
+      this.loading = true
+      try {
+        // Register apiへPOST
+        await axios.post("register", {
+          display_name     : displayName.value,
+          user_id          : userID.value,
+          grade            : grade.value,
+          email            : emailYamaguchi,
+          password         : password.value,
+          password_confirm : passwordConfirm.value
+        })
+      } catch (e) {
+        this.loading = false
+        console.log(e)
+      }
 
       // Login画面に戻る
       await router.push("/login")
@@ -128,6 +140,7 @@ export default {
       password,
       passwordConfirm,
       schema,
+      loading,
       submit
     }
   }

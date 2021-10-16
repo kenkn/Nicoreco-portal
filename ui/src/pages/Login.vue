@@ -25,7 +25,12 @@
         <router-link to="/forgot">パスワードを忘れましたか？</router-link>
       </div>
 
-      <button class="w-100 btn-lg btn-primary" type="submit">ログイン</button>
+      <button v-if="!loading" class="w-100 btn-lg btn-primary " type="submit">ログイン</button>
+      <button v-else class="w-100 btn-lg btn-primary disabled" disabled>
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </button>
     </form>
   </main>
 </template>
@@ -44,9 +49,10 @@ export default {
     const router     = useRouter()
     const store      = useStore()
     const errMessage = ref("")
-
+    let loading = false
     const login = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
+      this.loading = true
       try {
         await axios.post("login", {
           email: emailYamaguchi,
@@ -54,6 +60,7 @@ export default {
         })
       } catch (e) {
         errMessage.value = "メールアドレスかパスワードが間違っています．"
+        this.loading = false
         console.log(e)
       }
       const userData = await axios.get("user")
@@ -79,6 +86,7 @@ export default {
       errMessage,
       email,
       password,
+      loading,
       login
     }
   },
