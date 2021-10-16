@@ -176,19 +176,6 @@ func Login(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	// Cookieを設定
-	// cookie := fiber.Cookie{
-	// 	Name:     "jwt",
-	// 	Value:    token,
-	// 	Expires:  time.Now().Add(time.Hour * 24),
-	// 	HTTPOnly: true,
-	// 	Secure:   true,
-	// 	SameSite: "none",
-	// }
-	// c.Cookie(&cookie)
-
-	// log.Println(cookie)
-
 	return c.JSON(fiber.Map{
 		"jwt": token,
 	})
