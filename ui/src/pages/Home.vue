@@ -18,7 +18,7 @@ export default {
     onMounted(async () => {
       try {
         const { data } = await axios.post("user", {
-          jwt: localStorage.jwtToken
+          jwt: localStorage.authToken
         })
         message.value = `こんにちは．${data.display_name} さん`
 
