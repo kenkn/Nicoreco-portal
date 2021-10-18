@@ -1,2 +1,4 @@
 mysql/
 db/data/
+.idea/
+.vscode/
