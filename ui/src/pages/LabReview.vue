@@ -143,14 +143,14 @@ export default {
 
         // lgtm情報の表示(lgtmボタン+件数)
         const lgtmInfos = document.getElementsByClassName('lgtm-info')
-        for (const i in  lgtmInfos) {
+        for (let i = 0; i < lgtmInfos.length; i++) {
           lgtmInfos[i].classList.remove("d-none")
         }
 
         // ログインしていない場合LGTMボタンをdisabledにする
         if (!store.state.auth) {
           const lgtmButtons = document.getElementsByClassName('lgtm')
-          for (const i in lgtmButtons) {
+          for (let i = 0; i < lgtmButtons.length; i++) {
             console.log(lgtmButtons[i])
             lgtmButtons[i].classList.add("disabled")
           }

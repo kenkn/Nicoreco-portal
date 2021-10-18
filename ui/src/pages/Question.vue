@@ -39,7 +39,7 @@
           <span class="text-secondary m-0">ID: {{ answer.ID }} </span>
           <span class="text-secondary m-0">回答者: {{ answer.user_id }} </span>
           <span class="text-secondary m-0 pl-3">回答日時: {{ answer.CreatedAt }} </span>
-          <div class="d-none lgtn-info">
+          <div class="d-none lgtm-info">
             <div v-if="!answerLgtm[answer.ID]" class="mt-1">
               <button @click="updateAnswerLgtm(answer.ID)" id="lgtm" class="btn btn-outline-primary lgtm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
@@ -179,20 +179,16 @@ export default {
 
         // lgtm情報の表示(lgtmボタン+件数)
         const lgtmInfos = document.getElementsByClassName('lgtm-info')
-        // for (const i in lgtmInfos) {
-        //   lgtmInfos[i].classList.remove("d-none")
-        // }
-        for(let i=0; i < lgtmInfos.length; i++){
+        console.log(lgtmInfos)
+        for (let i = 0; i < lgtmInfos.length; i++) {
+          console.log(i)
           lgtmInfos[i].classList.remove("d-none")
         }
 
         // ログインしていない場合LGTMボタンをdisabledにする
         if (!store.state.auth) {
           const lgtmButtons = document.getElementsByClassName('lgtm')
-          // for (const i in lgtmButtons) {
-          //   lgtmButtons[i].classList.add("disabled")
-          // }
-          for(let i=0; i < lgtmButtons.length; i++){
+          for (let i = 0; i < lgtmButtons.length; i++) {
             console.log(lgtmButtons[i])
             lgtmButtons[i].classList.add("disabled")
           }
