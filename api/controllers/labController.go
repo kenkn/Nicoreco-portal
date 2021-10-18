@@ -135,7 +135,7 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 // /lgtm/lab (POST)
 // 機能 : 研究室レビューのLGTM数を加算する
 // 受信するJSON :
-//  * id 	  : LGTMする研究室レビューのID
+//  * lab_review_id 	  : LGTMする研究室レビューのID
 //  * user_id : LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
