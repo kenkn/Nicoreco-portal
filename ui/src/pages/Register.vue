@@ -18,11 +18,11 @@
       />
       <ErrorMessage name="userID" />
 
-      <select
+      <VeeField
+        name="grade"
         v-model="grade"
-        class="form-control"
-        required
-      >
+        as="select"
+        class="form-control">
         <option disabled value="">学年</option>
         <option>学部1年</option>
         <option>学部2年</option>
@@ -33,7 +33,8 @@
         <option>博士1年</option>
         <option>博士2年</option>
         <option>博士3年</option>
-      </select>
+      </VeeField>
+      <ErrorMessage name="grade" as="p" class="m-0"/>
 
       <VeeField
         name="email"
@@ -104,6 +105,7 @@ export default {
       displayName: yup.string().required("この項目は必須です"),
       userID: yup.string().required("この項目は必須です")
         .matches("^[0-9a-zA-Z]+$", "ユーザーIDは半角英数で入力してください").min(3, "ユーザIDは3文字以上で入力してください"),
+      grade: yup.string().required("学年を選択して下さい"),
       email: yup.string().required("この項目は必須です"),
       password: yup.string().required("この項目は必須です").min(8, "パスワードは8文字以上で入力してください"),
       passwordConfirm: yup.string().required("この項目は必須です")
