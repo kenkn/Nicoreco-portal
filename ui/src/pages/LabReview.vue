@@ -127,7 +127,6 @@ export default {
         // LGTM情報の取得
         if (localStorage.isLogin) {
           for (const i in labReviewData.data) {
-            // console.log(reviews.value[i])
             const id = labReviewData.data[i].ID
             const reviewLgtmData = await axios.get(
               "/lgtm/lab/" + id + "/" + localStorage.userID
@@ -151,7 +150,6 @@ export default {
         if (!store.state.auth) {
           const lgtmButtons = document.getElementsByClassName('lgtm')
           for (let i = 0; i < lgtmButtons.length; i++) {
-            console.log(lgtmButtons[i])
             lgtmButtons[i].classList.add("disabled")
           }
         }

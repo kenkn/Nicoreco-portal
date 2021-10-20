@@ -179,9 +179,7 @@ export default {
 
         // lgtm情報の表示(lgtmボタン+件数)
         const lgtmInfos = document.getElementsByClassName('lgtm-info')
-        console.log(lgtmInfos)
         for (let i = 0; i < lgtmInfos.length; i++) {
-          console.log(i)
           lgtmInfos[i].classList.remove("d-none")
         }
 
@@ -189,7 +187,6 @@ export default {
         if (!store.state.auth) {
           const lgtmButtons = document.getElementsByClassName('lgtm')
           for (let i = 0; i < lgtmButtons.length; i++) {
-            console.log(lgtmButtons[i])
             lgtmButtons[i].classList.add("disabled")
           }
         }
