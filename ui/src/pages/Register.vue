@@ -24,15 +24,15 @@
         as="select"
         class="form-control">
         <option disabled value="">学年</option>
-        <option>学部1年</option>
-        <option>学部2年</option>
-        <option>学部3年</option>
-        <option>学部4年</option>
-        <option>修士1年</option>
-        <option>修士2年</option>
-        <option>博士1年</option>
-        <option>博士2年</option>
-        <option>博士3年</option>
+        <option value="学部1年">学部1年</option>
+        <option value="学部2年">学部2年</option>
+        <option value="学部3年">学部3年</option>
+        <option value="学部4年">学部4年</option>
+        <option value="修士1年">修士1年</option>
+        <option value="修士2年">修士2年</option>
+        <option value="博士1年">博士1年</option>
+        <option value="博士2年">博士2年</option>
+        <option value="博士3年">博士3年</option>
       </VeeField>
       <ErrorMessage name="grade" as="p" class="m-0"/>
 
