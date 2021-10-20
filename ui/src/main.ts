@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import axios from 'axios'
-import { useStore } from 'vuex'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 
@@ -19,10 +18,10 @@ const loginCheck = async () => {
             const userData = await axios.post(axios.defaults.baseURL + "user", {
                 jwt: localStorage.authToken
             })
-            localStorage.displayName = await userData.data.display_name
-            localStorage.userID      = await userData.data.user_id
-            localStorage.grade       = await userData.data.Grade
-            localStorage.email       = await userData.data.email
+            localStorage.displayName = await userData.data.display_name as string
+            localStorage.userID      = await userData.data.user_id as string
+            localStorage.grade       = await userData.data.Grade as string
+            localStorage.email       = await userData.data.email as string
             localStorage.isLogin     = true
             store.dispatch("setAuth", true)
         } catch (e) {
