@@ -10,6 +10,7 @@ import (
 	"auth-api/models"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -46,6 +47,7 @@ func LabReview(c *fiber.Ctx) error {
 // /lab/review/post (POST)
 // 機能 : 研究室レビューの投稿
 // 受信するJSON :
+//  * jwt 	  		  : JWTトークン
 //  * lab_reviewer_id : レビュー者のユーザID
 //  * lab             : レビューする研究室名
 //  * body            : レビューの本文
@@ -59,6 +61,18 @@ func PostLabReview(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
+
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
+	}
+
 	review := models.LabReview{
 		Lab:           data["lab"],
 		LabReviewerID: data["lab_reviewer_id"],
@@ -75,7 +89,7 @@ func PostLabReview(c *fiber.Ctx) error {
 // /lab/reply/:id (GET)
 // 機能 : 研究室レビューのリプライ情報取得
 // 戻り値 : 研究室レビューのリプライ情報のJSON
-func LabReply(c *fiber.Ctx) error {
+func GetLabReply(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	lab_review_id := c.Params("lab_review_id")
@@ -90,6 +104,7 @@ func LabReply(c *fiber.Ctx) error {
 // /lab/reply/post (POST)
 // 機能 : 研究室レビューのリプライ投稿
 // 受信するJSON :
+//  * jwt 	        : JWTトークン
 //  * lab_review_id : リプライするレビューID
 //  * user_id       : リプライしたユーザーID
 //  * body          : レビューの本文
@@ -103,6 +118,18 @@ func PostLabReply(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
+
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
+	}
+
 	reply := models.LabReply{
 		LabReviewID: data["lab_review_id"],
 		Body:        data["body"],
@@ -135,8 +162,9 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 // /lgtm/lab (POST)
 // 機能 : 研究室レビューのLGTM数を加算する
 // 受信するJSON :
-//  * lab_review_id 	  : LGTMする研究室レビューのID
-//  * user_id : LGTMしたユーザーID
+//  * jwt 	  		: JWTトークン
+//  * lab_review_id : LGTMする研究室レビューのID
+//  * user_id 		: LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
@@ -146,6 +174,17 @@ func LgtmLabReview(c *fiber.Ctx) error {
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
 		return err
+	}
+
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える

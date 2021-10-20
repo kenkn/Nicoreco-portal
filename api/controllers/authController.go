@@ -84,9 +84,9 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	// パスワードをエンコード(暗号の強度: 14)
+	// パスワードをエンコード(暗号の強度: 10)
 	// 暗号の強度は，高いほどセキュリティ性は高いがパフォーマンス低下に繋がる
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 10)
 
 	user := models.User{
 		DisplayName: data["display_name"],

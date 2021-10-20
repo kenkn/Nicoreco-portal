@@ -10,13 +10,14 @@ import (
 	"auth-api/models"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
 // /questions/:subject (GET)
 // 機能 : 科目の質問の全取得
 // 戻り値 : 質問のJSON
-func Questions(c *fiber.Ctx) error {
+func GetQuestions(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	sbj := c.Params("subject")
@@ -31,7 +32,7 @@ func Questions(c *fiber.Ctx) error {
 // /question/:id (GET)
 // 機能 : 質問の詳細情報取得
 // 戻り値 : 質問の詳細情報のJSON
-func Question(c *fiber.Ctx) error {
+func GetQuestion(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	id := c.Params("id")
@@ -46,6 +47,7 @@ func Question(c *fiber.Ctx) error {
 // /question/post (POST)
 // 機能 : 質問をDBに追加する
 // 受信するJSON :
+//  * jwt			: JWTトークン
 //  * questioner_id : 質問者のユーザID
 //  * subject       : 質問の科目
 //  * title         : 質問のタイトル
@@ -59,6 +61,17 @@ func PostQuestion(c *fiber.Ctx) error {
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
 		return err
+	}
+
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
 	}
 
 	question := models.Question{
@@ -113,6 +126,7 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 // /lgtm/answer (POST)
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
+//  * jwt 	  : JWTトークン
 //  * id 	  : LGTMする質問のID
 //  * user_id : LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
@@ -124,6 +138,17 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
 		return err
+	}
+
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
 	}
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
@@ -160,6 +185,17 @@ func LgtmAnswer(c *fiber.Ctx) error {
 		return err
 	}
 
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
+	}
+
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	lgtmData := []models.LgtmAnswer{}
 	database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Find(&lgtmData)
@@ -189,7 +225,7 @@ func LgtmAnswer(c *fiber.Ctx) error {
 // /answer/:parent_id (GET)
 // 機能 : 該当のquestionに対するanswer一覧を取得する
 // 戻り値 : Answer一覧のJSON
-func Answer(c *fiber.Ctx) error {
+func GetAnswer(c *fiber.Ctx) error {
 
 	parent := c.Params("parent_id")
 	answers := []models.Answer{}
@@ -241,7 +277,7 @@ func PostAnswer(c *fiber.Ctx) error {
 // 機能 : 該当のquestionに対するreply一覧を取得する
 // 戻り値 : reply一覧のJSON
 // TODO labControllerと同じようにanswerに対してreplyJSONを返すようにする(ページング実装のため)
-func Reply(c *fiber.Ctx) error {
+func GetReply(c *fiber.Ctx) error {
 
 	parent := c.Params("question_id")
 	replys := []models.Reply{}
