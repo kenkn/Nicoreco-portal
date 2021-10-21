@@ -7,10 +7,10 @@ package controllers
 
 import (
 	"auth-api/database"
+	"auth-api/middleware"
 	"auth-api/models"
 	"strconv"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -63,11 +63,8 @@ func PostQuestion(c *fiber.Ctx) error {
 		return err
 	}
 
-	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid {
+	// JWTの認証
+	if !middleware.CanAuth(data["jwt"]) {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -140,11 +137,8 @@ func LgtmQuestion(c *fiber.Ctx) error {
 		return err
 	}
 
-	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid {
+	// JWTの認証
+	if !middleware.CanAuth(data["jwt"]) {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -185,11 +179,8 @@ func LgtmAnswer(c *fiber.Ctx) error {
 		return err
 	}
 
-	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid {
+	// JWTの認証
+	if !middleware.CanAuth(data["jwt"]) {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",

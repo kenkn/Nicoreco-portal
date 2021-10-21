@@ -7,6 +7,7 @@ package controllers
 
 import (
 	"auth-api/database"
+	"auth-api/middleware"
 	"auth-api/models"
 	"strconv"
 	"time"
@@ -17,11 +18,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
-
-// Claimsの型
-type Claims struct {
-	jwt.StandardClaims
-}
 
 // checkPattern(private)
 // 機能 : ID，パスワードの正当性チェック
@@ -74,18 +70,16 @@ func User(c *fiber.Ctx) error {
 		return err
 	}
 
-	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(data["jwt"], &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid {
+	// JWTの認証
+	token, canAuth := middleware.GetAuthToken(data["jwt"])
+	if !canAuth {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
 		})
 	}
 
-	claims := token.Claims.(*Claims)
+	claims := token.Claims.(*(middleware.Claims))
 	// User IDを取得
 	id := claims.Issuer
 
