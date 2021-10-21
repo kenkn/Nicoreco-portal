@@ -125,9 +125,6 @@ export default {
           email            : emailYamaguchi,
           password         : password.value,
           password_confirm : passwordConfirm.value
-        }).then(response => {
-          console.log("inkuakun s")
-          console.log(response)
         })
         // Login画面に戻る
         await router.push("/login")
