@@ -7,7 +7,7 @@
       </p>
       <!-- デバッグ用 TODO 消す -->
       <span class="text-secondary m-0">ID: {{ question.ID }} </span>
-      <span class="text-secondary m-0">質問者: {{ question.questionerID }} </span>
+      <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
       <span class="text-secondary m-0 pl-3">質問日時: {{ question.CreatedAt }} </span><br>
       <div class="d-none lgtm-info">
         <div v-if='!questionLgtm' class="mt-1">
