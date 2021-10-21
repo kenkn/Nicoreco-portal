@@ -40,11 +40,12 @@ export default {
     const auth = computed(() => store.state.auth)
     store.dispatch("setAuth", localStorage.isLogin)
     const logout = async () => {
-      localStorage.isLogin = false
+      localStorage.isLogin     = false
       localStorage.displayName = null
-      localStorage.userID = null
-      localStorage.grade = null     
-      localStorage.email = null
+      localStorage.userID      = null
+      localStorage.grade       = null     
+      localStorage.email       = null
+      localStorage.authToken   = null
       store.dispatch("setAuth", false)
       await router.push("/login")
     }
