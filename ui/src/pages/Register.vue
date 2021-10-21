@@ -24,15 +24,15 @@
         as="select"
         class="form-control">
         <option disabled value="">学年</option>
-        <option>学部1年</option>
-        <option>学部2年</option>
-        <option>学部3年</option>
-        <option>学部4年</option>
-        <option>修士1年</option>
-        <option>修士2年</option>
-        <option>博士1年</option>
-        <option>博士2年</option>
-        <option>博士3年</option>
+        <option value="学部1年">学部1年</option>
+        <option value="学部2年">学部2年</option>
+        <option value="学部3年">学部3年</option>
+        <option value="学部4年">学部4年</option>
+        <option value="修士1年">修士1年</option>
+        <option value="修士2年">修士2年</option>
+        <option value="博士1年">博士1年</option>
+        <option value="博士2年">博士2年</option>
+        <option value="博士3年">博士3年</option>
       </VeeField>
       <ErrorMessage name="grade" as="p" class="m-0"/>
 
@@ -66,6 +66,7 @@
         placeholder="パスワード(確認)"
       />
       <ErrorMessage name="passwordConfirm" />
+      <p>{{ errMessage }}</p>
 
       <button v-if="!loading" class="w-100 btn-lg btn-primary" type="submit">登録</button>
       <button v-else class="w-100 btn-lg btn-primary disabled" disabled>
@@ -97,6 +98,7 @@ export default {
     const email           = ref("")
     const password        = ref("")
     const passwordConfirm = ref("")
+    const errMessage      = ref("")
     const router = useRouter()
     let loading = false 
     
@@ -116,22 +118,23 @@ export default {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
       this.loading = true
       try {
-        // Register apiへPOST
-        await axios.post("register", {
+         await axios.post("register", {
           display_name     : displayName.value,
           user_id          : userID.value,
           grade            : grade.value,
           email            : emailYamaguchi,
           password         : password.value,
           password_confirm : passwordConfirm.value
+        }).then(response => {
+          console.log("inkuakun s")
+          console.log(response)
         })
+        // Login画面に戻る
+        await router.push("/login")
       } catch (e) {
         this.loading = false
-        console.log(e)
+        errMessage.value = e.response.data.message
       }
-
-      // Login画面に戻る
-      await router.push("/login")
     }
 
     return {
@@ -141,6 +144,7 @@ export default {
       email,
       password,
       passwordConfirm,
+      errMessage,
       schema,
       loading,
       submit

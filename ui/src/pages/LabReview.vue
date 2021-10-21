@@ -97,7 +97,7 @@ export default {
 
     onMounted(async () => {
       try {
-        // // ラボ名の取得
+        // ラボ名の取得
         for (const d of labData) {
           if (d.code === this.$route.params.professor) {
             lab.value = {

@@ -10,6 +10,8 @@ import (
 	"auth-api/models"
 	"strconv"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
@@ -19,6 +21,42 @@ import (
 // Claimsの型
 type Claims struct {
 	jwt.StandardClaims
+}
+
+// checkPattern(private)
+// 機能 : ID，パスワードの正当性チェック
+// 引数 :
+//  * id   : 検証したいID
+//  * pass : 検証したいパスワード
+// 戻り値 : 正しいID，パスワードならばtrue
+func checkPattern(id, pass string) bool {
+	// ASCIIかどうかのチェック
+	if !(utf8.ValidString(id) && utf8.RuneCountInString(id) == len(id)) ||
+		!(utf8.ValidString(pass) && utf8.RuneCountInString(pass) == len(pass)) {
+		return false
+	}
+
+	// idに空白文字もしくは制御文字があるかどうかのチェック
+	for _, c := range id {
+		if c == ' ' {
+			return false
+		}
+		if unicode.IsControl(c) {
+			return false
+		}
+	}
+
+	// パスワードに空白文字もしくは制御文字があるかどうかのチェック
+	for _, c := range pass {
+		if c == ' ' {
+			return false
+		}
+		if unicode.IsControl(c) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // /user (POST)
@@ -74,6 +112,44 @@ func Register(c *fiber.Ctx) error {
 	// リクエストデータをパース
 	if err := c.BodyParser(&data); err != nil {
 		return err
+	}
+
+	// IDとパスワードの存在チェック
+	_, isDisplayNameThere := data["display_name"]
+	_, isUserIDThere := data["user_id"]
+	_, isPasswordThere := data["password"]
+	_, isPasswordConfirmThere := data["password_confirm"]
+
+	// ID,パスワードの存在チェック
+	if !isDisplayNameThere || !isUserIDThere || !isPasswordThere || !isPasswordConfirmThere {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "IDまたはパスワードが欠けています",
+		})
+	}
+
+	// ASCIIであるかどうかのチェック
+	if !checkPattern(data["user_id"], data["password"]) {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "IDとパスワードはASCIIでスペースを用いてはいけません",
+		})
+	}
+
+	// IDの長さのチェック
+	if !(3 <= len(data["user_id"])) {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "ユーザIDは3文字以上で入力してください",
+		})
+	}
+
+	// パスワードの長さのチェック
+	if !(8 <= len(data["password"])) {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "パスワードは8文字以上で入力してください",
+		})
 	}
 
 	// パスワードチェック
