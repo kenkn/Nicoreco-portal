@@ -30,7 +30,6 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 
 export default {
   name: "Nav",
