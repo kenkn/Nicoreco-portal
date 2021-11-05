@@ -10,6 +10,7 @@ import Question from '../pages/Question.vue'
 import CreateQuestion from '../pages/CreateQuestion.vue'
 import Labs from '../pages/Labs.vue'
 import LabReview from '../pages/LabReview.vue'
+import Profile from '../pages/Profile.vue'
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', component: Home },
@@ -28,7 +29,14 @@ const routes: Array<RouteRecordRaw> = [
   // ラボの一覧ページ
   { path: '/lab', component: Labs },
   // ラボのレビューページ
-  { path: '/lab/:professor', component: LabReview }
+  { path: '/lab/:professor', component: LabReview },
+  // プロフィールページ
+  { path: '/profile', component: Profile, 
+    beforeEnter: (to, from, next) => {
+      if(localStorage.isLogin=='true') next()
+      else router.push("/login")
+    } 
+  }
 ]
 
 const router = createRouter({
