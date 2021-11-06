@@ -10,6 +10,9 @@
       <!-- ログイン済なら表示 -->
       <template v-if="auth">
         <li class="nav-item">
+          <router-link to="/profile" class="nav-link">{{ displayName }}</router-link>
+        </li>
+        <li class="nav-item">
           <router-link to="/login" class="nav-link" @click="logout">ログアウト</router-link>
         </li>
       </template>
@@ -37,7 +40,9 @@ export default {
     const store = useStore()
     const router = useRouter()
     const auth = computed(() => store.state.auth)
+    const displayName = computed(() => store.state.displayName)
     store.dispatch("setAuth", localStorage.isLogin)
+    store.dispatch('setDisplayName', localStorage.displayName)
     const logout = async () => {
       localStorage.isLogin     = false
       localStorage.displayName = null
@@ -46,10 +51,12 @@ export default {
       localStorage.email       = null
       localStorage.authToken   = null
       store.dispatch("setAuth", false)
+      store.dispatch("setAuth", '')
       await router.push("/login")
     }
     return {
       auth,
+      displayName,
       logout
     }
   }

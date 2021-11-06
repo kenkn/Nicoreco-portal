@@ -76,6 +76,7 @@ export default {
         localStorage.email = await userData.data.email
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
+        store.dispatch('setDisplayName', localStorage.displayName)
       } catch (e) {
         console.log(e)
       }
