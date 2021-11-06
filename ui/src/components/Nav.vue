@@ -40,8 +40,9 @@ export default {
     const store = useStore()
     const router = useRouter()
     const auth = computed(() => store.state.auth)
-    const displayName = computed(() => localStorage.displayName)
+    const displayName = computed(() => store.state.displayName)
     store.dispatch("setAuth", localStorage.isLogin)
+    store.dispatch('setDisplayName', localStorage.displayName)
     const logout = async () => {
       localStorage.isLogin     = false
       localStorage.displayName = null
@@ -50,6 +51,7 @@ export default {
       localStorage.email       = null
       localStorage.authToken   = null
       store.dispatch("setAuth", false)
+      store.dispatch("setAuth", '')
       await router.push("/login")
     }
     return {
