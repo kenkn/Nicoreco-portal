@@ -7,7 +7,8 @@
           <Sidebar />
         </div>
         <div id="contents" class="col-md-10 h-100 border-left border-dark overflow-auto px-5 pt-5">
-          <router-view />
+          <NotFound v-if="isNotFound" />
+          <router-view v-else />
         </div>
       </div>
     </main>
@@ -15,13 +16,25 @@
 </template>
  
 <script>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
+import NotFound from "@/components/NotFound";
 export default {
   components: {
     Nav,
-    Sidebar
+    Sidebar,
+    NotFound
   },
+  setup(){
+    const store = useStore() 
+    // 404エラーの状態管理
+    const isNotFound = computed(() => store.state.isNotFound)
+    return {
+      isNotFound
+    }
+  }
 };
 </script>
 

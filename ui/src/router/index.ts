@@ -11,6 +11,7 @@ import CreateQuestion from '../pages/CreateQuestion.vue'
 import Labs from '../pages/Labs.vue'
 import LabReview from '../pages/LabReview.vue'
 import Profile from '../pages/Profile.vue'
+import NotFound from '../components/NotFound.vue'
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', component: Home },
@@ -36,7 +37,9 @@ const routes: Array<RouteRecordRaw> = [
       if(localStorage.isLogin=='true') next()
       else router.push("/login")
     } 
-  }
+  },
+  // 404ページ
+  { path: '/:catchAll', component: NotFound, name: 'NotFound'}
 ]
 
 const router = createRouter({

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="display-5">{{ lab.name }}のレビュー</h1>
+    <h1 class="display-5">{{ labName }}のレビュー</h1>
     <div class="mt-5 border border-dark bg-white rounded">
       <p class="p-4 display-6 border-bottom border-dark">{{ reviews.length }}件のレビュー</p>
       <div v-for="review in reviews" :key="review.ID" class="border-bottom border-dark p-4 mt-2">
@@ -87,29 +87,30 @@ export default {
   data() {
     const store           = useStore()
     const auth            = computed(() => store.state.auth)
-    let lab               = ref({}) // 研究室名，コード
+    const labCode         = this.$route.params.professor // 研究室コード
+    const labName         = ref({}) // 研究室名
     const reviews         = ref({}) // 投稿されているreviewの集合
     const reviewBody      = ref("") // reviewの文章
     const replys          = ref([]) // 投稿されているreplyの集合
     const replyBody       = ref([]) // replyの文章
     const reviewLgtm      = ref([]) // ユーザがreviewをLGTMしているかどうか
     const reviewLgtmCount = ref([]) // reviewのLGTM数
+    
+    // URLから研究室を取得
+    const lab = labData.find((lab) => lab.code == labCode)
+    // labDataの中に一致するlabがない場合は404
+    if(lab === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      labName.value =lab.name
+    }
 
     onMounted(async () => {
       try {
-        // ラボ名の取得
-        for (const d of labData) {
-          if (d.code === this.$route.params.professor) {
-            lab.value = {
-              name: d.name,
-              code: d.code
-            }
-          }
-        }
-
         // 研究室レビューの取得
         const labReviewData = await axios.get(
-          "/lab/reviews/" + this.$route.params.professor
+          "/lab/reviews/" + labCode
         )
         reviews.value = labReviewData.data
         for (const i in labReviewData.data) {
@@ -161,7 +162,7 @@ export default {
     const submitReview = async () => {
       try {
         await axios.post("lab/review/post", {
-          lab : this.$route.params.professor,
+          lab : labCode,
           lab_reviewer_id : localStorage.userID,
           body : reviewBody.value
         })
@@ -213,7 +214,7 @@ export default {
 
     return {
       auth,
-      lab,
+      labName,
       reviews,
       replys,
       reviewBody,
