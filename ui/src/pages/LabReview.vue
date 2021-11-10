@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <not-found v-if="isNotFound" />
+  <div v-else>
     <h1 class="display-5">{{ lab.name }}のレビュー</h1>
     <div class="mt-5 border border-dark bg-white rounded">
       <p class="p-4 display-6 border-bottom border-dark">{{ reviews.length }}件のレビュー</p>
@@ -72,9 +73,7 @@
         </form>
       </div>
     </div>
-
   </div>
-
 </template>
  
 <script>
@@ -82,79 +81,92 @@ import { computed, onMounted, ref } from 'vue'
 import axios from 'axios';
 import { useStore } from 'vuex';
 import labData from '../data/lab-data.json'
+import NotFound from '@/pages/NotFound'
+
 export default {
   name: "LabReview",
+  components: {
+    NotFound
+  },
   data() {
     const store           = useStore()
     const auth            = computed(() => store.state.auth)
     let lab               = ref({}) // 研究室名，コード
-    const reviews         = ref({}) // 投稿されているreviewの集合
+    const reviews         = ref([]) // 投稿されているreviewの集合
     const reviewBody      = ref("") // reviewの文章
     const replys          = ref([]) // 投稿されているreplyの集合
     const replyBody       = ref([]) // replyの文章
     const reviewLgtm      = ref([]) // ユーザがreviewをLGTMしているかどうか
     const reviewLgtmCount = ref([]) // reviewのLGTM数
+    const isNotFound      = ref(false)
 
     onMounted(async () => {
-      try {
-        // ラボ名の取得
-        for (const d of labData) {
-          if (d.code === this.$route.params.professor) {
-            lab.value = {
-              name: d.name,
-              code: d.code
-            }
+      // ラボ名の取得
+      for (const d of labData) {
+        if (d.code === this.$route.params.professor) {
+          lab.value = {
+            name: d.name,
+            code: d.code
           }
         }
+      }
 
-        // 研究室レビューの取得
-        const labReviewData = await axios.get(
-          "/lab/reviews/" + this.$route.params.professor
-        )
-        reviews.value = labReviewData.data
-        for (const i in labReviewData.data) {
-          reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
-        }
+      if (lab.value.code === undefined) {
+        isNotFound.value = true
+      } else {
+        try {
+          // 研究室レビューの取得
+          const labReviewData = await axios.get(
+            "/lab/reviews/" + this.$route.params.professor
+          ).catch(error => {
+            console.log(error)
+          })
 
-        // 研究室レビューに対するリプライの取得
-        for (const i in labReviewData.data) {
-          const labReplyData = await axios.get(
-            "/lab/reply/" + labReviewData.data[i].ID
-          )
-          replys.value[labReviewData.data[i].ID] = labReplyData.data
-        }
-
-        // LGTM情報の取得
-        if (localStorage.isLogin) {
+          reviews.value = labReviewData.data
           for (const i in labReviewData.data) {
-            const id = labReviewData.data[i].ID
-            const reviewLgtmData = await axios.get(
-              "/lgtm/lab/" + id + "/" + localStorage.userID
+            reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
+          }
+
+          // 研究室レビューに対するリプライの取得
+          for (const i in labReviewData.data) {
+            const labReplyData = await axios.get(
+              "/lab/reply/" + labReviewData.data[i].ID
             )
-            // ユーザはLGTMしているか?
-            if (reviewLgtmData.data.length == 0) {
-              reviewLgtm.value[id] = false
-            } else {
-              reviewLgtm.value[id] = true
+            replys.value[labReviewData.data[i].ID] = labReplyData.data
+          }
+
+          // LGTM情報の取得
+          if (localStorage.isLogin) {
+            for (const i in labReviewData.data) {
+              const id = labReviewData.data[i].ID
+              const reviewLgtmData = await axios.get(
+                "/lgtm/lab/" + id + "/" + localStorage.userID
+              )
+              // ユーザはLGTMしているか?
+              if (reviewLgtmData.data.length == 0) {
+                reviewLgtm.value[id] = false
+              } else {
+                reviewLgtm.value[id] = true
+              }
             }
           }
-        }
 
-        // lgtm情報の表示(lgtmボタン+件数)
-        const lgtmInfos = document.getElementsByClassName('lgtm-info')
-        for (let i = 0; i < lgtmInfos.length; i++) {
-          lgtmInfos[i].classList.remove("d-none")
-        }
-
-        // ログインしていない場合LGTMボタンをdisabledにする
-        if (!store.state.auth) {
-          const lgtmButtons = document.getElementsByClassName('lgtm')
-          for (let i = 0; i < lgtmButtons.length; i++) {
-            lgtmButtons[i].classList.add("disabled")
+          // lgtm情報の表示(lgtmボタン+件数)
+          const lgtmInfos = document.getElementsByClassName('lgtm-info')
+          for (let i = 0; i < lgtmInfos.length; i++) {
+            lgtmInfos[i].classList.remove("d-none")
           }
+
+          // ログインしていない場合LGTMボタンをdisabledにする
+          if (!store.state.auth) {
+            const lgtmButtons = document.getElementsByClassName('lgtm')
+            for (let i = 0; i < lgtmButtons.length; i++) {
+              lgtmButtons[i].classList.add("disabled")
+            }
+          }
+        } catch (e) {
+          console.log(e)
         }
-      } catch (e) {
-        console.log(e)
       }
     })
 
@@ -211,6 +223,8 @@ export default {
       }
     }
 
+    console.log(reviews.value)
+
     return {
       auth,
       lab,
@@ -220,6 +234,7 @@ export default {
       replyBody,
       reviewLgtm,
       reviewLgtmCount,
+      isNotFound,
       submitReview,
       submitReply,
       displayReplyForm,

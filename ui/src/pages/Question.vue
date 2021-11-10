@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <not-found v-if="isNotFound" />
+  <div v-else>
     <div id="question" class="p-3 border border-dark bg-white rounded">
       <p class="fs-3 fw-bold">{{ question.title }}</p>
       <p>
@@ -114,8 +115,13 @@
 import { computed, onMounted, ref } from 'vue'
 import axios from 'axios';
 import { useStore } from 'vuex';
+import NotFound from '@/pages/NotFound'
+
 export default {
   name: "Question",
+  components: {
+    NotFound
+  },
   data() {
     const store           = useStore()
     const auth            = computed(() => store.state.auth)
@@ -127,71 +133,79 @@ export default {
     const questionLgtm    = ref()   // ユーザがquestionをLGTMしているかどうか
     const answerLgtm      = ref([]) // ユーザがquestionをLGTMしているかどうか
     const answerLgtmCount = ref([]) // answerのLGTM数
+    const isNotFound      = ref(false)  // 404か否か
 
     onMounted(async () => {
-      try {
-        // 質問情報の取得
-        const questionData = await axios.get(
-          "/question/" + this.$route.params.question_id
-        )
+      const questionData = await axios.get(
+        "/question/" + this.$route.params.question_id
+      ).catch(error => {
+        isNotFound.value = true
+        console.log(error)
+      })
+
+      // ページが存在していた時
+      if (!isNotFound.value) {
         question.value = questionData.data
-
-        // 回答情報の取得
-        const answerData = await axios.get(
-          "/answer/" + questionData.data.ID
-        )
-        answers.value = answerData.data
-        for (const i in answerData.data) {
-          answerLgtmCount.value[answerData.data[i].ID] = answerData.data[i].lgtm
-        }
-
-        // リプライ情報の取得
-        const replyData = await axios.get(
-          "/reply/" + questionData.data.ID
-        )
-        replys.value = replyData.data
-
-        // LGTM情報の取得
-        if (localStorage.isLogin) {
-          const questionLgtmData = await axios.get(
-            "/lgtm/question/" + questionData.data.ID + "/" + localStorage.userID
+        try {
+          // 回答情報の取得
+          const answerData = await axios.get(
+            "/answer/" + question.value.ID
           )
-          // ユーザはLGTMしているか?
-          if (questionLgtmData.data.length == 0) {
-            questionLgtm.value = false
-          } else {
-            questionLgtm.value = true
+          answers.value = answerData.data
+          for (const i in answerData.data) {
+            answerLgtmCount.value[answerData.data[i].ID] = answerData.data[i].lgtm
           }
 
-          // answerに対してユーザがLGTMしているか?
-          for (const i in answerData.data) {
-            const id = answerData.data[i].ID
-            const answerLgtmData = await axios.get(
-              "/lgtm/answer/" + id + "/" + localStorage.userID
+          // リプライ情報の取得
+          const replyData = await axios.get(
+            "/reply/" + question.value.ID
+          )
+          replys.value = replyData.data
+
+          // LGTM情報の取得
+          if (localStorage.isLogin) {
+            const questionLgtmData = await axios.get(
+              "/lgtm/question/" + question.value.ID + "/" + localStorage.userID
             )
-            if (answerLgtmData.data.length == 0) {
-              answerLgtm.value[id] = false
+            // ユーザはLGTMしているか?
+            if (questionLgtmData.data.length == 0) {
+              questionLgtm.value = false
             } else {
-              answerLgtm.value[id] = true
+              questionLgtm.value = true
+            }
+
+            // answerに対してユーザがLGTMしているか?
+            for (const i in answerData.data) {
+              const id = answerData.data[i].ID
+              const answerLgtmData = await axios.get(
+                "/lgtm/answer/" + id + "/" + localStorage.userID
+              )
+              if (answerLgtmData.data.length == 0) {
+                answerLgtm.value[id] = false
+              } else {
+                answerLgtm.value[id] = true
+              }
             }
           }
-        }
 
-        // lgtm情報の表示(lgtmボタン+件数)
-        const lgtmInfos = document.getElementsByClassName('lgtm-info')
-        for (let i = 0; i < lgtmInfos.length; i++) {
-          lgtmInfos[i].classList.remove("d-none")
-        }
-
-        // ログインしていない場合LGTMボタンをdisabledにする
-        if (!store.state.auth) {
-          const lgtmButtons = document.getElementsByClassName('lgtm')
-          for (let i = 0; i < lgtmButtons.length; i++) {
-            lgtmButtons[i].classList.add("disabled")
+          // lgtm情報の表示(lgtmボタン+件数)
+          const lgtmInfos = document.getElementsByClassName('lgtm-info')
+          for (let i = 0; i < lgtmInfos.length; i++) {
+            lgtmInfos[i].classList.remove("d-none")
           }
+
+          // ログインしていない場合LGTMボタンをdisabledにする
+          if (!store.state.auth) {
+            const lgtmButtons = document.getElementsByClassName('lgtm')
+            for (let i = 0; i < lgtmButtons.length; i++) {
+              lgtmButtons[i].classList.add("disabled")
+            }
+          }
+        } catch (e) {
+          console.log(e)
         }
-      } catch (e) {
-        console.log(e)
+      } else {
+        console.log(isNotFound)
       }
     })
 
@@ -280,6 +294,7 @@ export default {
       questionLgtm,
       answerLgtm,
       answerLgtmCount,
+      isNotFound,
       submitAnswer,
       submitReply,
       updateQuestionLgtm,

@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <not-found v-if="isNotFound" />
+  <div v-else class="container">
     <div class="">
       <h1 class="pb-3 d-inline-block display-5">{{ subjectName }}の質問一覧</h1>
       <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
@@ -49,18 +50,24 @@ import { computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import axios from 'axios'
 import subjectData from '../data/subject-data.json'
+import NotFound from '@/pages/NotFound'
 
 export default {
   name: "Questions",
+  components: {
+    NotFound
+  },
   data() {
-    const store = useStore()
-    const auth = computed(() => store.state.auth)
-    let code = '' // 授業コード
+    const store       = useStore()
+    const auth        = computed(() => store.state.auth)
     const subjectName = ref("")
-    const questions = ref({})
-    const answer = ref()
+    const questions   = ref({})
+    const answer      = ref()
+    const isNotFound  = ref()
+    let code          = '' // 授業コード
 
     // URLから科目名を取得
+    // TODO 逆引きのJSONを作る
     for (const d of subjectData) {
       if (d.code === this.$route.params.subject) {
         subjectName.value = d.name
@@ -75,6 +82,7 @@ export default {
         const { data } = await axios.get(url)
         questions.value = data
       } catch (e) {
+        isNotFound.value = true
         console.log(e)
       }
     })
@@ -84,7 +92,8 @@ export default {
       subjectName,
       code,
       questions,
-      answer
+      answer,
+      isNotFound
     }
   }
 }
