@@ -129,6 +129,7 @@ export default {
     const answerLgtmCount = ref([]) // answerのLGTM数
 
     onMounted(async () => {
+      // TODO 質問が存在しない場合は store.dispatch("setIsNotFound", true) という処理を行う
       try {
         // 質問情報の取得
         const questionData = await axios.get(
