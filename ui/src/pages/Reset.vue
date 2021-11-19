@@ -1,5 +1,5 @@
 <template>
-  <main class="form-reset">
+  <div class="form-reset">
     <form @submit.prevent="submit">
       <h1 class="h3 mb-3 fw-normal">Please Reset Your Password</h1>
 
@@ -20,7 +20,7 @@
 
       <button class="w-100 btn btn-lg btn-primary" type="submit">Submit</button>
     </form>
-  </main>
+  </div>
 </template>
 
 <script>

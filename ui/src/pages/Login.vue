@@ -1,5 +1,5 @@
 <template>
-  <main class="form-login">
+  <div class="form-login">
     <form @submit.prevent="login">
       <h1 class="h3 mb-3 fw-normal">ログイン</h1>
       <input
@@ -32,7 +32,7 @@
         </div>
       </button>
     </form>
-  </main>
+  </div>
 </template>
  
 <script>
