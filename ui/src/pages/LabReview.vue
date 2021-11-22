@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="display-5">{{ lab.name }}のレビュー</h1>
+    <h1 class="display-5">{{ labName }}のレビュー</h1>
     <div class="mt-5 border border-dark bg-white rounded">
       <p class="p-4 display-6 border-bottom border-dark">{{ reviews.length }}件のレビュー</p>
       <div v-for="review in reviews" :key="review.ID" class="border-bottom border-dark p-4 mt-2">
@@ -72,7 +72,6 @@
         </form>
       </div>
     </div>
-
   </div>
 
 </template>
@@ -87,8 +86,9 @@ export default {
   data() {
     const store           = useStore()
     const auth            = computed(() => store.state.auth)
-    let lab               = ref({}) // 研究室名，コード
-    const reviews         = ref({}) // 投稿されているreviewの集合
+    const labCode         = this.$route.params.professor // 研究室コード
+    const labName         = ref({}) // 研究室名
+    const reviews         = ref([]) // 投稿されているreviewの集合
     const reviewBody      = ref("") // reviewの文章
     const replys          = ref([]) // 投稿されているreplyの集合
     const replyBody       = ref([]) // replyの文章
@@ -96,74 +96,72 @@ export default {
     const reviewLgtmCount = ref([]) // reviewのLGTM数
 
     onMounted(async () => {
-      try {
-        // ラボ名の取得
-        for (const d of labData) {
-          if (d.code === this.$route.params.professor) {
-            lab.value = {
-              name: d.name,
-              code: d.code
-            }
-          }
-        }
-
-        // 研究室レビューの取得
-        const labReviewData = await axios.get(
-          "/lab/reviews/" + this.$route.params.professor
-        )
-        reviews.value = labReviewData.data
-        for (const i in labReviewData.data) {
-          reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
-        }
-
-        // 研究室レビューに対するリプライの取得
-        for (const i in labReviewData.data) {
-          const labReplyData = await axios.get(
-            "/lab/reply/" + labReviewData.data[i].ID
-          )
-          replys.value[labReviewData.data[i].ID] = labReplyData.data
-        }
-
-        // LGTM情報の取得
-        if (localStorage.isLogin) {
+      // URLから研究室を取得
+      const lab = labData.find((lab) => lab.code == labCode)
+      // labDataの中に一致するlabがない場合は404
+      if(lab === undefined){
+        store.dispatch("setIsNotFound", true)
+      }
+      else {
+        labName.value = lab.name
+        try {
+          // 研究室レビューの取得
+          const labReviewData = await axios.get(
+            "/lab/reviews/" + labCode
+          ).catch(error => {
+            console.log(error)
+          })
+          reviews.value = labReviewData.data
           for (const i in labReviewData.data) {
-            const id = labReviewData.data[i].ID
-            const reviewLgtmData = await axios.get(
-              "/lgtm/lab/" + id + "/" + localStorage.userID
+            reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
+          }
+          // 研究室レビューに対するリプライの取得
+          for (const i in labReviewData.data) {
+            const labReplyData = await axios.get(
+              "/lab/reply/" + labReviewData.data[i].ID
             )
-            // ユーザはLGTMしているか?
-            if (reviewLgtmData.data.length == 0) {
-              reviewLgtm.value[id] = false
-            } else {
-              reviewLgtm.value[id] = true
+            replys.value[labReviewData.data[i].ID] = labReplyData.data
+          }
+          // LGTM情報の取得
+          if (localStorage.isLogin) {
+            for (const i in labReviewData.data) {
+              const id = labReviewData.data[i].ID
+              const reviewLgtmData = await axios.get(
+                "/lgtm/lab/" + id + "/" + localStorage.userID
+              )
+              // ユーザはLGTMしているか?
+              if (reviewLgtmData.data.length == 0) {
+                reviewLgtm.value[id] = false
+              } else {
+                reviewLgtm.value[id] = true
+              }
             }
           }
-        }
-
-        // lgtm情報の表示(lgtmボタン+件数)
-        const lgtmInfos = document.getElementsByClassName('lgtm-info')
-        for (let i = 0; i < lgtmInfos.length; i++) {
-          lgtmInfos[i].classList.remove("d-none")
-        }
-
-        // ログインしていない場合LGTMボタンをdisabledにする
-        if (!store.state.auth) {
-          const lgtmButtons = document.getElementsByClassName('lgtm')
-          for (let i = 0; i < lgtmButtons.length; i++) {
-            lgtmButtons[i].classList.add("disabled")
+          // lgtm情報の表示(lgtmボタン+件数)
+          const lgtmInfos = document.getElementsByClassName('lgtm-info')
+          for (let i = 0; i < lgtmInfos.length; i++) {
+            lgtmInfos[i].classList.remove("d-none")
           }
+          // ログインしていない場合LGTMボタンをdisabledにする
+          if (!store.state.auth) {
+            const lgtmButtons = document.getElementsByClassName('lgtm')
+            for (let i = 0; i < lgtmButtons.length; i++) {
+              lgtmButtons[i].classList.add("disabled")
+            }
+          }
+        } catch (e) {
+          console.log(e)
         }
-      } catch (e) {
-        console.log(e)
       }
     })
 
     const submitReview = async () => {
       try {
         await axios.post("lab/review/post", {
-          lab : this.$route.params.professor,
+          jwt             : localStorage.authToken,
+          lab             : labCode,
           lab_reviewer_id : localStorage.userID,
-          body : reviewBody.value
+          body            : reviewBody.value
         })
         // リロード
         this.$router.go({path: this.$router.currentRoute.path, force: true})
@@ -175,9 +173,10 @@ export default {
     const submitReply = async (id) => {
       try {
         await axios.post("lab/reply/post", {
+          jwt           : localStorage.authToken,
           lab_review_id : String(id),
-          user_id : localStorage.userID,
-          body : replyBody.value[id]
+          user_id       : localStorage.userID,
+          body          : replyBody.value[id]
         })
         // リロード
         this.$router.go({path: this.$router.currentRoute.path, force: true})
@@ -213,7 +212,7 @@ export default {
 
     return {
       auth,
-      lab,
+      labName,
       reviews,
       replys,
       reviewBody,

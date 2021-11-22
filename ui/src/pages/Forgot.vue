@@ -1,5 +1,5 @@
 <template>
-  <main class="form-forgot">
+  <div class="form-forgot">
     <form @submit.prevent="forgot">
       <div v-if="notify.cls" :class="`alert alert-${notify.cls}`" role="alert">
         {{ notify.message }}
@@ -15,7 +15,7 @@
 
       <button class="w-100 btn-lg btn-primary" type="submit">送信</button>
     </form>
-  </main>
+  </div>
 </template>
 
 <script>

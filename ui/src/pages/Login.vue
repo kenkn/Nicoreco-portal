@@ -1,5 +1,5 @@
 <template>
-  <main class="form-login">
+  <div class="form-login">
     <form @submit.prevent="login">
       <h1 class="h3 mb-3 fw-normal">ログイン</h1>
       <input
@@ -32,7 +32,7 @@
         </div>
       </button>
     </form>
-  </main>
+  </div>
 </template>
  
 <script>
@@ -76,6 +76,7 @@ export default {
         localStorage.email = await userData.data.email
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
+        store.dispatch('setDisplayName', localStorage.displayName)
       } catch (e) {
         console.log(e)
       }

@@ -1,5 +1,5 @@
 <template>
-  <main class="form-register">
+  <div class="form-register">
     <VeeForm @submit="submit" :validation-schema="schema">
       <h1 class="h3 mb-3 fw-normal">ユーザー登録</h1>
       <VeeField
@@ -75,7 +75,7 @@
         </div>
       </button>
     </VeeForm>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -86,10 +86,10 @@ import { Form as VeeForm, Field as VeeField, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 export default {
   name: "Register",
-    components: {
-      VeeForm,
-      VeeField,
-      ErrorMessage,
+  components: {
+    VeeForm,
+    VeeField,
+    ErrorMessage,
   },
   data() {
     const displayName     = ref("")

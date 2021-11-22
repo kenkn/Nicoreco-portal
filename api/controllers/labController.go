@@ -24,6 +24,12 @@ func LabReviews(c *fiber.Ctx) error {
 
 	reviews := []models.LabReview{}
 	database.DB.Where("lab = ?", lab).Find(&reviews)
+	if len(reviews) == 0 {
+		c.Status(404)
+		return c.JSON(fiber.Map{
+			"message": "質問が見つかりませんでした",
+		})
+	}
 
 	return c.JSON(reviews)
 

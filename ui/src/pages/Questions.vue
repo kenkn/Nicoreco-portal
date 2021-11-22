@@ -5,7 +5,7 @@
       <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
         <button type="button" class="btn btn-primary">ログインして質問する</button>
       </router-link>
-      <router-link v-else class="pageLink d-inline p-3" :to="'/question/' + code + '/create'">
+      <router-link v-else class="pageLink d-inline p-3" :to="'/question/' + subjectCode + '/create'">
         <button type="button" class="btn btn-primary">質問する</button>
       </router-link>
     </div>
@@ -55,23 +55,25 @@ export default {
   data() {
     const store = useStore()
     const auth = computed(() => store.state.auth)
-    let code = '' // 授業コード
+    const subjectCode = this.$route.params.subject // 授業コード
     const subjectName = ref("")
     const questions = ref({})
     const answer = ref()
 
-    // URLから科目名を取得
-    for (const d of subjectData) {
-      if (d.code === this.$route.params.subject) {
-        subjectName.value = d.name
-        code = d.code
-      }
+    // URLから科目を取得
+    const subject = subjectData.find((subject) => subject.code == subjectCode)
+    // subjectDataの中に一致するSubjectがない場合は404
+    if(subject === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      subjectName.value =subject.name
     }
 
     // 科目に対する質問一覧を取得
     onMounted(async () => {
       try {
-        const url = "questions/" + code
+        const url = "questions/" + subjectCode
         const { data } = await axios.get(url)
         questions.value = data
       } catch (e) {
@@ -82,7 +84,7 @@ export default {
     return {
       auth,
       subjectName,
-      code,
+      subjectCode,
       questions,
       answer
     }
@@ -93,7 +95,7 @@ export default {
 <style scoped>
   .link-box {
     border-width: 1px;
-    border-color: black;
+    border-color: rgb(167, 167, 167);
     background-color: white;
   }
   .link-box :hover{

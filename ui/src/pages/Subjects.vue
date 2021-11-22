@@ -23,7 +23,7 @@ export default {
 <style scoped>
   .link-box {
     border-width: 1px;
-    border-color: black;
+    border-color: rgb(167, 167, 167);
     background-color: white;
   }
   .link-box :hover{
