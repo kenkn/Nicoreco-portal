@@ -28,7 +28,7 @@ services:
       - 8080:8080
     volumes:
       - ./ui:/app
-    command: npm run serve
+    command: sh -c "npm install && npm run serve"
 
   mysql:
     image: mysql/mysql-server:5.7.28
