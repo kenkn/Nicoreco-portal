@@ -23,10 +23,10 @@ export default {
         message.value = `こんにちは．${data.display_name} さん`
 
         // index.tsのactionsに設定したパラメータ名を設定
-        await store.dispatch("setAuth", true)
+        store.dispatch("setAuth", true)
       } catch (e) {
         console.log(e)
-        await store.dispatch("setAuth", false)
+        store.dispatch("setAuth", false)
       }
     })
 

@@ -127,7 +127,7 @@ export default {
           password_confirm : passwordConfirm.value
         })
         // Login画面に戻る
-        await router.push("/login")
+        router.push("/login")
       } catch (e) {
         loading.value = false
         errMessage.value = e.response.data.message

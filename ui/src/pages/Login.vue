@@ -70,10 +70,10 @@ export default {
           jwt: localStorage.authToken
         })
         // localStorageの情報を更新
-        localStorage.displayName = await userData.data.display_name
-        localStorage.userID = await userData.data.user_id
-        localStorage.grade = await userData.data.Grade
-        localStorage.email = await userData.data.email
+        localStorage.displayName = userData.data.display_name
+        localStorage.userID = userData.data.user_id
+        localStorage.grade = userData.data.Grade
+        localStorage.email = userData.data.email
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
         store.dispatch('setDisplayName', localStorage.displayName)

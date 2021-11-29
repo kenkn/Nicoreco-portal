@@ -18,10 +18,10 @@ const loginCheck = async () => {
             const userData = await axios.post(axios.defaults.baseURL + "user", {
                 jwt: localStorage.authToken
             })
-            localStorage.displayName = await userData.data.display_name as string
-            localStorage.userID      = await userData.data.user_id as string
-            localStorage.grade       = await userData.data.Grade as string
-            localStorage.email       = await userData.data.email as string
+            localStorage.displayName = userData.data.display_name as string
+            localStorage.userID      = userData.data.user_id as string
+            localStorage.grade       = userData.data.Grade as string
+            localStorage.email       = userData.data.email as string
             localStorage.isLogin     = true
             store.dispatch("setAuth", true)
         } catch (e) {

@@ -111,7 +111,7 @@ export default {
       localStorage.authToken   = null
       store.dispatch("setAuth", false)
       store.dispatch("setAuth", '')
-      await router.push("/login")
+      router.push("/login")
     }
     // ナビが開いている場合は閉じる
     const closeNav = () => {
