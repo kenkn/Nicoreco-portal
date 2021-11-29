@@ -23,6 +23,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { Form as VeeForm, Field as VeeField, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import subjectData from '../data/subject-data.json'
@@ -34,19 +35,22 @@ export default {
     ErrorMessage,
   },
   setup() {
-    let code        = "" // 授業コード
-    let subjectName = "" // 科目名
-    const title     = ref("")
-    const body      = ref("")
-    const route     = useRoute()
-    const router    = useRouter()
-    
-    // URLから講義codeを取得しjsonから講義名を取得
-    for (const d of subjectData) {
-      if (d.code === route.params.subject) {
-        subjectName = d.name
-        code = d.code
-      }
+    const store       = useStore()
+    const route       = useRoute()
+    const router      = useRouter()
+    const subjectCode = route.params.subject // 授業コード
+    const subjectName = ref("") // 科目名
+    const title       = ref("")
+    const body        = ref("")
+
+    // URLから科目を取得
+    const subject = subjectData.find((subject) => subject.code == subjectCode)
+    // subjectDataの中に一致するSubjectがない場合は404
+    if(subject === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      subjectName.value =subject.name
     }
 
     // バリデーション
@@ -64,7 +68,7 @@ export default {
           title         : title.value,
           body          : body.value,
         })
-        await router.push("/question/" + code)
+        await router.push("/question/" + subjectCode)
       }
       else { return false; }
     }  
