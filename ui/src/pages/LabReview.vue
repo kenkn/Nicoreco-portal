@@ -78,15 +78,18 @@
  
 <script>
 import { computed, onMounted, ref } from 'vue'
-import axios from 'axios';
-import { useStore } from 'vuex';
+import axios from 'axios'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import labData from '../data/lab-data.json'
 export default {
   name: "LabReview",
-  data() {
+  setup() {
     const store           = useStore()
+    const route           = useRoute()
+    const router          = useRouter()
     const auth            = computed(() => store.state.auth)
-    const labCode         = this.$route.params.professor // 研究室コード
+    const labCode         = route.params.professor // 研究室コード
     const labName         = ref({}) // 研究室名
     const reviews         = ref([]) // 投稿されているreviewの集合
     const reviewBody      = ref("") // reviewの文章
@@ -164,7 +167,7 @@ export default {
           body            : reviewBody.value
         })
         // リロード
-        this.$router.go({path: this.$router.currentRoute.path, force: true})
+        router.go({path: router.currentRoute.path, force: true})
       } catch (e) {
         console.log(e)
       }
@@ -179,7 +182,7 @@ export default {
           body          : replyBody.value[id]
         })
         // リロード
-        this.$router.go({path: this.$router.currentRoute.path, force: true})
+        router.go({path: router.currentRoute.path, force: true})
       } catch (e) {
         console.log(e)
       }

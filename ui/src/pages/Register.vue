@@ -91,7 +91,8 @@ export default {
     VeeField,
     ErrorMessage,
   },
-  data() {
+  setup() {
+    const router          = useRouter()
     const displayName     = ref("")
     const userID          = ref("")
     const grade           = ref("")
@@ -99,8 +100,7 @@ export default {
     const password        = ref("")
     const passwordConfirm = ref("")
     const errMessage      = ref("")
-    const router = useRouter()
-    let loading = false 
+    const loading         = ref(false) 
     
     // バリデーション
     const schema = yup.object({
@@ -116,7 +116,7 @@ export default {
 
     const submit = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
-      this.loading = true
+      loading.value = true
       try {
          await axios.post("register", {
           display_name     : displayName.value,
@@ -129,7 +129,7 @@ export default {
         // Login画面に戻る
         await router.push("/login")
       } catch (e) {
-        this.loading = false
+        loading.value = false
         errMessage.value = e.response.data.message
       }
     }

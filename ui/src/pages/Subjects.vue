@@ -13,7 +13,7 @@
 import data from '../data/subject-data.json'
 export default {
   name: "Subjects",
-  data() {
+  setup() {
     return {
       subjects: data
     }

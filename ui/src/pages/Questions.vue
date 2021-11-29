@@ -46,19 +46,21 @@
  
 <script>
 import { computed, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import axios from 'axios'
 import subjectData from '../data/subject-data.json'
 
 export default {
   name: "Questions",
-  data() {
-    const store = useStore()
-    const auth = computed(() => store.state.auth)
-    const subjectCode = this.$route.params.subject // 授業コード
+  setup() {
+    const store       = useStore()
+    const route       = useRoute()
+    const auth        = computed(() => store.state.auth)
+    const subjectCode = route.params.subject // 授業コード
     const subjectName = ref("")
-    const questions = ref({})
-    const answer = ref()
+    const questions   = ref({})
+    const answer      = ref()
 
     // URLから科目を取得
     const subject = subjectData.find((subject) => subject.code == subjectCode)

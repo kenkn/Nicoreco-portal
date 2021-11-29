@@ -13,7 +13,7 @@
 import data from '../data/lab-data.json'
 export default {
   name: "Labs",
-  data() {
+  setup() {
     return {
       labs: data
     }

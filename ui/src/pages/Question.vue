@@ -112,12 +112,15 @@
  
 <script>
 import { computed, onMounted, ref } from 'vue'
-import axios from 'axios';
-import { useStore } from 'vuex';
+import axios from 'axios'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 export default {
   name: "Question",
-  data() {
+  setup() {
     const store           = useStore()
+    const route           = useRoute()
+    const router          = useRouter()
     const auth            = computed(() => store.state.auth)
     const question        = ref({}) // questionの内容
     const answers         = ref({}) // 投稿されているanswerの集合
@@ -132,7 +135,7 @@ export default {
       try {
         // 質問情報の取得
         const questionData = await axios.get(
-          "/question/" + this.$route.params.question_id
+          "/question/" + route.params.question_id
         )
         // 質問者が空の場合は404判定
         if(questionData.data.questioner_id == ''){
@@ -202,12 +205,12 @@ export default {
     const submitAnswer = async () => {
       try {
         await axios.post("answer/post", {
-          parent_id : this.$route.params.question_id,
+          parent_id : route.params.question_id,
           user_id : localStorage.userID,
           body : answerBody.value
         })
         // リロード
-        this.$router.go({path: this.$router.currentRoute.path, force: true})
+        router.go({path: router.currentRoute.path, force: true})
       } catch (e) {
         console.log(e)
       }
@@ -216,13 +219,13 @@ export default {
     const submitReply = async (id) => {
       try {
         await axios.post("reply/post", {
-          question_id : this.$route.params.question_id,
+          question_id : route.params.question_id,
           parent_id : String(id),
           user_id : localStorage.userID,
           body : replyBody.value[id]
         })
         // リロード
-        this.$router.go({path: this.$router.currentRoute.path, force: true})
+        router.go({path: router.currentRoute.path, force: true})
       } catch (e) {
         console.log(e)
       }
@@ -240,7 +243,7 @@ export default {
 
       try {
         await axios.post("/lgtm/question", {
-          question_id : this.$route.params.question_id,
+          question_id : route.params.question_id,
           user_id : localStorage.userID
         })
       } catch (e) {

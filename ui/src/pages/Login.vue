@@ -43,16 +43,16 @@ import { useStore } from 'vuex'
 
 export default {
   name: "Login",
-  data() {
+  setup() {
     const email      = ref("")
     const password   = ref("")
     const router     = useRouter()
     const store      = useStore()
     const errMessage = ref("")
-    let loading = false
+    const loading    = ref(false)
     const login = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
-      this.loading = true
+      loading.value = true
       try {
         const jwtToken = await axios.post("login", {
           email: emailYamaguchi,
@@ -61,7 +61,7 @@ export default {
         localStorage.authToken = jwtToken.data.jwt
       } catch (e) {
         errMessage.value = "メールアドレスかパスワードが間違っています．"
-        this.loading = false
+        loading.value = false
         console.log(e)
       }
 
@@ -82,10 +82,10 @@ export default {
       }
       
       // 前のページに遷移する
-      if (this.prevRoute.path == '/register') {
-        await router.push('/')
+      if (localStorage.prevRoute == '/register') {
+        router.push('/')
       } else {
-        await router.push(this.prevRoute.path)
+        router.push(localStorage.prevRoute)
       }
     }
 
@@ -99,9 +99,8 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.prevRoute = from
-    })
+    localStorage.prevRoute = from.path
+    next()
   }
 }
 </script>
