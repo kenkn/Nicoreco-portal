@@ -39,10 +39,19 @@
             <router-link to="/" class="nav-link" @click="closeNav">Nicoreco</router-link>
           </li>
         </ul>
-        <button id="nav-btn" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="flase" aria-label="Toggle navigation">
+        <button 
+          id="nav-btn" 
+          class="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarToggler" 
+          aria-controls="navbarToggler" 
+          aria-expanded="flase" 
+          aria-label="Toggle navigation"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+        <div class="collapse navbar-collapse" id="navbarToggler">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
               <router-link to="/question" class="nav-link" @click="closeNav">講義質問</router-link>
@@ -79,14 +88,15 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: "Nav",
   setup() {
     const store = useStore()
+    const route = useRoute()
     const router = useRouter()
     const auth = computed(() => store.state.auth)
     const displayName = computed(() => store.state.displayName)
@@ -103,8 +113,12 @@ export default {
       store.dispatch("setAuth", '')
       await router.push("/login")
     }
+    // ナビが開いている場合は閉じる
     const closeNav = () => {
-      document.getElementById('nav-btn').click()
+      const navBtn = document.getElementById('nav-btn')
+      if(navBtn.getAttribute('aria-expanded') === 'true'){
+        navBtn.click()
+      }
     }
     return {
       auth,
