@@ -1,5 +1,5 @@
 //
-// authController.go
+// userController.go
 // ユーザ認証
 //
 
@@ -7,7 +7,6 @@ package controllers
 
 import (
 	"auth-api/database"
-	"auth-api/middleware"
 	"auth-api/models"
 	"strconv"
 	"time"
@@ -55,7 +54,7 @@ func checkPattern(id, pass string) bool {
 	return true
 }
 
-// /user (POST)
+// /user (GET)
 // 機能 : ユーザ情報の取得
 // 受信するJSON :
 //  * jwt : JWTトークン
@@ -64,22 +63,20 @@ func checkPattern(id, pass string) bool {
 // 	* 失敗時 : エラー文(JSON)
 func User(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
-		return err
-	}
-
-	// JWTの認証
-	token, canAuth := middleware.GetAuthToken(data["jwt"])
-	if !canAuth {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
 		})
 	}
 
-	claims := token.Claims.(*(middleware.Claims))
+	claims := token.Claims.(*Claims)
 	// User IDを取得
 	id := claims.Issuer
 
@@ -102,9 +99,8 @@ func User(c *fiber.Ctx) error {
 // 	* リクエストデータのパースに失敗した場合に例外を発行
 func Register(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
@@ -186,9 +182,8 @@ func Register(c *fiber.Ctx) error {
 // 	* JSONの内容呼び出しに失敗した場合に例外を発行
 func Login(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
@@ -226,6 +221,15 @@ func Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+
+	// Cookieを設定
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+	}
+	c.Cookie(&cookie)
 
 	return c.JSON(fiber.Map{
 		"jwt": token,

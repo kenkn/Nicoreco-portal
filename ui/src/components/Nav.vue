@@ -98,7 +98,6 @@ export default {
       localStorage.userID      = null
       localStorage.grade       = null     
       localStorage.email       = null
-      localStorage.authToken   = null
       store.dispatch("setAuth", false)
       store.dispatch("setAuth", '')
       await router.push("/login")

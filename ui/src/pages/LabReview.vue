@@ -158,7 +158,6 @@ export default {
     const submitReview = async () => {
       try {
         await axios.post("lab/review/post", {
-          jwt             : localStorage.authToken,
           lab             : labCode,
           lab_reviewer_id : localStorage.userID,
           body            : reviewBody.value
@@ -173,7 +172,6 @@ export default {
     const submitReply = async (id) => {
       try {
         await axios.post("lab/reply/post", {
-          jwt           : localStorage.authToken,
           lab_review_id : String(id),
           user_id       : localStorage.userID,
           body          : replyBody.value[id]

@@ -15,9 +15,7 @@ createApp(App).use(store).use(router).mount('#app')
 const loginCheck = async () => {
     if (localStorage.isLogin == "true") {
         try {
-            const userData = await axios.post(axios.defaults.baseURL + "user", {
-                jwt: localStorage.authToken
-            })
+            const userData = await axios.get(axios.defaults.baseURL + "user")
             localStorage.displayName = await userData.data.display_name as string
             localStorage.userID      = await userData.data.user_id as string
             localStorage.grade       = await userData.data.Grade as string
@@ -30,7 +28,6 @@ const loginCheck = async () => {
             localStorage.grade       = null
             localStorage.email       = null
             localStorage.isLogin     = false
-            localStorage.authToken   = null
             store.dispatch("setAuth", false)
         }
     } else {
@@ -39,7 +36,6 @@ const loginCheck = async () => {
         localStorage.grade       = null
         localStorage.email       = null
         localStorage.isLogin     = false
-        localStorage.authToken   = null
         store.dispatch("setAuth", false)
     }
 }

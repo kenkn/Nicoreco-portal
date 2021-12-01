@@ -7,10 +7,10 @@ package controllers
 
 import (
 	"auth-api/database"
-	"auth-api/middleware"
 	"auth-api/models"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -57,14 +57,18 @@ func GetQuestion(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostQuestion(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
-	// JWTの認証
-	if !middleware.CanAuth(data["jwt"]) {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -131,14 +135,18 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func LgtmQuestion(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
-	// JWTの認証
-	if !middleware.CanAuth(data["jwt"]) {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -173,14 +181,18 @@ func LgtmQuestion(c *fiber.Ctx) error {
 
 func LgtmAnswer(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
-	// JWTの認証
-	if !middleware.CanAuth(data["jwt"]) {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -236,10 +248,22 @@ func GetAnswer(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostAnswer(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
+	}
+
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
 	}
 
 	parent_id, _ := strconv.Atoi(data["parent_id"])
@@ -288,10 +312,22 @@ func GetReply(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostReply(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
+	}
+
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
 	}
 
 	question_id, _ := strconv.Atoi(data["question_id"])

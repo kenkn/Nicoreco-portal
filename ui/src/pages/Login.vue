@@ -54,11 +54,10 @@ export default {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
       this.loading = true
       try {
-        const jwtToken = await axios.post("login", {
+        await axios.post("login", {
           email: emailYamaguchi,
           password: password.value
         })
-        localStorage.authToken = jwtToken.data.jwt
       } catch (e) {
         errMessage.value = "メールアドレスかパスワードが間違っています．"
         this.loading = false
@@ -66,9 +65,7 @@ export default {
       }
 
       try {
-        const userData = await axios.post("user", {
-          jwt: localStorage.authToken
-        })
+        const userData = await axios.get("user")
         // localStorageの情報を更新
         localStorage.displayName = await userData.data.display_name
         localStorage.userID = await userData.data.user_id
