@@ -62,9 +62,8 @@ func LabReview(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReview(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
@@ -121,9 +120,8 @@ func GetLabReply(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReply(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
@@ -180,9 +178,8 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func LgtmLabReview(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
