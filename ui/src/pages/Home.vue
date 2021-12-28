@@ -17,9 +17,7 @@ export default {
 
     onMounted(async () => {
       try {
-        const { data } = await axios.post("user", {
-          jwt: localStorage.authToken
-        })
+        const { data } = await axios.get("user")
         message.value = `こんにちは．${data.display_name} さん`
 
         // index.tsのactionsに設定したパラメータ名を設定

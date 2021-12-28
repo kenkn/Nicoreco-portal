@@ -62,7 +62,6 @@ export default {
     const submit = async () => {
       if(window.confirm('送信します')) {
         await axios.post("/question/post", {
-          jwt           : localStorage.authToken,
           questioner_id : localStorage.userID,
           subject       : route.params.subject,
           title         : title.value,

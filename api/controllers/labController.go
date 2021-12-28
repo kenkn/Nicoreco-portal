@@ -7,10 +7,10 @@ package controllers
 
 import (
 	"auth-api/database"
-	"auth-api/middleware"
 	"auth-api/models"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -62,14 +62,18 @@ func LabReview(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReview(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
-	// JWTの認証
-	if !middleware.CanAuth(data["jwt"]) {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -116,14 +120,18 @@ func GetLabReply(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReply(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
-	// JWTの認証
-	if !middleware.CanAuth(data["jwt"]) {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
@@ -170,14 +178,18 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func LgtmLabReview(c *fiber.Ctx) error {
 
-	var data map[string]string
-	// リクエストデータをパース
-	if err := c.BodyParser(&data); err != nil {
+	data, err := ParseData(c)
+	if err != nil {
 		return err
 	}
 
-	// JWTの認証
-	if !middleware.CanAuth(data["jwt"]) {
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "認証されていません．",
