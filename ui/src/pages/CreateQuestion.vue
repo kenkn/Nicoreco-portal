@@ -22,7 +22,8 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { Form as VeeForm, Field as VeeField, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import subjectData from '../data/subject-data.json'
@@ -33,19 +34,23 @@ export default {
     VeeField,
     ErrorMessage,
   },
-  data() {
-    let code        = "" // 授業コード
-    let subjectName = "" // 科目名
-    const title     = ref("")
-    const body      = ref("")
-    const router    = useRouter()
-    
-    // URLから講義codeを取得しjsonから講義名を取得
-    for (const d of subjectData) {
-      if (d.code === this.$route.params.subject) {
-        subjectName = d.name
-        code = d.code
-      }
+  setup() {
+    const store       = useStore()
+    const route       = useRoute()
+    const router      = useRouter()
+    const subjectCode = route.params.subject // 授業コード
+    const subjectName = ref("") // 科目名
+    const title       = ref("")
+    const body        = ref("")
+
+    // URLから科目を取得
+    const subject = subjectData.find((subject) => subject.code == subjectCode)
+    // subjectDataの中に一致するSubjectがない場合は404
+    if(subject === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      subjectName.value =subject.name
     }
 
     // バリデーション
@@ -58,11 +63,11 @@ export default {
       if(window.confirm('送信します')) {
         await axios.post("/question/post", {
           questioner_id : localStorage.userID,
-          subject       : this.$route.params.subject,
+          subject       : route.params.subject,
           title         : title.value,
           body          : body.value,
         })
-        await router.push("/question/" + code)
+        router.push("/question/" + subjectCode)
       }
       else { return false; }
     }  

@@ -43,16 +43,16 @@ import { useStore } from 'vuex'
 
 export default {
   name: "Login",
-  data() {
+  setup() {
     const email      = ref("")
     const password   = ref("")
     const router     = useRouter()
     const store      = useStore()
     const errMessage = ref("")
-    let loading = false
+    const loading    = ref(false)
     const login = async () => {
       const emailYamaguchi = email.value + "@yamaguchi-u.ac.jp"
-      this.loading = true
+      loading.value = true
       try {
         await axios.post("login", {
           email: emailYamaguchi,
@@ -60,17 +60,17 @@ export default {
         })
       } catch (e) {
         errMessage.value = "メールアドレスかパスワードが間違っています．"
-        this.loading = false
+        loading.value = false
         console.log(e)
       }
 
       try {
         const userData = await axios.get("user")
         // localStorageの情報を更新
-        localStorage.displayName = await userData.data.display_name
-        localStorage.userID = await userData.data.user_id
-        localStorage.grade = await userData.data.Grade
-        localStorage.email = await userData.data.email
+        localStorage.displayName = userData.data.display_name
+        localStorage.userID = userData.data.user_id
+        localStorage.grade = userData.data.Grade
+        localStorage.email = userData.data.email
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
         store.dispatch('setDisplayName', localStorage.displayName)
@@ -79,10 +79,10 @@ export default {
       }
       
       // 前のページに遷移する
-      if (this.prevRoute.path == '/register') {
-        await router.push('/')
+      if (localStorage.prevRoute == '/register') {
+        router.push('/')
       } else {
-        await router.push(this.prevRoute.path)
+        router.push(localStorage.prevRoute)
       }
     }
 
@@ -96,9 +96,8 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.prevRoute = from
-    })
+    localStorage.prevRoute = from.path
+    next()
   }
 }
 </script>

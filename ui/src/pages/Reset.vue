@@ -44,7 +44,7 @@ export default {
         password_confirm: passwordConfirm.value
       })
 
-      await router.push("/login")
+      router.push("/login")
     }
 
     return {

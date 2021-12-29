@@ -5,19 +5,17 @@
 </template>
 
 <script>
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 export default {
   name: "NotFound",
-  data() {
+  setup() {
     const store = useStore()
-    return{
-      store
-    }
-  },
-  watch: {
-    $route(){
-      this.store.dispatch("setIsNotFound", false)
-    }
+    const route = useRoute()
+    watch(route, () =>
+      store.dispatch("setIsNotFound", false)
+    )
   }
 }
 </script>
