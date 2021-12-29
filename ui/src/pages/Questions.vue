@@ -1,45 +1,51 @@
 <template>
   <div class="container">
-    <div class="">
-      <h1 class="pb-3 d-inline-block display-5">{{ subjectName }}の質問一覧</h1>
-      <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
-        <button type="button" class="btn btn-primary">ログインして質問する</button>
-      </router-link>
-      <router-link v-else class="pageLink d-inline p-3" :to="'/question/' + subjectCode + '/create'">
-        <button type="button" class="btn btn-primary">質問する</button>
-      </router-link>
-    </div>
-    
-    <div v-if="questions!=null">
-      <router-link v-for="question in questions" :key="question.ID" v-bind:to="$route.path  + '/' + question.ID" class="list-group-item link-box p-0 text-dark">
-        <div class="row m-0">
-          <div class="col-6 col-md-8 col-xl-10 btn">
-            <p class="fw-bolder">{{ question.title }}</p>
-            <p class="text-right text-secondary m-0">更新日時:{{ question.CreatedAt }}</p>
-          </div>
-          <div class="col-3 col-md-2 col-xl-1">
-            <div>
-              <p class="text-center text-secondary m-0 p-2">{{ question.lgtm }}</p>
-            </div>
-            <div>
-              <p class="text-center text-secondary m-0 p-2">Good</p>
-            </div>
-          </div>
-          <div class="col-3 col-md-2 col-xl-1 p-0">
-            <div>
-              <p class="text-center text-secondary m-0 p-2">{{ question.answer_count }}</p>
-            </div>
-            <div>
-              <p class="text-center text-secondary m-0 p-2">回答数</p>
-            </div>
-          </div>
-        </div>
-      </router-link>
-    </div>
+    <!-- ロード画面 -->
+    <Loader v-if="loading"></Loader>
+    <!-- コンテンツ -->
     <div v-else>
-      <h3 class="p-3">
-        質問はまだありません
-      </h3>
+      <div>
+        <h1 class="pb-3 d-inline-block display-5">{{ subjectName }}の質問一覧</h1>
+        <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
+          <button type="button" class="btn btn-primary">ログインして質問する</button>
+        </router-link>
+        <router-link v-else class="pageLink d-inline p-3" :to="'/question/' + subjectCode + '/create'">
+          <button type="button" class="btn btn-primary">質問する</button>
+        </router-link>
+      </div>
+      <!-- 質問一覧(質問がある場合) -->
+      <div v-if="questions!=null">
+        <router-link v-for="question in questions" :key="question.ID" v-bind:to="$route.path  + '/' + question.ID" class="list-group-item link-box p-0 text-dark">
+          <div class="row m-0">
+            <div class="col-6 col-md-8 col-xl-10 btn">
+              <p class="fw-bolder">{{ question.title }}</p>
+              <p class="text-right text-secondary m-0">更新日時:{{ question.CreatedAt }}</p>
+            </div>
+            <div class="col-3 col-md-2 col-xl-1">
+              <div>
+                <p class="text-center text-secondary m-0 p-2">{{ question.lgtm }}</p>
+              </div>
+              <div>
+                <p class="text-center text-secondary m-0 p-2">Good</p>
+              </div>
+            </div>
+            <div class="col-3 col-md-2 col-xl-1 p-0">
+              <div>
+                <p class="text-center text-secondary m-0 p-2">{{ question.answer_count }}</p>
+              </div>
+              <div>
+                <p class="text-center text-secondary m-0 p-2">回答数</p>
+              </div>
+            </div>
+          </div>
+        </router-link>
+      </div>
+      <!-- 質問がない場合 -->
+      <div v-else>
+        <h3 class="p-3">
+          質問はまだありません
+        </h3>
+      </div>
     </div>
   </div>
 </template>
@@ -50,9 +56,13 @@ import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import axios from 'axios'
 import subjectData from '../data/subject-data.json'
+import Loader from "@/components/Loader"
 
 export default {
   name: "Questions",
+  components: {
+    Loader
+  },
   setup() {
     const store       = useStore()
     const route       = useRoute()
@@ -61,6 +71,7 @@ export default {
     const subjectName = ref("")
     const questions   = ref({})
     const answer      = ref()
+    const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
 
     // URLから科目を取得
     const subject = subjectData.find((subject) => subject.code == subjectCode)
@@ -81,6 +92,8 @@ export default {
       } catch (e) {
         console.log(e)
       }
+      // ロード画面を解除
+      loading.value = false
     })
     
     return {
@@ -88,7 +101,8 @@ export default {
       subjectName,
       subjectCode,
       questions,
-      answer
+      answer,
+      loading
     }
   }
 }
