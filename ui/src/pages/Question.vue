@@ -5,7 +5,8 @@
     <!-- コンテンツ -->
     <div v-else>
       <!-- 質問部分 -->
-      <div id="question" class="p-3 border border-dark bg-white rounded">
+      <div id="question" class="position-relative p-3 border border-dark bg-white rounded">
+        <Editor v-if="userId===question.questioner_id" target="question" :id="question.ID" @sendDelete="submitDelete"></Editor>
         <p class="fs-3 fw-bold">{{ question.title }}</p>
         <p>
           {{ question.body }}
@@ -37,7 +38,8 @@
         <h1 class="p-4 display-6 border-bottom border-dark">{{ answers.length }}件の回答</h1>
   
         <div v-for="answer in answers" :key="answer.ID" class="border-bottom border-dark p-4 mt-2">
-          <div class="border p-3 mb-2 shadow-sm">
+          <div class="position-relative border p-3 mb-2 shadow-sm">
+            <Editor v-if="userId===answer.user_id" target="answer" :id="answer.ID" @sendDelete="submitDelete"></Editor>
             <h4>{{ answer.body }}</h4>
             <!-- デバッグ用 TODO 消す -->
             <span class="text-secondary m-0">ID: {{ answer.ID }} </span>
@@ -60,13 +62,14 @@
               <span class="pl-2">{{ answerLgtmCount[answer.ID] }}件</span>
             </div>
           </div>
-  
+          <!-- 返信部分 -->
           <template v-for="reply in replys" :key="reply.ID">
             <div v-if="reply.parent_id==answer.ID">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical  my-2 ml-5" viewBox="0 0 16 16">
                 <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
               </svg>
-              <div class="border p-2 ml-5 mb-2 shadow-sm">
+              <div class="position-relative border p-2 ml-5 mb-2 shadow-sm">
+                <Editor v-if="userId===reply.user_id" target="reply" :id="reply.ID" @sendDelete="submitDelete"></Editor>
                 <p>{{ reply.body }}</p>
                 <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
                 <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
@@ -119,17 +122,20 @@ import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import Loader from "@/components/Loader"
+import Editor from "@/components/Editor"
 
 export default {
   name: "Question",
   components: {
-    Loader
+    Loader,
+    Editor
   },
   setup() {
     const store           = useStore()
     const route           = useRoute()
     const router          = useRouter()
     const auth            = computed(() => store.state.auth)
+    const userId          = localStorage.userID
     const question        = ref({}) // questionの内容
     const answers         = ref({}) // 投稿されているanswerの集合
     const answerBody      = ref("") // 投稿時のanswerの文章
@@ -282,8 +288,19 @@ export default {
       document.getElementById("reply-form-" + answerid).style.display = "block";
     }
 
+    // 投稿を削除
+    const submitDelete = (target, id) => {
+      // target(投稿の種類): "question" || "answer" || "reply"
+      // id: id(targetがquestionならquestionId)
+      if(window.confirm("投稿を削除しましすか？")) {
+        //ここにAPI処理お願いします
+        console.log(target,id)
+      }
+    }
+
     return {
       auth,
+      userId,
       question,
       answers,
       replys,
@@ -297,7 +314,8 @@ export default {
       submitReply,
       updateQuestionLgtm,
       updateAnswerLgtm,
-      displayReplyForm
+      displayReplyForm,
+      submitDelete
     }
   }
 };
