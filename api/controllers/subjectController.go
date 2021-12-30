@@ -8,6 +8,7 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
+	"auth-api/utils"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
@@ -57,7 +58,7 @@ func GetQuestion(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostQuestion(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func PostQuestion(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -135,7 +136,7 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func LgtmQuestion(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -143,7 +144,7 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -181,7 +182,7 @@ func LgtmQuestion(c *fiber.Ctx) error {
 
 func LgtmAnswer(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -189,7 +190,7 @@ func LgtmAnswer(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -248,7 +249,7 @@ func GetAnswer(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostAnswer(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -256,7 +257,7 @@ func PostAnswer(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -312,7 +313,7 @@ func GetReply(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostReply(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -320,7 +321,7 @@ func PostReply(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {

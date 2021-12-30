@@ -8,6 +8,7 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
+	"auth-api/utils"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
@@ -62,7 +63,7 @@ func LabReview(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReview(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -70,7 +71,7 @@ func PostLabReview(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -120,7 +121,7 @@ func GetLabReply(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func PostLabReply(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -128,7 +129,7 @@ func PostLabReply(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -178,7 +179,7 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 //  * リクエストデータのパースに失敗した場合に例外を発行
 func LgtmLabReview(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -186,7 +187,7 @@ func LgtmLabReview(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {

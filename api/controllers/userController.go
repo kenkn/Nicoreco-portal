@@ -8,51 +8,14 @@ package controllers
 import (
 	"auth-api/database"
 	"auth-api/models"
+	"auth-api/utils"
 	"strconv"
 	"time"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
-
-// checkPattern(private)
-// 機能 : ID，パスワードの正当性チェック
-// 引数 :
-//  * id   : 検証したいID
-//  * pass : 検証したいパスワード
-// 戻り値 : 正しいID，パスワードならばtrue
-func checkPattern(id, pass string) bool {
-	// ASCIIかどうかのチェック
-	if !(utf8.ValidString(id) && utf8.RuneCountInString(id) == len(id)) ||
-		!(utf8.ValidString(pass) && utf8.RuneCountInString(pass) == len(pass)) {
-		return false
-	}
-
-	// idに空白文字もしくは制御文字があるかどうかのチェック
-	for _, c := range id {
-		if c == ' ' {
-			return false
-		}
-		if unicode.IsControl(c) {
-			return false
-		}
-	}
-
-	// パスワードに空白文字もしくは制御文字があるかどうかのチェック
-	for _, c := range pass {
-		if c == ' ' {
-			return false
-		}
-		if unicode.IsControl(c) {
-			return false
-		}
-	}
-
-	return true
-}
 
 // /user (GET)
 // 機能 : ユーザ情報の取得
@@ -66,7 +29,7 @@ func User(c *fiber.Ctx) error {
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
 	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
 	if err != nil || !token.Valid {
@@ -76,7 +39,7 @@ func User(c *fiber.Ctx) error {
 		})
 	}
 
-	claims := token.Claims.(*Claims)
+	claims := token.Claims.(*utils.Claims)
 	// User IDを取得
 	id := claims.Issuer
 
@@ -99,7 +62,7 @@ func User(c *fiber.Ctx) error {
 // 	* リクエストデータのパースに失敗した場合に例外を発行
 func Register(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
@@ -119,7 +82,7 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	// ASCIIであるかどうかのチェック
-	if !checkPattern(data["user_id"], data["password"]) {
+	if !(utils.IsJustifiableUserinfo(data["user_id"], data["password"])) {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "IDとパスワードはASCIIでスペースを用いてはいけません",
@@ -182,7 +145,7 @@ func Register(c *fiber.Ctx) error {
 // 	* JSONの内容呼び出しに失敗した場合に例外を発行
 func Login(c *fiber.Ctx) error {
 
-	data, err := ParseData(c)
+	data, err := utils.ParseData(c)
 	if err != nil {
 		return err
 	}
