@@ -9,7 +9,8 @@ import (
 	"auth-api/database"
 	"auth-api/models"
 	"auth-api/utils"
-	"log"
+	// "hash/maphash"
+	// "log"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
@@ -35,10 +36,6 @@ func GetQuestions(c *fiber.Ctx) error {
 // 機能 : 質問の詳細情報取得
 // 戻り値 : 質問の詳細情報のJSON
 func GetQuestionInfo(c *fiber.Ctx) error {
-	type answerAndReply struct {
-		answer models.Answer
-		reply  []models.Reply
-	}
 
 	// GETの内容を取得
 	id := c.Params("id")
@@ -49,19 +46,20 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	answers := []models.Answer{}
 	database.DB.Where("parent_id = ?", question.ID).Order("lgtm desc").Find(&answers)
 
-	answerTree := []answerAndReply{}
-	for _, answer := range answers {
+	answer := []fiber.Map{}
+	for _, ans := range answers {
 		reply := []models.Reply{}
-		database.DB.Where("parent_id = ?", answer.ID).Order("created_at").Find(&reply)
-		at :=answerAndReply{
-			answer: answer,
-			reply:  reply,
-		}
-		answerTree = append(answerTree, at)
+		database.DB.Where("parent_id = ?", ans.ID).Order("created_at").Find(&reply)
+		answer = append(answer, fiber.Map{
+			"answer": ans,
+			"reply":  reply,
+		})
 	}
-	log.Println(answerTree)
 
-	return c.JSON(answerTree)
+	return c.JSON(fiber.Map{
+		"question": question,
+		"answers":   answer,
+	})
 
 }
 
