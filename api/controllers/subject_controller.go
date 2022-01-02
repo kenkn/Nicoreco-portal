@@ -9,8 +9,7 @@ import (
 	"auth-api/database"
 	"auth-api/models"
 	"auth-api/utils"
-	// "hash/maphash"
-	// "log"
+
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
@@ -32,33 +31,60 @@ func GetQuestions(c *fiber.Ctx) error {
 
 }
 
-// /question/:id (GET)
+// /question/:id/:user (GET)
 // 機能 : 質問の詳細情報取得
+// <user>が"unauthorized"の時は非ログイン時であるためLGTMedはFalseとする
 // 戻り値 : 質問の詳細情報のJSON
 func GetQuestionInfo(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	id := c.Params("id")
+	user := c.Params("user")
+	isGetLgtmled := true
+	if user == "unauthorized" {
+		isGetLgtmled = false
+	}
 
+	// Question情報及びuserがLGTMedか否かの取得
 	var question models.Question
 	database.DB.Where("id = ?", id).First(&question)
+	isQuestionLgtmed := false
+	if isGetLgtmled {
+		var lgtmQuestion models.LgtmQuestion
+		res := database.DB.Where("question_id = ?", id).Where("user_id", user).First(&lgtmQuestion)
+		if res.Error != nil {
+			isQuestionLgtmed = true
+		}
+	}
 
+	// Answer情報の取得
 	answers := []models.Answer{}
 	database.DB.Where("parent_id = ?", question.ID).Order("lgtm desc").Find(&answers)
 
+	// Reply情報及びAnswerがLGTMedか否かの取得
 	answer := []fiber.Map{}
 	for _, ans := range answers {
 		reply := []models.Reply{}
 		database.DB.Where("parent_id = ?", ans.ID).Order("created_at").Find(&reply)
+		isAnswerLgtmed := false
+		if isGetLgtmled {
+			var lgtmAnswer models.LgtmAnswer
+			res := database.DB.Where("answer_id = ?", ans.ID).Where("user_id = ?", user).First(&lgtmAnswer)
+			if res.Error != nil {
+				isAnswerLgtmed = true
+			}
+		} 
 		answer = append(answer, fiber.Map{
-			"answer": ans,
-			"reply":  reply,
+			"answer":   ans,
+			"islgtmed": isAnswerLgtmed,
+			"reply":    reply,
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"question": question,
-		"answers":   answer,
+		"islgtmed": isQuestionLgtmed,
+		"answers":  answer,
 	})
 
 }

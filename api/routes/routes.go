@@ -21,7 +21,7 @@ func Setup(app *fiber.App) {
 	route.Post("/reset", controllers.Reset)
 	// route.Patch("/user/update", controllers.UpdateUserInfo)
 	route.Get("/questions/:subject", controllers.GetQuestions)
-	route.Get("/question/:id", controllers.GetQuestionInfo)
+	route.Get("/question/:id/:user", controllers.GetQuestionInfo)
 	route.Post("/question/post", controllers.PostQuestion)
 	route.Get("/lgtm/question/:question_id/:user_id", controllers.IsQuestionLgtmed)
 	route.Post("/lgtm/question", controllers.LgtmQuestion)
