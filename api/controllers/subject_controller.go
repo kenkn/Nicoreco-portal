@@ -31,7 +31,7 @@ func GetQuestions(c *fiber.Ctx) error {
 
 }
 
-// /question/:id/:user (GET)
+// /question/:id (GET)
 // 機能 : 質問の詳細情報取得
 // <user>が"unauthorized"の時は非ログイン時であるためLGTMedはFalseとする
 // 戻り値 : 質問の詳細情報のJSON
@@ -39,11 +39,19 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	id := c.Params("id")
-	user := c.Params("user")
+	cookie := c.Cookies("jwt")
 	isGetLgtmled := true
-	if user == "unauthorized" {
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
 		isGetLgtmled = false
 	}
+
+	claims := token.Claims.(*utils.Claims)
+	// User IDを取得
+	userID := claims.Issuer
 
 	// Question情報及びuserがLGTMedか否かの取得
 	var question models.Question
@@ -51,8 +59,8 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	isQuestionLgtmed := false
 	if isGetLgtmled {
 		var lgtmQuestion models.LgtmQuestion
-		res := database.DB.Where("question_id = ?", id).Where("user_id", user).First(&lgtmQuestion)
-		if res.Error != nil {
+		res := database.DB.Where("question_id = ?", id).Where("user_id", userID).First(&lgtmQuestion)
+		if res.Error == nil {
 			isQuestionLgtmed = true
 		}
 	}
@@ -69,8 +77,8 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 		isAnswerLgtmed := false
 		if isGetLgtmled {
 			var lgtmAnswer models.LgtmAnswer
-			res := database.DB.Where("answer_id = ?", ans.ID).Where("user_id = ?", user).First(&lgtmAnswer)
-			if res.Error != nil {
+			res := database.DB.Where("answer_id = ?", ans.ID).Where("user_id = ?", userID).First(&lgtmAnswer)
+			if res.Error == nil {
 				isAnswerLgtmed = true
 			}
 		} 
@@ -168,22 +176,18 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 
 }
 
-// /lgtm/question (POST)
-// /lgtm/answer (POST)
+// /lgtm/question/:question_id (PUT)
+// /lgtm/answer/:answer_id (PUT)
 // 機能 : 質問のLGTM数を加算する
 // 受信するJSON :
-//  * jwt 	  : JWTトークン
 //  * id 	  : LGTMする質問のID
-//  * user_id : LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
+// HACK: LGTMクエリをDELETEしない，増やさない
 func LgtmQuestion(c *fiber.Ctx) error {
 
-	data, err := utils.ParseData(c)
-	if err != nil {
-		return err
-	}
+	questionID := c.Params("question_id")
 
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
@@ -197,28 +201,31 @@ func LgtmQuestion(c *fiber.Ctx) error {
 			"message": "認証されていません．",
 		})
 	}
+	claims := token.Claims.(*utils.Claims)
+	// User IDを取得
+	userID := claims.Issuer
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	lgtmData := []models.LgtmQuestion{}
-	database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).Find(&lgtmData)
+	database.DB.Where("user_id = ?", userID).Where("question_id = ?", questionID).Find(&lgtmData)
 
 	if len(lgtmData) > 0 {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("question_id = ?", data["question_id"]).Delete(&lgtmData[0])
+		database.DB.Where("user_id = ?", userID).Where("question_id = ?", questionID).Delete(&lgtmData[0])
 	} else {
-		parent_id, _ := strconv.Atoi(data["question_id"])
+		parent_id, _ := strconv.Atoi(questionID)
 		question_id_uint := uint(parent_id)
 		lgtm := models.LgtmQuestion{
 			QuestionID: question_id_uint,
-			UserID:     data["user_id"],
+			UserID:     userID,
 		}
 		database.DB.Create(&lgtm)
 	}
 
 	// LGTMの更新
 	lgtms := []models.LgtmQuestion{}
-	database.DB.Where("question_id = ?", data["question_id"]).Find(&lgtms)
+	database.DB.Where("question_id = ?", questionID).Find(&lgtms)
 	var question models.Question
-	database.DB.Model(&question).Where("id = ?", data["question_id"]).Update("lgtm", len(lgtms))
+	database.DB.Model(&question).Where("id = ?", questionID).Update("lgtm", len(lgtms))
 
 	return c.JSON(question)
 
@@ -226,10 +233,7 @@ func LgtmQuestion(c *fiber.Ctx) error {
 
 func LgtmAnswer(c *fiber.Ctx) error {
 
-	data, err := utils.ParseData(c)
-	if err != nil {
-		return err
-	}
+	answerID := c.Params("answer_id")
 
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
@@ -243,28 +247,31 @@ func LgtmAnswer(c *fiber.Ctx) error {
 			"message": "認証されていません．",
 		})
 	}
+	claims := token.Claims.(*utils.Claims)
+	// User IDを取得
+	userID := claims.Issuer
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	lgtmData := []models.LgtmAnswer{}
-	database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Find(&lgtmData)
+	database.DB.Where("user_id = ?", userID).Where("answer_id = ?", answerID).Find(&lgtmData)
 
 	if len(lgtmData) > 0 {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("answer_id = ?", data["answer_id"]).Delete(&lgtmData[0])
+		database.DB.Where("user_id = ?", userID).Where("answer_id = ?", answerID).Delete(&lgtmData[0])
 	} else {
-		parent_id, _ := strconv.Atoi(data["answer_id"])
+		parent_id, _ := strconv.Atoi(answerID)
 		answer_id_uint := uint(parent_id)
 		lgtm := models.LgtmAnswer{
 			AnswerID: answer_id_uint,
-			UserID:   data["user_id"],
+			UserID:   userID,
 		}
 		database.DB.Create(&lgtm)
 	}
 
 	// LGTMの更新
 	lgtms := []models.LgtmAnswer{}
-	database.DB.Where("answer_id = ?", data["answer_id"]).Find(&lgtms)
+	database.DB.Where("answer_id = ?", answerID).Find(&lgtms)
 	var answer models.Answer
-	database.DB.Model(&answer).Where("id = ?", data["answer_id"]).Update("lgtm", len(lgtms))
+	database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", len(lgtms))
 
 	return c.JSON(answer)
 
