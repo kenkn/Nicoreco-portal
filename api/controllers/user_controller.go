@@ -9,7 +9,6 @@ import (
 	"auth-api/database"
 	"auth-api/models"
 	"auth-api/utils"
-	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -153,10 +152,10 @@ func Login(c *fiber.Ctx) error {
 	var user models.User
 	// emailに紐づくユーザーを取得
 	// &userを指定することでDBから取得したデータを直接格納できる
-	database.DB.Where("email = ?", data["email"]).First(&user)
+	res := database.DB.Where("email = ?", data["email"]).First(&user)
 
 	// ユーザが見つからなかったとき
-	if user.ID == 0 {
+	if res.Error != nil {
 		c.Status(404)
 		return c.JSON(fiber.Map{
 			"message": "メールアドレスまたはユーザ名が違います",
@@ -174,7 +173,7 @@ func Login(c *fiber.Ctx) error {
 
 	// JWT Claimsの発行
 	claims := jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.ID)),            // ユーザIDをstringに変換
+		Issuer:    user.UserID,            // ユーザIDをstringに変換
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // JWTトークンの有効期限
 	}
 
