@@ -62,7 +62,7 @@ export default {
     const submit = async () => {
       if(window.confirm('送信します')) {
         await axios.post("/question/post", {
-          questioner_id : localStorage.userID,
+          user_id       : localStorage.userID,
           subject       : route.params.subject,
           title         : title.value,
           body          : body.value,
