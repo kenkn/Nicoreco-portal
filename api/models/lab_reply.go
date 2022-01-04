@@ -9,7 +9,9 @@ import "gorm.io/gorm"
 
 type LabReply struct {
 	gorm.Model
-	LabReviewID string `json:"lab_review_id"`
-	UserID      string `json:"user_id"`
-	Body        string `json:"body"`
+	LabReviewID string    `json:"lab_review_id"`
+	LabReview   LabReview `gorm:"foreignKey:LabReviewID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	ReplyerID   string    `json:"replyer_id" gorm:"size:256"`
+	Replyer     User      `gorm:"foreignKey:ReplyerID;references:UserID"`
+	Body        string    `json:"body"`
 }

@@ -9,8 +9,10 @@ import "gorm.io/gorm"
 
 type Answer struct {
 	gorm.Model
-	ParentID uint   `json:"parent_id"`
-	UserID   string `json:"user_id"`
-	Body     string `json:"body"`
-	Lgtm     uint   `json:"lgtm"`
+	QuestionID uint     `json:"question_id"`
+	Question   Question `gorm:"foreignKey:QuestionID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	AnswererID string   `json:"answerer_id" gorm:"size:256"`
+	Answerer   User     `gorm:"foreignKey:AnswererID;references:UserID"`
+	Body       string   `json:"body"`
+	Lgtm       uint     `json:"lgtm"`
 }
