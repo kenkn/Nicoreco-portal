@@ -41,7 +41,7 @@
             <h4>{{ answer.answer.body }}</h4>
             <!-- デバッグ用 TODO 消す -->
             <span class="text-secondary m-0">ID: {{ answer.answer.ID }} </span>
-            <span class="text-secondary m-0">回答者: {{ answer.answer.user_id }} </span>
+            <span class="text-secondary m-0">回答者: {{ answer.answer.answerer_id }} </span>
             <span class="text-secondary m-0 pl-3">回答日時: {{ answer.answer.CreatedAt }} </span>
             <div v-if="!answer.islgtmed" class="mt-1">
               <button @click="updateAnswerLgtm(idx)" id="lgtm" class="btn btn-outline-primary lgtm">
@@ -67,7 +67,7 @@
             </svg>
             <div class="border p-2 ml-5 mb-2 shadow-sm">
               <p>{{ reply.body }}</p>
-              <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
+              <span class="text-secondary m-0">返信者: {{ reply.replyer_id }} </span>
               <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
             </div>
           </template>
@@ -134,8 +134,6 @@ export default {
     const replys          = ref({}) // 投稿されているreplyの集合
     const replyBody       = ref([]) // 投稿時のreplyの文章
     const questionLgtm    = ref()   // ユーザがquestionをLGTMしているかどうか
-    const answerLgtm      = ref([]) // ユーザがquestionをLGTMしているかどうか
-    const answerLgtmCount = ref([]) // answerのLGTM数
     const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
 
     onMounted(async () => {
@@ -153,8 +151,6 @@ export default {
         question.value = questionData.data.question
         answers.value = questionData.data.answers
         questionLgtm.value = questionData.data.islgtmed
-        // questionLgtm = questionData.data.islgtmed
-        console.log(questionData.data)
       
         // ログインしていない場合LGTMボタンをdisabledにする
         if (!store.state.auth) {
@@ -248,8 +244,6 @@ export default {
       answerBody,
       replyBody,
       questionLgtm,
-      answerLgtm,
-      answerLgtmCount,
       loading,
       submitAnswer,
       submitReply,

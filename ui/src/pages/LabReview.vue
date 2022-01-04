@@ -10,7 +10,7 @@
         <div v-for="review in reviews" :key="review.ID" class="border-bottom border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
             <h4>{{ review.body }}</h4>
-            <span class="text-secondary m-0">レビュー者: {{ review.lab_reviewer_id }} </span>
+            <span class="text-secondary m-0">レビュー者: {{ review.labreviewer_id }} </span>
             <span class="text-secondary m-0 pl-3">レビュー日時: {{ review.CreatedAt }} </span>
             <!-- ここにlgtmボタンの分岐 -->
             <div v-if='!reviewLgtm[review.ID]' class="mt-1">
@@ -38,7 +38,7 @@
               </svg>
               <div class="border p-2 ml-5 mb-2 shadow-sm">
                 <p>{{ reply.body }}</p>
-                <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
+                <span class="text-secondary m-0">返信者: {{ reply.replyer_id }} </span>
                 <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span>
               </div>
             </div>
@@ -168,7 +168,7 @@ export default {
       try {
         await axios.post("lab/review/post", {
           lab             : labCode,
-          lab_reviewer_id : localStorage.userID,
+          user_id         : localStorage.userID,
           body            : reviewBody.value
         })
         // リロード
