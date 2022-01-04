@@ -18,7 +18,7 @@ import (
 // /lab/reviews/:lab (GET)
 // 機能 : 研究室レビューの情報取得
 // 戻り値 : 研究室レビューの情報のJSON
-func LabReviews(c *fiber.Ctx) error {
+func GetLabReviews(c *fiber.Ctx) error {
 
 	// GETの内容を取得
 	lab := c.Params("lab")
@@ -55,7 +55,7 @@ func LabReview(c *fiber.Ctx) error {
 // 機能 : 研究室レビューの投稿
 // 受信するJSON :
 //  * jwt 	  		  : JWTトークン
-//  * lab_reviewer_id : レビュー者のユーザID
+//  * user_id : レビュー者のユーザID
 //  * lab             : レビューする研究室名
 //  * body            : レビューの本文
 // 戻り値 : 投稿したレビューのJSON
@@ -83,7 +83,7 @@ func PostLabReview(c *fiber.Ctx) error {
 
 	review := models.LabReview{
 		Lab:           data["lab"],
-		LabReviewerID: data["lab_reviewer_id"],
+		LabReviewerID: data["user_id"],
 		Body:          data["body"],
 		Lgtm:          0,
 	}
@@ -119,6 +119,7 @@ func GetLabReply(c *fiber.Ctx) error {
 // 戻り値 : 投稿したリプライのJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
+// TODO: CookieのissuerからUser情報を取得
 func PostLabReply(c *fiber.Ctx) error {
 
 	data, err := utils.ParseData(c)
@@ -142,7 +143,7 @@ func PostLabReply(c *fiber.Ctx) error {
 	reply := models.LabReply{
 		LabReviewID: data["lab_review_id"],
 		Body:        data["body"],
-		UserID:      data["user_id"],
+		ReplyerID:   data["user_id"],
 	}
 	// データ登録(CreateはGORMメソッド)
 	database.DB.Create(&reply)
@@ -162,7 +163,7 @@ func IsLabReviewLgtmed(c *fiber.Ctx) error {
 
 	// 質問を全検索してリストで取得
 	lgtm := []models.LgtmLabReview{}
-	database.DB.Where("user_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).Find(&lgtm)
+	database.DB.Where("lgtmer_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).Find(&lgtm)
 
 	return c.JSON(lgtm)
 
@@ -199,16 +200,16 @@ func LgtmLabReview(c *fiber.Ctx) error {
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	lgtmData := []models.LgtmLabReview{}
-	database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtmData)
+	database.DB.Where("lgtmer_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtmData)
 
 	if len(lgtmData) > 0 {
-		database.DB.Where("user_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&lgtmData[0])
+		database.DB.Where("lgtmer_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&lgtmData[0])
 	} else {
 		parent_id, _ := strconv.Atoi(data["lab_review_id"])
 		lab_review_id_uint := uint(parent_id)
 		lgtm := models.LgtmLabReview{
 			LabReviewID: lab_review_id_uint,
-			UserID:      data["user_id"],
+			LgtmerID:    data["user_id"],
 		}
 		database.DB.Create(&lgtm)
 	}
