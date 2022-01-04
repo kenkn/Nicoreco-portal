@@ -43,7 +43,7 @@ func User(c *fiber.Ctx) error {
 	id := claims.Issuer
 
 	var user models.User
-	database.DB.Where("id = ?", id).First(&user)
+	database.DB.Where("user_id = ?", id).First(&user)
 
 	return c.JSON(user)
 

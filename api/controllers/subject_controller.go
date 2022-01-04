@@ -59,7 +59,7 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	isQuestionLgtmed := false
 	if isGetLgtmled {
 		var lgtmQuestion models.LgtmQuestion
-		res := database.DB.Where("question_id = ?", id).Where("user_id", userID).First(&lgtmQuestion)
+		res := database.DB.Where("question_id = ?", id).Where("lgtmer_id", userID).First(&lgtmQuestion)
 		if res.Error == nil {
 			isQuestionLgtmed = true
 		}
@@ -67,17 +67,17 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 
 	// Answer情報の取得
 	answers := []models.Answer{}
-	database.DB.Where("parent_id = ?", question.ID).Order("lgtm desc").Find(&answers)
+	database.DB.Where("question_id = ?", question.ID).Order("lgtm desc").Find(&answers)
 
 	// Reply情報及びAnswerがLGTMedか否かの取得
 	answer := []fiber.Map{}
 	for _, ans := range answers {
 		reply := []models.Reply{}
-		database.DB.Where("parent_id = ?", ans.ID).Order("created_at").Find(&reply)
+		database.DB.Where("answer_id = ?", ans.ID).Order("created_at").Find(&reply)
 		isAnswerLgtmed := false
 		if isGetLgtmled {
 			var lgtmAnswer models.LgtmAnswer
-			res := database.DB.Where("answer_id = ?", ans.ID).Where("user_id = ?", userID).First(&lgtmAnswer)
+			res := database.DB.Where("answer_id = ?", ans.ID).Where("lgtmer_id = ?", userID).First(&lgtmAnswer)
 			if res.Error == nil {
 				isAnswerLgtmed = true
 			}
@@ -101,7 +101,7 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 // 機能 : 質問をDBに追加する
 // 受信するJSON :
 //  * jwt			: JWTトークン
-//  * questioner_id : 質問者のユーザID
+//  * user_id       : 質問者のユーザID
 //  * subject       : 質問の科目
 //  * title         : 質問のタイトル
 //  * body          : 質問の本文
@@ -129,7 +129,7 @@ func PostQuestion(c *fiber.Ctx) error {
 	}
 
 	question := models.Question{
-		QuestionerID: data["questioner_id"],
+		QuestionerID: data["user_id"],
 		Subject:      data["subject"],
 		Title:        data["title"],
 		Body:         data["body"],
@@ -154,7 +154,7 @@ func IsQuestionLgtmed(c *fiber.Ctx) error {
 
 	// 質問を全検索してリストで取得
 	lgtm := []models.LgtmQuestion{}
-	database.DB.Where("user_id = ?", user_id).Where("question_id = ?", question_id).Find(&lgtm)
+	database.DB.Where("lgtmer_id = ?", user_id).Where("question_id = ?", question_id).Find(&lgtm)
 
 	return c.JSON(lgtm)
 
@@ -171,7 +171,7 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 
 	// 質問を全検索してリストで取得
 	lgtm := []models.LgtmAnswer{}
-	database.DB.Where("user_id = ?", user_id).Where("answer_id = ?", answer_id).Find(&lgtm)
+	database.DB.Where("lgtmer_id = ?", user_id).Where("answer_id = ?", answer_id).Find(&lgtm)
 	return c.JSON(lgtm)
 
 }
@@ -207,16 +207,16 @@ func LgtmQuestion(c *fiber.Ctx) error {
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	lgtmData := []models.LgtmQuestion{}
-	database.DB.Where("user_id = ?", userID).Where("question_id = ?", questionID).Find(&lgtmData)
+	database.DB.Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).Find(&lgtmData)
 
 	if len(lgtmData) > 0 {
-		database.DB.Where("user_id = ?", userID).Where("question_id = ?", questionID).Delete(&lgtmData[0])
+		database.DB.Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).Delete(&lgtmData[0])
 	} else {
 		parent_id, _ := strconv.Atoi(questionID)
 		question_id_uint := uint(parent_id)
 		lgtm := models.LgtmQuestion{
 			QuestionID: question_id_uint,
-			UserID:     userID,
+			LgtmerID:   userID,
 		}
 		database.DB.Create(&lgtm)
 	}
@@ -253,16 +253,16 @@ func LgtmAnswer(c *fiber.Ctx) error {
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
 	lgtmData := []models.LgtmAnswer{}
-	database.DB.Where("user_id = ?", userID).Where("answer_id = ?", answerID).Find(&lgtmData)
+	database.DB.Where("lgtmer_id = ?", userID).Where("answer_id = ?", answerID).Find(&lgtmData)
 
 	if len(lgtmData) > 0 {
-		database.DB.Where("user_id = ?", userID).Where("answer_id = ?", answerID).Delete(&lgtmData[0])
+		database.DB.Where("lgtmer_id = ?", userID).Where("answer_id = ?", answerID).Delete(&lgtmData[0])
 	} else {
 		parent_id, _ := strconv.Atoi(answerID)
 		answer_id_uint := uint(parent_id)
 		lgtm := models.LgtmAnswer{
 			AnswerID: answer_id_uint,
-			UserID:   userID,
+			LgtmerID: userID,
 		}
 		database.DB.Create(&lgtm)
 	}
@@ -318,14 +318,14 @@ func PostAnswer(c *fiber.Ctx) error {
 		})
 	}
 
-	parent_id, _ := strconv.Atoi(data["parent_id"])
-	parent_id_uint := uint(parent_id)
+	question_id, _ := strconv.Atoi(data["parent_id"])
+	question_id_uint := uint(question_id)
 
 	answer := models.Answer{
-		ParentID: parent_id_uint,
-		UserID:   data["user_id"],
-		Body:     data["body"],
-		Lgtm:     0,
+		QuestionID: question_id_uint,
+		AnswererID: data["user_id"],
+		Body:       data["body"],
+		Lgtm:       0,
 	}
 
 	database.DB.Create(&answer)
@@ -384,13 +384,13 @@ func PostReply(c *fiber.Ctx) error {
 
 	question_id, _ := strconv.Atoi(data["question_id"])
 	question_id_uint := uint(question_id)
-	parent_id, _ := strconv.Atoi(data["parent_id"])
-	parent_id_uint := uint(parent_id)
+	answer_id, _ := strconv.Atoi(data["parent_id"])
+	answer_id_uint := uint(answer_id)
 
 	reply := models.Reply{
 		QuestionID: question_id_uint,
-		ParentID:   parent_id_uint,
-		UserID:     data["user_id"],
+		AnswerID:   answer_id_uint,
+		ReplyerID:  data["user_id"],
 		Body:       data["body"],
 		Lgtm:       0,
 	}
