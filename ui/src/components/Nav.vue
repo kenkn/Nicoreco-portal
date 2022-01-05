@@ -2,10 +2,12 @@
   <div>
     <!-- PC用のナビ -->
     <div id="for-pc">
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <nav class="navbar navbar-expand-md bg-white fixed-top py-0">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <router-link to="/" class="nav-link">Nicoreco</router-link>
+            <router-link to="/" class="nav-link p-0">
+              <img src="@/assets/NicoRecoTop.png" width="140" height="60" alt="Top">
+            </router-link>
           </li>
         </ul>
         <ul class="navbar-nav my-sm-0">
