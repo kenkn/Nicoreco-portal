@@ -1,15 +1,16 @@
 <template>
-  <div class="h-100">
+  <div>
     <Nav />
-    <div class="h-100 m-0 wrapper">
-      <div id="sidebar">
-        <Sidebar />
-      </div>
-      <main id="contents" class="border-left border-dark overflow-auto">
-        <NotFound v-if="isNotFound" />
-        <router-view v-else />
-      </main>
+    <!-- TODO 画像に差し替え -->
+    <div id="code" class="bg-dark position-fixed"></div>
+    <!-- <img src="@/assets/NicoRecoTop.png" id="code" alt="code"> -->
+    <div id="sidebar">
+      <Sidebar />
     </div>
+    <main class="p-4">
+      <NotFound v-if="isNotFound" />
+      <router-view v-else />
+    </main>
   </div>
 </template>
  
@@ -37,43 +38,43 @@ export default {
 </script>
 
 <style>
-  html {
-    height: 100%;
-  }
+  /* 共通 */
   body {
-    height: 100%;
     word-wrap: break-word;
   }
-  #app {
-    height: 100%;
-  }
-  .wrapper {
-    display: flex;
-  }
-  #sidebar {
-    background-color: rgba(227, 225, 230, 0.555);
+  /* スマホ版 */
+  #code {
     display: none;
   }
-  #contents {
-    padding-top: 5rem;
-    padding-inline: 2rem;
-    background-color: rgba(255, 255, 255, 0.966);
-    flex: 1;
+  #sidebar {
+    display: none;
   }
+  main {
+    position: relative;
+    top: 60px;
+  }
+  /* PC版 */
+  /*画面サイズが768px(BootstrapのMedium)からはここを読み込む*/
   @media screen and (min-width:768px) {
-    /*画面サイズが768px(BootstraoのMedium)からはここを読み込む*/
-    #menu {
-      display: none;
+    #code {
+      display: block;
+      top: 60px;
+      width: 100vw;
+      height: 120px;
+      z-index: 1030;
     }
     #sidebar {
       display: block;
+      position: fixed;
+      top: 180px;
       width: 250px;
+      height: 100vh;
       background-color: rgba(227, 225, 230, 0.555);
     }
-    #contents {
-      padding-top: 5rem;
-      padding-inline: 5rem;
-      height: 100%;
+    main{
+      position: relative;
+      top: 180px;
+      margin-left: 250px;
     }
   }
 </style>
