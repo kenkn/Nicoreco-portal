@@ -9,6 +9,7 @@ import (
 	"auth-api/database"
 	"auth-api/models"
 	"auth-api/utils"
+	"log"
 
 	"strconv"
 
@@ -78,7 +79,7 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 		if isGetLgtmled {
 			var lgtmAnswer models.LgtmAnswer
 			res := database.DB.Where("answer_id = ?", ans.ID).Where("lgtmer_id = ?", userID).First(&lgtmAnswer)
-			if res.Error == nil {
+			if res.Error == nil && lgtmAnswer.IsLgtmed {
 				isAnswerLgtmed = true
 			}
 		} 
@@ -206,7 +207,7 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	// User IDを取得
 	userID := claims.Issuer
 
-	lgtmData := models.LgtmQuestion{}
+	var lgtmData models.LgtmQuestion
 	res := database.DB.Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).First(&lgtmData)
 
 	if res.Error == nil {
@@ -262,29 +263,40 @@ func LgtmAnswer(c *fiber.Ctx) error {
 	userID := claims.Issuer
 
 	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	lgtmData := []models.LgtmAnswer{}
-	database.DB.Where("lgtmer_id = ?", userID).Where("answer_id = ?", answerID).Find(&lgtmData)
+	var lgtmData models.LgtmAnswer
+	res := database.DB.Where("lgtmer_id = ?", userID).Where("answer_id = ?", answerID).First(&lgtmData)
 
-	if len(lgtmData) > 0 {
-		database.DB.Where("lgtmer_id = ?", userID).Where("answer_id = ?", answerID).Delete(&lgtmData[0])
+	if res.Error == nil {
+		// LGTM情報が既にある場合
+		la := models.LgtmAnswer{}
+		database.DB.Model(&la).Where("lgtmer_id = ?", userID).Where("answer_id = ?", answerID).Update("is_lgtmed", !(lgtmData.IsLgtmed))
+
+		var answer models.Answer
+		database.DB.Where("id = ?", answerID).First(&answer)
+		if lgtmData.IsLgtmed {
+			log.Println("minus")
+			database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", answer.Lgtm-1)
+		} else {
+			database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", answer.Lgtm+1)
+		}
+
+		return c.JSON(answer)
 	} else {
+		// LGTM情報がない場合
 		parent_id, _ := strconv.Atoi(answerID)
 		answer_id_uint := uint(parent_id)
 		lgtm := models.LgtmAnswer{
 			AnswerID: answer_id_uint,
 			LgtmerID: userID,
+			IsLgtmed: true,
 		}
 		database.DB.Create(&lgtm)
+		var answer models.Answer
+		database.DB.Where("id = ?", answerID).First(&answer)
+		database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", answer.Lgtm+1)
+
+		return c.JSON(answer)
 	}
-
-	// LGTMの更新
-	lgtms := []models.LgtmAnswer{}
-	database.DB.Where("answer_id = ?", answerID).Find(&lgtms)
-	var answer models.Answer
-	database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", len(lgtms))
-
-	return c.JSON(answer)
-
 }
 
 // /answer/:parent_id (GET)
