@@ -74,6 +74,7 @@ export default {
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
         store.dispatch('setDisplayName', localStorage.displayName)
+        store.dispatch('setGrade', localStorage.grade)
       } catch (e) {
         console.log(e)
       }

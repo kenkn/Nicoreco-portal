@@ -104,6 +104,7 @@ export default {
     const displayName = computed(() => store.state.displayName)
     store.dispatch("setAuth", localStorage.isLogin)
     store.dispatch('setDisplayName', localStorage.displayName)
+    store.dispatch("setGrade", localStorage.grade)
     const logout = async () => {
       localStorage.isLogin     = false
       localStorage.displayName = null
@@ -112,6 +113,7 @@ export default {
       localStorage.email       = null
       store.dispatch("setAuth", false)
       store.dispatch("setDisplayName", '')
+      store.dispatch("setGrade", '')
       router.push("/login")
     }
     // ナビが開いている場合は閉じる
@@ -139,7 +141,7 @@ export default {
     display: none;
   }
   @media screen and (min-width:768px) {
-    /*画面サイズが768px(BootstraoのMedium)からはここを読み込む*/
+    /*画面サイズが768px(BootstrapのMedium)からはここを読み込む*/
     #for-smart {
       display: none;
     }
