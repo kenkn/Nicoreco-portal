@@ -6,7 +6,7 @@
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
             <router-link to="/" class="nav-link p-0">
-              <img src="@/assets/NicoRecoTop.png" width="140" height="60" alt="Top">
+              <img src="@/assets/img/logo.png" width="140" height="60" alt="Top">
             </router-link>
           </li>
         </ul>
