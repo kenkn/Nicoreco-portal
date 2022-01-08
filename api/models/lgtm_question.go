@@ -13,4 +13,5 @@ type LgtmQuestion struct {
 	Question   Question `gorm:"foreignKey:QuestionID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	LgtmerID   string   `json:"lgtmer_id" gorm:"size:256"`
 	Lgtmer     User     `gorm:"foreignKey:LgtmerID;references:UserID;"`
+	IsLgtmed   bool     `json:"is_lgtmed"`
 }

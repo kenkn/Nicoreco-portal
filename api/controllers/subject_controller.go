@@ -60,7 +60,7 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	if isGetLgtmled {
 		var lgtmQuestion models.LgtmQuestion
 		res := database.DB.Where("question_id = ?", id).Where("lgtmer_id", userID).First(&lgtmQuestion)
-		if res.Error == nil {
+		if res.Error == nil && lgtmQuestion.IsLgtmed {
 			isQuestionLgtmed = true
 		}
 	}
@@ -195,6 +195,7 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
+
 	if err != nil || !token.Valid {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
@@ -205,30 +206,39 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	// User IDを取得
 	userID := claims.Issuer
 
-	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	lgtmData := []models.LgtmQuestion{}
-	database.DB.Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).Find(&lgtmData)
+	lgtmData := models.LgtmQuestion{}
+	res := database.DB.Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).First(&lgtmData)
 
-	if len(lgtmData) > 0 {
-		database.DB.Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).Delete(&lgtmData[0])
+	if res.Error == nil {
+		// LGTM情報が既にある場合
+		lq := models.LgtmQuestion{}
+		database.DB.Model(&lq).Where("lgtmer_id = ?", userID).Where("question_id = ?", questionID).Update("is_lgtmed", !(lgtmData.IsLgtmed))
+
+		var question models.Question
+		database.DB.Where("id = ?", questionID).First(&question)
+		if lgtmData.IsLgtmed {
+			database.DB.Model(&question).Where("id = ?", questionID).Update("lgtm", question.Lgtm-1)
+		} else {
+			database.DB.Model(&question).Where("id = ?", questionID).Update("lgtm", question.Lgtm+1)
+		}
+
+		return c.JSON(question)
 	} else {
+		// LGTM情報がない場合
 		parent_id, _ := strconv.Atoi(questionID)
 		question_id_uint := uint(parent_id)
 		lgtm := models.LgtmQuestion{
 			QuestionID: question_id_uint,
 			LgtmerID:   userID,
+			IsLgtmed:   true,
 		}
 		database.DB.Create(&lgtm)
+		var question models.Question
+		database.DB.Where("id = ?", questionID).First(&question)
+		database.DB.Model(&question).Where("id = ?", questionID).Update("lgtm", question.Lgtm+1)
+
+		return c.JSON(question)
 	}
-
-	// LGTMの更新
-	lgtms := []models.LgtmQuestion{}
-	database.DB.Where("question_id = ?", questionID).Find(&lgtms)
-	var question models.Question
-	database.DB.Model(&question).Where("id = ?", questionID).Update("lgtm", len(lgtms))
-
-	return c.JSON(question)
-
 }
 
 func LgtmAnswer(c *fiber.Ctx) error {
