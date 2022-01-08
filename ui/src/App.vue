@@ -1,7 +1,7 @@
 <template>
   <div>
     <Nav />
-    <img src="@/assets/code.png" id="code" alt="code">
+    <img :src="codeImg" id="code" alt="code">
     <div id="sidebar">
       <Sidebar />
     </div>
@@ -18,6 +18,7 @@ import { useStore } from 'vuex'
 import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
 import NotFound from "@/components/NotFound";
+import codeImg from "@/assets/img/code.png";
 export default {
   components: {
     Nav,
@@ -25,10 +26,11 @@ export default {
     NotFound
   },
   setup(){
-    const store = useStore() 
+    const store = useStore()
     // 404エラーの状態管理
     const isNotFound = computed(() => store.state.isNotFound)
     return {
+      codeImg,
       isNotFound
     }
   }
