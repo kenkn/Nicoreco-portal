@@ -1,9 +1,7 @@
 <template>
   <div>
     <Nav />
-    <!-- TODO 画像に差し替え -->
-    <div id="code" class="bg-dark position-fixed"></div>
-    <!-- <img src="@/assets/NicoRecoTop.png" id="code" alt="code"> -->
+    <img src="@/assets/code.png" id="code" alt="code">
     <div id="sidebar">
       <Sidebar />
     </div>
@@ -58,22 +56,24 @@ export default {
   @media screen and (min-width:768px) {
     #code {
       display: block;
+      object-fit: cover;
+      position: fixed;
       top: 60px;
       width: 100vw;
-      height: 120px;
+      height: 160px;
       z-index: 1030;
     }
     #sidebar {
       display: block;
       position: fixed;
-      top: 180px;
+      top: 220px;
       width: 250px;
       height: 100vh;
       background-color: rgba(227, 225, 230, 0.555);
     }
     main{
       position: relative;
-      top: 180px;
+      top: 220px;
       margin-left: 250px;
     }
   }
