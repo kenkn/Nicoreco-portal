@@ -111,7 +111,7 @@ export default {
       localStorage.grade       = null     
       localStorage.email       = null
       store.dispatch("setAuth", false)
-      store.dispatch("setAuth", '')
+      store.dispatch("setDisplayName", '')
       router.push("/login")
     }
     // ナビが開いている場合は閉じる
