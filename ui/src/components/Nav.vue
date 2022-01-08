@@ -6,7 +6,7 @@
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
             <router-link to="/" class="nav-link p-0">
-              <img src="@/assets/img/logo.png" width="140" height="60" alt="Top">
+              <img :src="logo" width="140" height="60" alt="Top">
             </router-link>
           </li>
         </ul>
@@ -93,6 +93,7 @@
 import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import logo from '@/assets/img/logo.png'
 
 export default {
   name: "Nav",
@@ -124,6 +125,7 @@ export default {
       }
     }
     return {
+      logo,
       auth,
       displayName,
       logout,
