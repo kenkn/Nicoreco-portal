@@ -98,85 +98,6 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 
 }
 
-// /question/post (POST)
-// 機能 : 質問をDBに追加する
-// 受信するJSON :
-//  * jwt			: JWTトークン
-//  * user_id       : 質問者のユーザID
-//  * subject       : 質問の科目
-//  * title         : 質問のタイトル
-//  * body          : 質問の本文
-// 戻り値 : 投稿した質問のJSON
-// 例外発行 :
-//  * リクエストデータのパースに失敗した場合に例外を発行
-func PostQuestion(c *fiber.Ctx) error {
-
-	data, err := utils.ParseData(c)
-	if err != nil {
-		return err
-	}
-
-	// CookieからJWTを取得(Loginにて保存したユーザ情報)
-	cookie := c.Cookies("jwt")
-	// JWTtoken取得
-	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid {
-		c.Status(fiber.StatusUnauthorized)
-		return c.JSON(fiber.Map{
-			"message": "認証されていません．",
-		})
-	}
-
-	question := models.Question{
-		QuestionerID: data["user_id"],
-		Subject:      data["subject"],
-		Title:        data["title"],
-		Body:         data["body"],
-		Lgtm:         0,
-	}
-
-	// データ登録(CreateはGORMメソッド)
-	database.DB.Create(&question)
-
-	return c.JSON(question)
-
-}
-
-// /lgtm/question/:question_id:user_id (GET)
-// 機能 : LGTMされたどうかの判定(question用)
-// 戻り値 : LGTM情報のJSON
-func IsQuestionLgtmed(c *fiber.Ctx) error {
-
-	// GETの内容を取得
-	question_id := c.Params("question_id")
-	user_id := c.Params("user_id")
-
-	// 質問を全検索してリストで取得
-	lgtm := []models.LgtmQuestion{}
-	database.DB.Where("lgtmer_id = ?", user_id).Where("question_id = ?", question_id).Find(&lgtm)
-
-	return c.JSON(lgtm)
-
-}
-
-// /lgtm/answer/:answer_id/:user_id (GET)
-// 機能 : LGTMされたどうかの判定(answer用)
-// 戻り値 : LGTM情報のJSON
-func IsAnswerLgtmed(c *fiber.Ctx) error {
-
-	// GETの内容を取得
-	answer_id := c.Params("answer_id")
-	user_id := c.Params("user_id")
-
-	// 質問を全検索してリストで取得
-	lgtm := []models.LgtmAnswer{}
-	database.DB.Where("lgtmer_id = ?", user_id).Where("answer_id = ?", answer_id).Find(&lgtm)
-	return c.JSON(lgtm)
-
-}
-
 // /lgtm/question/:question_id (PUT)
 // /lgtm/answer/:answer_id (PUT)
 // 機能 : 質問のLGTM数を加算する
@@ -185,7 +106,6 @@ func IsAnswerLgtmed(c *fiber.Ctx) error {
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
 //  * リクエストデータのパースに失敗した場合に例外を発行
-// HACK: LGTMクエリをDELETEしない，増やさない
 func LgtmQuestion(c *fiber.Ctx) error {
 
 	questionID := c.Params("question_id")
@@ -299,15 +219,49 @@ func LgtmAnswer(c *fiber.Ctx) error {
 	}
 }
 
-// /answer/:parent_id (GET)
-// 機能 : 該当のquestionに対するanswer一覧を取得する
-// 戻り値 : Answer一覧のJSON
-func GetAnswer(c *fiber.Ctx) error {
+// /question/post (POST)
+// 機能 : 質問をDBに追加する
+// 受信するJSON :
+//  * jwt			: JWTトークン
+//  * user_id       : 質問者のユーザID
+//  * subject       : 質問の科目
+//  * title         : 質問のタイトル
+//  * body          : 質問の本文
+// 戻り値 : 投稿した質問のJSON
+// 例外発行 :
+//  * リクエストデータのパースに失敗した場合に例外を発行
+func PostQuestion(c *fiber.Ctx) error {
 
-	parent := c.Params("parent_id")
-	answers := []models.Answer{}
-	database.DB.Where("parent_id = ?", parent).Find(&answers)
-	return c.JSON(answers)
+	data, err := utils.ParseData(c)
+	if err != nil {
+		return err
+	}
+
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
+	}
+
+	question := models.Question{
+		QuestionerID: data["user_id"],
+		Subject:      data["subject"],
+		Title:        data["title"],
+		Body:         data["body"],
+		Lgtm:         0,
+	}
+
+	// データ登録(CreateはGORMメソッド)
+	database.DB.Create(&question)
+
+	return c.JSON(question)
 
 }
 
@@ -359,19 +313,6 @@ func PostAnswer(c *fiber.Ctx) error {
 	database.DB.Model(&question).Where("id = ?", data["parent_id"]).Update("answer_count", len(answers))
 
 	return c.JSON(answer)
-
-}
-
-// /reply/:question_id (GET)
-// 機能 : 該当のquestionに対するreply一覧を取得する
-// 戻り値 : reply一覧のJSON
-// TODO labControllerと同じようにanswerに対してreplyJSONを返すようにする(ページング実装のため)
-func GetReply(c *fiber.Ctx) error {
-
-	parent := c.Params("question_id")
-	replys := []models.Reply{}
-	database.DB.Where("question_id = ?", parent).Find(&replys)
-	return c.JSON(replys)
 
 }
 
