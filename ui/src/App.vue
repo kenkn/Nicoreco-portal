@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Nav />
+    <Nav id="nav"/>
     <img :src="codeImg" id="code" alt="code">
     <div id="sidebar">
       <Sidebar />
@@ -41,6 +41,11 @@ export default {
   /* 共通 */
   body {
     word-wrap: break-word;
+  }
+  #nav {
+    position: relative;
+    /* code部分より前に出すため */
+    z-index: 1031
   }
   /* スマホ版 */
   #code {

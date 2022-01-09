@@ -13,11 +13,15 @@
         <ul class="navbar-nav my-sm-0">
           <!-- ログイン済なら表示 -->
           <template v-if="auth">
-            <li class="nav-item">
-              <router-link to="/profile" class="nav-link">{{ displayName }}</router-link>
+            <!-- TODO 通知機能 -->
+            <li class="nav-item p-2">
+              <button class="btn p-1">
+                <img :src="bell" alt="bell" width="30" height="30">
+              </button>
             </li>
-            <li class="nav-item">
-              <router-link to="/login" class="nav-link" @click="logout">ログアウト</router-link>
+            <!-- メニュー -->
+            <li class="nav-item p-2">
+              <UserIcon @sendLogout="logout"/>
             </li>
           </template>
           <!-- 未ログインなら表示 -->
@@ -90,13 +94,18 @@
 </template>
 
 <script>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import UserIcon from "@/components/UserIcon"
 import logo from '@/assets/img/logo.png'
+import bell from '@/assets/img/bell.png'
 
 export default {
   name: "Nav",
+  components: {
+    UserIcon
+  },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -126,6 +135,7 @@ export default {
     }
     return {
       logo,
+      bell,
       auth,
       displayName,
       logout,
