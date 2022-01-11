@@ -3,9 +3,10 @@
     <ul class="list-group pt-2">
       <router-link
         tag="li"
-        class="link-box list-group-item text-dark p-0"
+        class="link-box list-group-item text-dark p-0 position-relative"
         to="/question"
       >
+        <div v-if="appName=='question'" class="position-absolute top-0 end-0 selected"></div>
         <div class="w-100 h-100 px-3 py-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -24,9 +25,10 @@
       </router-link>
       <router-link
         tag="li"
-        class="link-box list-group-item text-dark p-0"
+        class="link-box list-group-item text-dark p-0 position-relative"
         to="/lab"
       >
+        <div v-if="appName=='lab'" class="position-absolute top-0 end-0 selected"></div>
         <div class="w-100 h-100 px-3 py-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -45,9 +47,10 @@
       </router-link>
       <router-link
         tag="li"
-        class="link-box list-group-item text-dark p-0"
+        class="link-box list-group-item text-dark p-0 position-relative"
         to="/"
       >
+        <div v-if="appName=='chat'" class="position-absolute top-0 end-0 selected"></div>
         <div class="w-100 h-100 px-3 py-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -72,12 +75,39 @@
 </template>
 
 <script>
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+
 export default {
   name: "Sidebar",
+  setup() {
+    const route = useRoute()
+    const appName = ref(null)
+    // 赤いバーを表示するために、urlからappNameを判定
+    watch(route, () => {
+      if(route.path.indexOf("/question") != -1) {
+        appName.value = "question"
+      } else if(route.path.indexOf("/lab") != -1) {
+        appName.value = "lab"
+      } else if(route.path.indexOf("/lab") != -1) {
+        appName.value = "chat"
+      } else {
+        appName.value = null
+      }
+    })
+    return {
+      appName
+    }
+  }
 };
 </script>
 
 <style scoped>
+  .selected {
+    background-color: red;
+    height: 100%;
+    width: 2px;
+  }
   .link-box {
     background-color: white;
   }
