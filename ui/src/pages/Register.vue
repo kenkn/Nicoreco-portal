@@ -8,7 +8,7 @@
         class="form-control"
         placeholder="表示名"
       />
-      <ErrorMessage name="displayName" />
+      <ErrorMessage name="displayName" as="p" class="text-danger" />
 
       <VeeField
         name="userID"
@@ -16,7 +16,7 @@
         class="form-control"
         placeholder="ユーザID"
       />
-      <ErrorMessage name="userID" />
+      <ErrorMessage name="userID" as="p" class="text-danger" />
 
       <VeeField
         name="grade"
@@ -34,20 +34,19 @@
         <option value="博士2年">博士2年</option>
         <option value="博士3年">博士3年</option>
       </VeeField>
-      <ErrorMessage name="grade" as="p" class="m-0"/>
+      <ErrorMessage name="grade" as="p" class="text-danger" />
 
       <VeeField
         name="email"
         v-model="email"
         type="email"
         class="form-control d-inline"
-        placeholder="山口大学メールアドレス"
+        placeholder="山口大学メール"
       />
-      <span class="d-inline lead borde">
+      <span class="d-inline text-nowrap">
         @yamaguchi-u.ac.jp
       </span>
-      <ErrorMessage name="email" />
-
+      <ErrorMessage name="email" as="p" class="text-danger" />
 
       <VeeField
         name="password"
@@ -56,7 +55,7 @@
         class="form-control"
         placeholder="パスワード"
       />
-      <ErrorMessage name="password" />
+      <ErrorMessage name="password" as="p" class="text-danger" />
       
       <VeeField
         name="passwordConfirm"
@@ -65,9 +64,12 @@
         class="form-control"
         placeholder="パスワード(確認)"
       />
-      <ErrorMessage name="passwordConfirm" />
-      <p>{{ errMessage }}</p>
+      <ErrorMessage name="passwordConfirm" as="p" class="text-danger" />
 
+      <!-- APIからのエラーメッセージ -->
+      <p class="text-danger">{{ errMessage }}</p>
+
+      <!-- submit -->
       <button v-if="!loading" class="w-100 btn-lg btn-primary" type="submit">登録</button>
       <button v-else class="w-100 btn-lg btn-primary disabled" disabled>
         <div class="spinner-border" role="status">
@@ -175,7 +177,6 @@ export default {
   border-bottom-left-radius: 0;
 }
 .form-register input[type="password"] {
-  margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
