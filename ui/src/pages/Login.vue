@@ -6,10 +6,10 @@
         v-model="email"
         name="email"
         class="form-control email d-inline"
-        placeholder="Email"
+        placeholder="山口大学メール"
         required
       />
-      <span class="d-inline lead borde">
+      <span class="d-inline text-nowrap">
         @yamaguchi-u.ac.jp
       </span>
 
@@ -20,7 +20,7 @@
         placeholder="パスワード"
         required
       />
-      <p>{{ errMessage }}</p>
+      <p class="text-danger">{{ errMessage }}</p>
       <div class="mb-2">
         <router-link to="/forgot">パスワードを忘れましたか？</router-link>
       </div>
@@ -74,6 +74,7 @@ export default {
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
         store.dispatch('setDisplayName', localStorage.displayName)
+        store.dispatch('setGrade', localStorage.grade)
       } catch (e) {
         console.log(e)
       }

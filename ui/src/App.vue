@@ -1,15 +1,14 @@
 <template>
-  <div class="h-100">
-    <Nav />
-    <div class="h-100 m-0 wrapper">
-      <div id="sidebar">
-        <Sidebar />
-      </div>
-      <main id="contents" class="border-left border-dark overflow-auto">
-        <NotFound v-if="isNotFound" />
-        <router-view v-else />
-      </main>
+  <div>
+    <Nav id="nav"/>
+    <img :src="codeImg" id="code" alt="code">
+    <div id="sidebar">
+      <Sidebar />
     </div>
+    <main class="p-4">
+      <NotFound v-if="isNotFound" />
+      <router-view v-else />
+    </main>
   </div>
 </template>
  
@@ -19,6 +18,7 @@ import { useStore } from 'vuex'
 import Nav from "@/components/Nav";
 import Sidebar from "@/components/Sidebar";
 import NotFound from "@/components/NotFound";
+import codeImg from "@/assets/img/code.png";
 export default {
   components: {
     Nav,
@@ -26,10 +26,11 @@ export default {
     NotFound
   },
   setup(){
-    const store = useStore() 
+    const store = useStore()
     // 404エラーの状態管理
     const isNotFound = computed(() => store.state.isNotFound)
     return {
+      codeImg,
       isNotFound
     }
   }
@@ -37,43 +38,50 @@ export default {
 </script>
 
 <style>
-  html {
-    height: 100%;
-  }
+  /* 共通 */
   body {
-    height: 100%;
     word-wrap: break-word;
   }
-  #app {
-    height: 100%;
+  #nav {
+    position: relative;
+    /* code部分より前に出すため */
+    z-index: 1031
   }
-  .wrapper {
-    display: flex;
-  }
-  #sidebar {
-    background-color: rgba(227, 225, 230, 0.555);
+  /* スマホ版 */
+  #code {
     display: none;
   }
-  #contents {
-    padding-top: 5rem;
-    padding-inline: 2rem;
-    background-color: rgba(255, 255, 255, 0.966);
-    flex: 1;
+  #sidebar {
+    display: none;
   }
+  main {
+    position: relative;
+    top: 60px;
+  }
+  /* PC版 */
+  /*画面サイズが768px(BootstrapのMedium)からはここを読み込む*/
   @media screen and (min-width:768px) {
-    /*画面サイズが768px(BootstraoのMedium)からはここを読み込む*/
-    #menu {
-      display: none;
+    #code {
+      display: block;
+      object-fit: cover;
+      position: fixed;
+      top: 60px;
+      width: 100vw;
+      height: 160px;
+      z-index: 1030;
     }
     #sidebar {
       display: block;
+      position: fixed;
+      top: 220px;
       width: 250px;
+      height: 100vh;
       background-color: rgba(227, 225, 230, 0.555);
     }
-    #contents {
-      padding-top: 5rem;
-      padding-inline: 5rem;
-      height: 100%;
+    main{
+      position: relative;
+      top: 220px;
+      margin-left: 250px;
     }
   }
 </style>

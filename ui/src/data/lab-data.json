@@ -1,74 +1,92 @@
 [
     {
-        "name" : "伊藤研究室",
-        "code" : "akito"
+        "name": "伊藤研究室",
+        "code": "akito",
+        "course": "media"
     },
     {
         "name": "井田研究室",
-        "code" : "y.ida"
+        "code": "y.ida",
+        "course": "system"
     },
     {
         "name": "福士研究室",
-        "code" : "mfukushi"
+        "code": "mfukushi",
+        "course": "system"
     },
     {
         "name": "山口研究室",
-        "code" : "shingo"
+        "code": "shingo",
+        "course": "system"
     },
     {
         "name": "アヌアル研究室",
-        "code" : "anuar"
+        "code": "anuar",
+        "course": "system"
     },
     {
         "name": "中正研究室",
-        "code" : "nakasho"
+        "code": "nakasho",
+        "course": "system"
     },
     {
         "name": "王研究室",
-        "code" : "y.wang"
+        "code": "y.wang",
+        "course": "system"
     },
     {
         "name": "藤田研究室",
-        "code" : "y-fujita"
+        "code": "y-fujita",
+        "course": "media"
     },
     {
         "name": "間普研究室",
-        "code" : "mabu"
+        "code": "mabu",
+        "course": "media"
     },
     {
         "name": "佐村研究室",
-        "code" : "samura"
+        "code": "samura",
+        "course": "media"
     },
     {
         "name": "佐伯研究室",
-        "code" : "tsaeki"
+        "code": "tsaeki",
+        "course": "media"
     },
     {
         "name": "河村研究室",
-        "code" : "kay"
+        "code": "kay",
+        "course": "system"
     },
     {
         "name": "中村研究室",
-        "code" : "nakahide"
+        "code" : "nakahide",
+        "course": "system"
     },
     {
         "name": "瀧本研究室",
-        "code" : "dpslpage"
+        "code" : "dpslpage",
+        "course": "system"
     },
     {
         "name": "多田村研究室",
-        "code" : "tadamura"
+        "code" : "tadamura",
+        "course": "media"
     },
     {
         "name": "長研究室",
-        "code" : "osaa"
+        "code" : "osaa",
+        "course": "media"
     },
     {
         "name": "相田研究室",
-        "code" : "saoaida"
+        "code" : "saoaida",
+        "course": "media"
     },
     {
         "name": "水上研究室",
-        "code" : "mizu"
+        "code" : "mizu",
+        "course": "media"
     }
 ]
