@@ -2,7 +2,7 @@
   <div class='lab-btn position-relative bg-Secondary m-2 p-0'>
     <router-link v-bind:to="'/lab/' + labCode" class="stretched-link">
       <img :src="labLogo" alt="lab-logo" class="lab-img position-absolute top-50 start-50 translate-middle">
-      <p class="position-absolute top-50 start-50 translate-middle text-light text-break fw-bold fs-5">{{ labName }}</p>
+      <p class="position-absolute top-50 start-50 translate-middle text-light text-nowrap fw-bold fs-5">{{ labName }}</p>
     </router-link>
   </div>
 </template>
