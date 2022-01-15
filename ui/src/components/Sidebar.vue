@@ -4,6 +4,20 @@
       <router-link
         tag="li"
         class="link-box list-group-item text-dark p-0 position-relative"
+        to="/"
+      >
+        <div v-if="appName=='home'" class="position-absolute top-0 end-0 selected"></div>
+        <div class="w-100 h-100 px-3 py-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+            <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+          </svg>
+          ホーム
+        </div>
+      </router-link>
+      <router-link
+        tag="li"
+        class="link-box list-group-item text-dark p-0 position-relative"
         to="/question"
       >
         <div v-if="appName=='question'" class="position-absolute top-0 end-0 selected"></div>
@@ -85,11 +99,13 @@ export default {
     const appName = ref(null)
     // 赤いバーを表示するために、urlからappNameを判定
     watch(route, () => {
-      if(route.path.indexOf("/question") != -1) {
+      if(route.path==="/") {
+        appName.value = "home"
+      } else if(route.path.indexOf("/question") != -1) {
         appName.value = "question"
       } else if(route.path.indexOf("/lab") != -1) {
         appName.value = "lab"
-      } else if(route.path.indexOf("/lab") != -1) {
+      } else if(route.path.indexOf("/chat") != -1) {
         appName.value = "chat"
       } else {
         appName.value = null
