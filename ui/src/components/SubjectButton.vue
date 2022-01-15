@@ -40,15 +40,4 @@ export default {
     background: black;
     opacity: 0.1;
   }
-  /* スマホ版 */
-  .card {
-    margin-right: auto;
-    margin-left: auto;
-  }
-  /* PC版 */
-  /*画面サイズが768px(BootstrapのMedium)からはここを読み込む*/
-  @media screen and (min-width:768px) {
-    .card {
-    }
-  }
 </style>
