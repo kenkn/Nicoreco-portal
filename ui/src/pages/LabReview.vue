@@ -11,7 +11,7 @@
           <div class="border p-3 mb-2 shadow-sm">
             <h4>{{ review.body }}</h4>
             <span class="text-secondary m-0">レビュー者: {{ review.lab_reviewer_id }} </span>
-            <span class="text-secondary m-0 pl-3">レビュー日時: {{ review.CreatedAt }} </span>
+            <span class="text-secondary m-0 pl-3">レビュー日時: {{ FormatData(review.CreatedAt) }} </span>
             <!-- ここにlgtmボタンの分岐 -->
             <div v-if='!reviewLgtm[review.ID]' class="mt-1">
               <button @click="updateReviewLgtm(review.ID)" id="lgtm" class="btn btn-outline-primary lgtm">
@@ -39,7 +39,7 @@
               <div class="border p-2 ml-5 mb-2 shadow-sm">
                 <p>{{ reply.body }}</p>
                 <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
-                <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span>
+                <span class="text-secondary m-0 pl-3">返信日時: {{ FormatData(reply.CreatedAt) }} </span>
               </div>
             </div>
           </template>
@@ -86,6 +86,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import labData from '../data/lab-data.json'
 import Loader from "@/components/Loader"
+import FormatData from '@/functions/FormatData'
 
 export default {
   name: "LabReview",
@@ -231,6 +232,7 @@ export default {
       submitReply,
       displayReplyForm,
       updateReviewLgtm,
+      FormatData,
     }
   }
 };
