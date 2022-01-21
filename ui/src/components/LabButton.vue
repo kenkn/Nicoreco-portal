@@ -43,8 +43,8 @@ export default {
     opacity: 0.1;
   }
   .lab-btn {
-    width: 14rem;
-    height: 14rem;
+    width: 12rem;
+    height: 12rem;
     background-color: gray;
   }
   .lab-img {
