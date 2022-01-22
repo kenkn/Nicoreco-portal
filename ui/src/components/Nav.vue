@@ -21,7 +21,7 @@
             </li>
             <!-- メニュー -->
             <li class="nav-item p-2">
-              <UserIcon @sendLogout="logout"/>
+              <UserIconMenu @sendLogout="logout"/>
             </li>
           </template>
           <!-- 未ログインなら表示 -->
@@ -97,14 +97,14 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-import UserIcon from "@/components/UserIcon"
+import UserIconMenu from "@/components/UserIconMenu"
 import logo from '@/assets/img/logo.png'
 import bell from '@/assets/img/bell.png'
 
 export default {
   name: "Nav",
   components: {
-    UserIcon
+    UserIconMenu
   },
   setup() {
     const store = useStore()
