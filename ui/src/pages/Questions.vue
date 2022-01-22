@@ -58,7 +58,7 @@
 </template>
  
 <script>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import axios from 'axios'
@@ -79,7 +79,8 @@ export default {
     const subjectName = ref("")
     const questions   = ref({})
     const answer      = ref()
-    const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
+    const loading     = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
+
 
     // URLから科目を取得
     const subject = subjectData.find((subject) => subject.code == subjectCode)
@@ -103,6 +104,12 @@ export default {
       // ロード画面を解除
       loading.value = false
     })
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", subjectName.value + "の質問一覧")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
     
     return {
       auth,
