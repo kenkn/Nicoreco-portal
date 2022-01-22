@@ -13,6 +13,8 @@
 </template>
  
 <script>
+import { onBeforeUnmount } from 'vue'
+import { useStore } from 'vuex'
 import data from '../data/subject-data.json'
 import SubjectButton from '@/components/SubjectButton'
 
@@ -22,6 +24,12 @@ export default {
     SubjectButton
   },
   setup() {
+    const store = useStore()
+    // 見出しの処理
+    store.dispatch("setJumbotron", "講義一覧")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
     return {
       subjects: data
     }
