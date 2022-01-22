@@ -8,7 +8,9 @@
       <!-- 質問部分 -->
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
+
         <pre v-html="question.body"/>
+        
         <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
@@ -153,15 +155,16 @@ export default {
         }
         question.value = questionData.data
 
-        // let reg = /(?<=```.*\n)[\s\S]*?(?=\n.*```)/g
-        const reg = /```.*\n(.*?)\n```/g
+        const reg = /(```.*\n)[\s\S]*?(\n```)/g
+
         const questionCode = question.value.body.match(reg)
         // console.log(questionCode)
         for (const i in questionCode) {
           const re = /(?<=```.*\n)[\s\S]*?(?=\n.*```)/
           const code = questionCode[i].match(re)[0]
           console.log(code)
-          const highlightedCode = hljs.highlightAuto(code).value
+          const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
+          console.log(highlightedCode)
           question.value.body = question.value.body.replace(questionCode[i], highlightedCode)
         }
 
