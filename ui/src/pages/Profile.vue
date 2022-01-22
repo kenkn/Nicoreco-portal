@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h1 class="h3 mb-3 fw-normal">ユーザー情報確認・変更</h1>
     <VeeForm @submit="submit" :validation-schema="schema">
       <table class="table">

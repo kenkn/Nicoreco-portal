@@ -2,20 +2,26 @@
   <div>
     <!-- PC用のナビ -->
     <div id="for-pc">
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <nav class="navbar navbar-expand-md bg-white fixed-top py-0">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <router-link to="/" class="nav-link">Nicoreco</router-link>
+            <router-link to="/" class="nav-link p-0">
+              <img :src="logo" width="140" height="60" alt="Top">
+            </router-link>
           </li>
         </ul>
         <ul class="navbar-nav my-sm-0">
           <!-- ログイン済なら表示 -->
           <template v-if="auth">
-            <li class="nav-item">
-              <router-link to="/profile" class="nav-link">{{ displayName }}</router-link>
+            <!-- TODO 通知機能 -->
+            <li class="nav-item p-2">
+              <button class="btn p-1">
+                <img :src="bell" alt="bell" width="30" height="30">
+              </button>
             </li>
-            <li class="nav-item">
-              <router-link to="/login" class="nav-link" @click="logout">ログアウト</router-link>
+            <!-- メニュー -->
+            <li class="nav-item p-2">
+              <UserIconMenu @sendLogout="logout"/>
             </li>
           </template>
           <!-- 未ログインなら表示 -->
@@ -88,12 +94,18 @@
 </template>
 
 <script>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import UserIconMenu from "@/components/UserIconMenu"
+import logo from '@/assets/img/logo.png'
+import bell from '@/assets/img/bell.png'
 
 export default {
   name: "Nav",
+  components: {
+    UserIconMenu
+  },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -102,6 +114,7 @@ export default {
     const displayName = computed(() => store.state.displayName)
     store.dispatch("setAuth", localStorage.isLogin)
     store.dispatch('setDisplayName', localStorage.displayName)
+    store.dispatch("setGrade", localStorage.grade)
     const logout = async () => {
       localStorage.isLogin     = false
       localStorage.displayName = null
@@ -109,7 +122,8 @@ export default {
       localStorage.grade       = null     
       localStorage.email       = null
       store.dispatch("setAuth", false)
-      store.dispatch("setAuth", '')
+      store.dispatch("setDisplayName", '')
+      store.dispatch("setGrade", '')
       router.push("/login")
     }
     // ナビが開いている場合は閉じる
@@ -120,6 +134,8 @@ export default {
       }
     }
     return {
+      logo,
+      bell,
       auth,
       displayName,
       logout,
@@ -137,7 +153,7 @@ export default {
     display: none;
   }
   @media screen and (min-width:768px) {
-    /*画面サイズが768px(BootstraoのMedium)からはここを読み込む*/
+    /*画面サイズが768px(BootstrapのMedium)からはここを読み込む*/
     #for-smart {
       display: none;
     }
