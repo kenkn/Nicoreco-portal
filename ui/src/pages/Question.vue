@@ -123,7 +123,7 @@
 </template>
  
 <script>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -304,6 +304,12 @@ export default {
       document.getElementById("reply-disply-button-" + answerid).style.display = "none";
       document.getElementById("reply-form-" + answerid).style.display = "block";
     }
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", subjectName.value + "の質問")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
 
     return {
       auth,
