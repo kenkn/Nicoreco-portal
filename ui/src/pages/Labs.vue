@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="pb-3 display-5">研究室一覧</h1>
+    <h1 class="pb-3 display-5 d-md-none">研究室一覧</h1>
     <div class="row">
       <LabButton
         v-for="lab in labs" 

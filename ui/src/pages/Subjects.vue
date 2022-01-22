@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="pb-3 display-5">講義一覧</h1>
+    <h1 class="pb-3 display-5 d-md-none">講義一覧</h1>
     <div class="row">
       <SubjectButton 
         v-for="subject in subjects" 

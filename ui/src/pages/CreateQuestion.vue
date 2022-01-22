@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="pb-3 display-5">質問する</h1>
+    <h1 class="pb-3 display-5 d-md-none">質問する</h1>
     <div class="p-3 border border-dark bg-white rounded shadow-sm">
       <h2 class="display-6">講義名:{{ subjectName }}</h2>
         <VeeForm @submit="submit" :validation-schema="schema">

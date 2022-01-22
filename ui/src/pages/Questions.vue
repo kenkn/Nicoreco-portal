@@ -5,7 +5,7 @@
     <!-- コンテンツ -->
     <div v-else>
       <div>
-        <h1 class="pb-3 d-inline-block display-5">{{ subjectName }}の質問一覧</h1>
+        <h1 class="pb-3 d-inline-block display-5 d-md-none">{{ subjectName }}の質問一覧</h1>
         <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
           <button type="button" class="btn btn-primary">ログインして質問する</button>
         </router-link>

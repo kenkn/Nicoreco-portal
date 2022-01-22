@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="pb-3 display-5">レビューする</h1>
+    <h1 class="pb-3 display-5 d-md-none">レビューする</h1>
     <div class="p-3 border border-dark bg-white rounded shadow-sm">
       <h2 class="display-6">研究室名:{{ labName }}</h2>
         <VeeForm @submit="submitReview" :validation-schema="schema">
@@ -42,7 +42,6 @@ export default {
 
     // URLから研究室を取得
     const lab = labData.find((lab) => lab.code == labCode)
-    console.log(lab)
     // labDataの中に一致するlabがない場合は404
     if(lab === undefined){
       store.dispatch("setIsNotFound", true)
