@@ -5,6 +5,7 @@ import store from './store'
 import axios from 'axios'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
+import "@/css/container.css"
 
 // /api/registerにリクエスト飛ばすためのやつ
 axios.defaults.baseURL = 'http://localhost:80/api/'
