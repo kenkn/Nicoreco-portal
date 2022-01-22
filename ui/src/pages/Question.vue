@@ -4,12 +4,11 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
+
       <!-- 質問部分 -->
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
-        <p>
-          {{ question.body }}
-        </p>
+        <pre v-html="question.body"/>
         <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
@@ -38,7 +37,7 @@
   
         <div v-for="answer in answers" :key="answer.ID" class="border-bottom border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
-            <h4>{{ answer.body }}</h4>
+            <h4><pre>{{ answer.body }}</pre></h4>
             <!-- デバッグ用 TODO 消す -->
             <span class="text-secondary m-0">ID: {{ answer.ID }} </span>
             <span class="text-secondary m-0">回答者: {{ answer.user_id }} </span>
@@ -67,7 +66,7 @@
                 <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
               </svg>
               <div class="border p-2 ml-5 mb-2 shadow-sm">
-                <p>{{ reply.body }}</p>
+                <pre>{{ reply.body }}</pre>
                 <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
                 <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
               </div>
@@ -119,6 +118,8 @@ import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import Loader from "@/components/Loader"
+import hljs from 'highlight.js';
+import 'highlight.js/styles/xcode.css';
 
 export default {
   name: "Question",
@@ -147,10 +148,22 @@ export default {
           "/question/" + route.params.question_id
         )
         // 質問者が空の場合は404判定
-        if(questionData.data.questioner_id == ''){
+        if (questionData.data.questioner_id == ''){
           store.dispatch("setIsNotFound", true)
         }
         question.value = questionData.data
+
+        // let reg = /(?<=```.*\n)[\s\S]*?(?=\n.*```)/g
+        const reg = /```.*\n(.*?)\n```/g
+        const questionCode = question.value.body.match(reg)
+        // console.log(questionCode)
+        for (const i in questionCode) {
+          const re = /(?<=```.*\n)[\s\S]*?(?=\n.*```)/
+          const code = questionCode[i].match(re)[0]
+          console.log(code)
+          const highlightedCode = hljs.highlightAuto(code).value
+          question.value.body = question.value.body.replace(questionCode[i], highlightedCode)
+        }
 
         // 回答情報の取得
         const answerData = await axios.get(
