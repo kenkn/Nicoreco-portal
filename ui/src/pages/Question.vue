@@ -4,6 +4,7 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
+      <h1 class="pb-3 d-inline-block display-5 d-md-none">{{ subjectName }}の質問</h1>
       <!-- 一覧ページへのリンク -->
         <div class="mb-2 ml-2">
           <router-link :to="'/question/' + subjectCode">
