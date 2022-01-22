@@ -75,7 +75,7 @@
 </template>
  
 <script>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -102,61 +102,62 @@ export default {
     const reviewLgtmCount = ref([]) // reviewのLGTM数
     const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
 
+    // URLから科目を取得
+    const lab = labData.find((lab) => lab.code == labCode)
+    // labDataの中に一致するlabがない場合は404
+    if(lab === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      labName.value = lab.name
+    }
+
     onMounted(async () => {
-      // URLから研究室を取得
-      const lab = labData.find((lab) => lab.code == labCode)
-      // labDataの中に一致するlabがない場合は404
-      if(lab === undefined){
-        store.dispatch("setIsNotFound", true)
-      }
-      else {
-        labName.value = lab.name
-        // TODO 対象の研究室レビューのみの取得にする
-        try {
-          const labReviewData = await axios.get(
-            "/lab/reviews/" + labCode
-          ).catch(error => {
-            console.log(error)
-          })
-          review.value = labReviewData.data[0] // 仮で先頭のレビューのみを表示中
-          for (const i in labReviewData.data) {
-            reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
-          }
-          // 研究室レビューに対するリプライの取得
-          for (const i in labReviewData.data) {
-            const labReplyData = await axios.get(
-              "/lab/reply/" + labReviewData.data[i].ID
-            )
-            replys.value[labReviewData.data[i].ID] = labReplyData.data
-          }
-          // LGTM情報の取得
-          if (localStorage.isLogin) {
-            for (const i in labReviewData.data) {
-              const id = labReviewData.data[i].ID
-              const reviewLgtmData = await axios.get(
-                "/lgtm/lab/" + id + "/" + localStorage.userID
-              )
-              // ユーザはLGTMしているか?
-              if (reviewLgtmData.data.length == 0) {
-                reviewLgtm.value[id] = false
-              } else {
-                reviewLgtm.value[id] = true
-              }
-            }
-          }
-          // ログインしていない場合LGTMボタンをdisabledにする
-          if (!store.state.auth) {
-            const lgtmButtons = document.getElementsByClassName('lgtm')
-            for (let i = 0; i < lgtmButtons.length; i++) {
-              lgtmButtons[i].classList.add("disabled")
-            }
-          }
-        } catch (e) {
-          console.log(e)
+      // TODO 対象の研究室レビューのみの取得にする
+      try {
+        const labReviewData = await axios.get(
+          "/lab/reviews/" + labCode
+        ).catch(error => {
+          console.log(error)
+        })
+        review.value = labReviewData.data[0] // 仮で先頭のレビューのみを表示中
+        for (const i in labReviewData.data) {
+          reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
         }
-        // ロード画面を解除
-        loading.value = false
+        // 研究室レビューに対するリプライの取得
+        for (const i in labReviewData.data) {
+          const labReplyData = await axios.get(
+            "/lab/reply/" + labReviewData.data[i].ID
+          )
+          replys.value[labReviewData.data[i].ID] = labReplyData.data
+        }
+        // LGTM情報の取得
+        if (localStorage.isLogin) {
+          for (const i in labReviewData.data) {
+            const id = labReviewData.data[i].ID
+            const reviewLgtmData = await axios.get(
+              "/lgtm/lab/" + id + "/" + localStorage.userID
+            )
+            // ユーザはLGTMしているか?
+            if (reviewLgtmData.data.length == 0) {
+              reviewLgtm.value[id] = false
+            } else {
+              reviewLgtm.value[id] = true
+            }
+          }
+        }
+        // ログインしていない場合LGTMボタンをdisabledにする
+        if (!store.state.auth) {
+          const lgtmButtons = document.getElementsByClassName('lgtm')
+          for (let i = 0; i < lgtmButtons.length; i++) {
+            lgtmButtons[i].classList.add("disabled")
+          }
+        }
+      } catch (e) {
+        console.log(e)
       }
+      // ロード画面を解除
+      loading.value = false
     })
 
     const submitReply = async (id) => {
@@ -197,6 +198,12 @@ export default {
         console.log(e)
       }
     }
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", labName.value + "のレビュー")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
 
     return {
       auth,
