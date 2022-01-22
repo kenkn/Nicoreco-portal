@@ -4,6 +4,15 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
+      <!-- 一覧ページへのリンク -->
+        <div class="mb-2 ml-2">
+          <router-link :to="'/question/' + subjectCode">
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+           </svg>
+           {{ subjectName }}の質問一覧に戻る
+          </router-link>
+        </div>
       <!-- 質問部分 -->
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
@@ -118,6 +127,7 @@ import { computed, onMounted, ref } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import subjectData from '../data/subject-data.json'
 import Loader from "@/components/Loader"
 import FormatDate from '@/functions/FormatDate'
 
@@ -131,6 +141,8 @@ export default {
     const route           = useRoute()
     const router          = useRouter()
     const auth            = computed(() => store.state.auth)
+    const subjectCode     = route.params.subject // 授業コード
+    const subjectName     = ref("")
     const question        = ref({}) // questionの内容
     const answers         = ref({}) // 投稿されているanswerの集合
     const answerBody      = ref("") // 投稿時のanswerの文章
@@ -140,6 +152,16 @@ export default {
     const answerLgtm      = ref([]) // ユーザがquestionをLGTMしているかどうか
     const answerLgtmCount = ref([]) // answerのLGTM数
     const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
+
+    // URLから科目を取得
+    const subject = subjectData.find((subject) => subject.code == subjectCode)
+    // subjectDataの中に一致するSubjectがない場合は404
+    if(subject === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      subjectName.value =subject.name
+    }
 
     onMounted(async () => {
       try {
@@ -285,6 +307,8 @@ export default {
 
     return {
       auth,
+      subjectCode,
+      subjectName,
       question,
       answers,
       replys,
