@@ -2,7 +2,7 @@
   <div>
     <h1 class="pb-3 display-5">レビューする</h1>
     <div class="p-3 border border-dark bg-white rounded shadow-sm">
-      <h2 class="display-6">研究室名:{{ LabName }}</h2>
+      <h2 class="display-6">研究室名:{{ labName }}</h2>
         <VeeForm @submit="submitReview" :validation-schema="schema">
           <div class="form-group">
             <p class="m-0 py-2">レビュー:</p>
@@ -17,7 +17,7 @@
 </template>
  
 <script>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -36,7 +36,7 @@ export default {
     const route       = useRoute()
     const router      = useRouter()
     const labCode     = route.params.professor // ラボコード
-    const LabName = ref("") // 科目名
+    const labName = ref("") // 科目名
     const title       = ref("")
     const body        = ref("")
 
@@ -48,7 +48,7 @@ export default {
       store.dispatch("setIsNotFound", true)
     }
     else{
-      LabName.value = lab.name
+      labName.value = lab.name
     }
 
     // バリデーション
@@ -70,10 +70,16 @@ export default {
           console.log(e)
         }
       }
-    } 
+    }
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", labName.value + "のレビューを投稿")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
     
     return {
-      LabName,
+      labName,
       body,
       schema,
       submitReview
