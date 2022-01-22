@@ -4,15 +4,6 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
-      <!-- 一覧ページへのリンク -->
-      <div class="mb-2 ml-2">
-        <router-link to="/lab">
-         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-           <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-         </svg>
-         研究室一覧に戻る
-        </router-link>
-      </div>
       <div>
         <h1 class="pb-3 d-inline-block display-5">{{ labName }}のレビュー一覧</h1>
         <router-link v-if="!auth" class="pageLink d-inline p-3" to="/login">
@@ -20,6 +11,15 @@
         </router-link>
         <router-link v-else class="pageLink d-inline p-3" :to="'/lab/' + labCode + '/create'">
           <button type="button" class="btn btn-primary">レビューする</button>
+        </router-link>
+      </div>
+      <!-- 一覧ページへのリンク -->
+      <div class="mb-2 ml-2">
+        <router-link to="/lab">
+         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+           <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+         </svg>
+         研究室一覧に戻る
         </router-link>
       </div>
       <!-- レビュー一覧(レビューがある場合) -->
@@ -59,7 +59,7 @@
 </template>
  
 <script>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import axios from 'axios'
@@ -103,6 +103,12 @@ export default {
       // ロード画面を解除
       loading.value = false
     })
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", labName.value + "のレビュー一覧")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
     
     return {
       auth,
