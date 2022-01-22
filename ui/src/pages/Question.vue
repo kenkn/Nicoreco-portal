@@ -9,8 +9,12 @@
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
 
-        <pre v-html="question.body"/>
         
+        <p v-for="(qBody, idx) in questionBodies" :key="idx">
+          <pre>{{ qBody }}</pre>
+          <pre v-html="questionCodeBodies[idx]"/>
+        </p>
+
         <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
@@ -62,7 +66,7 @@
             </div>
           </div>
   
-          <template v-for="reply in replys" :key="reply.ID">
+          <template v-for="(reply, key) in replys" :key="key">
             <div v-if="reply.parent_id==answer.ID">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical  my-2 ml-5" viewBox="0 0 16 16">
                 <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
@@ -129,19 +133,21 @@ export default {
     Loader
   },
   setup() {
-    const store           = useStore()
-    const route           = useRoute()
-    const router          = useRouter()
-    const auth            = computed(() => store.state.auth)
-    const question        = ref({}) // questionの内容
-    const answers         = ref({}) // 投稿されているanswerの集合
-    const answerBody      = ref("") // 投稿時のanswerの文章
-    const replys          = ref({}) // 投稿されているreplyの集合
-    const replyBody       = ref([]) // 投稿時のreplyの文章
-    const questionLgtm    = ref()   // ユーザがquestionをLGTMしているかどうか
-    const answerLgtm      = ref([]) // ユーザがquestionをLGTMしているかどうか
-    const answerLgtmCount = ref([]) // answerのLGTM数
-    const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
+    const store              = useStore()
+    const route              = useRoute()
+    const router             = useRouter()
+    const auth               = computed(() => store.state.auth)
+    const question           = ref({}) // questionの内容
+    const questionBodies     = ref([])
+    const questionCodeBodies = ref([])
+    const answers            = ref({}) // 投稿されているanswerの集合
+    const answerBody         = ref("") // 投稿時のanswerの文章
+    const replys             = ref({}) // 投稿されているreplyの集合
+    const replyBody          = ref([]) // 投稿時のreplyの文章
+    const questionLgtm       = ref()   // ユーザがquestionをLGTMしているかどうか
+    const answerLgtm         = ref([]) // ユーザがquestionをLGTMしているかどうか
+    const answerLgtmCount    = ref([]) // answerのLGTM数
+    const loading            = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
 
     onMounted(async () => {
       try {
@@ -155,18 +161,35 @@ export default {
         }
         question.value = questionData.data
 
-        const reg = /(```.*\n)[\s\S]*?(\n```)/g
-
-        const questionCode = question.value.body.match(reg)
-        // console.log(questionCode)
-        for (const i in questionCode) {
-          const re = /(?<=```.*\n)[\s\S]*?(?=\n.*```)/
-          const code = questionCode[i].match(re)[0]
-          console.log(code)
-          const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
-          console.log(highlightedCode)
-          question.value.body = question.value.body.replace(questionCode[i], highlightedCode)
+        const splitedBody = questionData.data.body.split('```')
+        // console.log(splitedBody)
+        for (const i in splitedBody) {
+          if (i%2) {
+            // const re = /=c(.*?)a/
+            const re = /(?<=\n)([\s\S]*)(?=\n)/
+            const code = splitedBody[i].match(re)[0]
+            console.log(code)
+            const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
+            questionCodeBodies.value.push(highlightedCode)
+          } else {
+            questionBodies.value.push(splitedBody[i])
+          }
         }
+
+        if (questionBodies.value.length > questionCodeBodies.value.length) {
+          questionCodeBodies.value.push('')
+        }
+
+        // const reg = /(```.*\n)[\s\S]*?(\n```)/g
+
+        // const questionCode = question.value.body.match(reg)
+        // // console.log(questionCode)
+        // for (const i in questionCode) {
+        //   const re = /(?<=```.*\n)[\s\S]*?(?=\n.*```)/
+        //   const code = questionCode[i].match(re)[0]
+        //   const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
+        //   question.value.body = question.value.body.replace(questionCode[i], highlightedCode)
+        // }
 
         // 回答情報の取得
         const answerData = await axios.get(
@@ -301,6 +324,8 @@ export default {
     return {
       auth,
       question,
+      questionBodies,
+      questionCodeBodies,
       answers,
       replys,
       answerBody,
