@@ -14,6 +14,8 @@
 </template>
  
 <script>
+import { onBeforeUnmount } from 'vue'
+import { useStore } from 'vuex'
 import LabButton from '@/components/LabButton'
 import data from '../data/lab-data.json'
 
@@ -23,6 +25,11 @@ export default {
     LabButton
   },
   setup() {
+    const store = useStore()
+    store.dispatch("setJumbotron", "研究室一覧")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
     return {
       labs: data
     }
