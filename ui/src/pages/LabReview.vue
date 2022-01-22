@@ -4,10 +4,8 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
-      <h1 class="display-5">{{ labName }}のレビュー</h1>
       <div class="mt-5 border border-dark bg-white rounded">
-        <p class="p-4 display-6 border-bottom border-dark">{{ reviews.length }}件のレビュー</p>
-        <div v-for="review in reviews" :key="review.ID" class="border-bottom border-dark p-4 mt-2">
+        <div class="border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
             <h4>{{ review.body }}</h4>
             <span class="text-secondary m-0">レビュー者: {{ review.lab_reviewer_id }} </span>
@@ -61,18 +59,6 @@
             </div>
           </form>
         </div>
-        <div class="p-4">
-          <h1 class="mt-3 display-6 d-inline">レビューする</h1>
-          <form action="" @submit.prevent="submitReview" class="p-3">
-            <router-link v-if="!auth" class="pageLink d-inline btn btn-outline-primary" to="/login">
-              ログインしてレビューを送信
-            </router-link>
-            <div v-else class="form-group">
-              <textarea v-model="reviewBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='レビューを追加' required />
-              <button class="btn btn-outline-primary w-100" type="submit">レビューを送信</button>
-            </div>
-          </form>
-        </div>
       </div>
     </div>
   </div>
@@ -100,8 +86,7 @@ export default {
     const auth            = computed(() => store.state.auth)
     const labCode         = route.params.professor // 研究室コード
     const labName         = ref({}) // 研究室名
-    const reviews         = ref([]) // 投稿されているreviewの集合
-    const reviewBody      = ref("") // reviewの文章
+    const review          = ref({}) // 投稿されているreview
     const replys          = ref([]) // 投稿されているreplyの集合
     const replyBody       = ref([]) // replyの文章
     const reviewLgtm      = ref([]) // ユーザがreviewをLGTMしているかどうか
@@ -117,14 +102,14 @@ export default {
       }
       else {
         labName.value = lab.name
+        // TODO 対象の研究室レビューのみの取得にする
         try {
-          // 研究室レビューの取得
           const labReviewData = await axios.get(
             "/lab/reviews/" + labCode
           ).catch(error => {
             console.log(error)
           })
-          reviews.value = labReviewData.data
+          review.value = labReviewData.data[0] // 仮で先頭のレビューのみを表示中
           for (const i in labReviewData.data) {
             reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
           }
@@ -164,20 +149,6 @@ export default {
         loading.value = false
       }
     })
-
-    const submitReview = async () => {
-      try {
-        await axios.post("lab/review/post", {
-          lab             : labCode,
-          lab_reviewer_id : localStorage.userID,
-          body            : reviewBody.value
-        })
-        // リロード
-        router.go({path: router.currentRoute.path, force: true})
-      } catch (e) {
-        console.log(e)
-      }
-    }
 
     const submitReply = async (id) => {
       try {
@@ -221,14 +192,12 @@ export default {
     return {
       auth,
       labName,
-      reviews,
+      review,
       replys,
-      reviewBody,
       replyBody,
       reviewLgtm,
       reviewLgtmCount,
       loading,
-      submitReview,
       submitReply,
       displayReplyForm,
       updateReviewLgtm,
