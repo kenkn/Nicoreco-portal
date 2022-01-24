@@ -9,7 +9,9 @@ import Questions from '../pages/Questions.vue'
 import Question from '../pages/Question.vue'
 import CreateQuestion from '../pages/CreateQuestion.vue'
 import Labs from '../pages/Labs.vue'
+import LabReviews from '../pages/LabReviews.vue'
 import LabReview from '../pages/LabReview.vue'
+import CreateLabReview from '../pages/CreateLabReview.vue'
 import Profile from '../pages/Profile.vue'
 import NotFound from '../components/NotFound.vue'
 
@@ -29,8 +31,12 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/question/:subject/:question_id', component: Question },
   // ラボの一覧ページ
   { path: '/lab', component: Labs },
-  // ラボのレビューページ
-  { path: '/lab/:professor', component: LabReview },
+  // ラボレビューの一覧ページ
+  { path: '/lab/:professor', component: LabReviews },
+  // 新規レビューの作成ページ
+  { path: '/lab/:professor/create', component: CreateLabReview },
+  // ラボのレビュ詳細ーページ
+  { path: '/lab/:professor/:review_id', component: LabReview },
   // プロフィールページ
   { path: '/profile', component: Profile, 
     beforeEnter: (to, from, next) => {

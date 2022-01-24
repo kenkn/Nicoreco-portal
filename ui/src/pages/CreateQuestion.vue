@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="pb-3 display-5">質問する</h1>
+    <h1 class="pb-3 display-5 d-md-none">質問する</h1>
     <div class="p-3 border border-dark bg-white rounded shadow-sm">
       <h2 class="display-6">講義名:{{ subjectName }}</h2>
         <VeeForm @submit="submit" :validation-schema="schema">
@@ -20,7 +20,7 @@
 </template>
  
 <script>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -70,7 +70,13 @@ export default {
         router.push("/question/" + subjectCode)
       }
       else { return false; }
-    }  
+    }
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", subjectName.value + "について質問する")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
     
     return {
       subjectName,

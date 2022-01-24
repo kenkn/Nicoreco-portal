@@ -4,10 +4,18 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
-      <h1 class="display-5">{{ labName }}のレビュー</h1>
+      <h1 class="pb-3 d-inline-block display-5 d-md-none">{{ labName }}のレビュー</h1>
+      <!-- 一覧ページへのリンク -->
+      <div class="mb-2 ml-2">
+        <router-link :to="'/lab/' + labCode">
+         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+           <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+         </svg>
+        {{ labName }}のレビュー一覧に戻る
+        </router-link>
+      </div>
       <div class="mt-5 border border-dark bg-white rounded">
-        <p class="p-4 display-6 border-bottom border-dark">{{ reviews.length }}件のレビュー</p>
-        <div v-for="review in reviews" :key="review.ID" class="border-bottom border-dark p-4 mt-2">
+        <div class="border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
             <h4>{{ review.body }}</h4>
             <span class="text-secondary m-0">レビュー者: {{ review.lab_reviewer_id }} </span>
@@ -61,18 +69,6 @@
             </div>
           </form>
         </div>
-        <div class="p-4">
-          <h1 class="mt-3 display-6 d-inline">レビューする</h1>
-          <form action="" @submit.prevent="submitReview" class="p-3">
-            <router-link v-if="!auth" class="pageLink d-inline btn btn-outline-primary" to="/login">
-              ログインしてレビューを送信
-            </router-link>
-            <div v-else class="form-group">
-              <textarea v-model="reviewBody" class="form-control p-1 my-2 mb-4" rows="4" placeholder='レビューを追加' required />
-              <button class="btn btn-outline-primary w-100" type="submit">レビューを送信</button>
-            </div>
-          </form>
-        </div>
       </div>
     </div>
   </div>
@@ -80,7 +76,7 @@
 </template>
  
 <script>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -100,84 +96,70 @@ export default {
     const auth            = computed(() => store.state.auth)
     const labCode         = route.params.professor // 研究室コード
     const labName         = ref({}) // 研究室名
-    const reviews         = ref([]) // 投稿されているreviewの集合
-    const reviewBody      = ref("") // reviewの文章
+    const review          = ref({}) // 投稿されているreview
     const replys          = ref([]) // 投稿されているreplyの集合
     const replyBody       = ref([]) // replyの文章
     const reviewLgtm      = ref([]) // ユーザがreviewをLGTMしているかどうか
     const reviewLgtmCount = ref([]) // reviewのLGTM数
     const loading         = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
 
-    onMounted(async () => {
-      // URLから研究室を取得
-      const lab = labData.find((lab) => lab.code == labCode)
-      // labDataの中に一致するlabがない場合は404
-      if(lab === undefined){
-        store.dispatch("setIsNotFound", true)
-      }
-      else {
-        labName.value = lab.name
-        try {
-          // 研究室レビューの取得
-          const labReviewData = await axios.get(
-            "/lab/reviews/" + labCode
-          ).catch(error => {
-            console.log(error)
-          })
-          reviews.value = labReviewData.data
-          for (const i in labReviewData.data) {
-            reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
-          }
-          // 研究室レビューに対するリプライの取得
-          for (const i in labReviewData.data) {
-            const labReplyData = await axios.get(
-              "/lab/reply/" + labReviewData.data[i].ID
-            )
-            replys.value[labReviewData.data[i].ID] = labReplyData.data
-          }
-          // LGTM情報の取得
-          if (localStorage.isLogin) {
-            for (const i in labReviewData.data) {
-              const id = labReviewData.data[i].ID
-              const reviewLgtmData = await axios.get(
-                "/lgtm/lab/" + id + "/" + localStorage.userID
-              )
-              // ユーザはLGTMしているか?
-              if (reviewLgtmData.data.length == 0) {
-                reviewLgtm.value[id] = false
-              } else {
-                reviewLgtm.value[id] = true
-              }
-            }
-          }
-          // ログインしていない場合LGTMボタンをdisabledにする
-          if (!store.state.auth) {
-            const lgtmButtons = document.getElementsByClassName('lgtm')
-            for (let i = 0; i < lgtmButtons.length; i++) {
-              lgtmButtons[i].classList.add("disabled")
-            }
-          }
-        } catch (e) {
-          console.log(e)
-        }
-        // ロード画面を解除
-        loading.value = false
-      }
-    })
+    // URLから科目を取得
+    const lab = labData.find((lab) => lab.code == labCode)
+    // labDataの中に一致するlabがない場合は404
+    if(lab === undefined){
+      store.dispatch("setIsNotFound", true)
+    }
+    else{
+      labName.value = lab.name
+    }
 
-    const submitReview = async () => {
+    onMounted(async () => {
+      // TODO 対象の研究室レビューのみの取得にする
       try {
-        await axios.post("lab/review/post", {
-          lab             : labCode,
-          lab_reviewer_id : localStorage.userID,
-          body            : reviewBody.value
+        const labReviewData = await axios.get(
+          "/lab/reviews/" + labCode
+        ).catch(error => {
+          console.log(error)
         })
-        // リロード
-        router.go({path: router.currentRoute.path, force: true})
+        review.value = labReviewData.data[0] // 仮で先頭のレビューのみを表示中
+        for (const i in labReviewData.data) {
+          reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
+        }
+        // 研究室レビューに対するリプライの取得
+        for (const i in labReviewData.data) {
+          const labReplyData = await axios.get(
+            "/lab/reply/" + labReviewData.data[i].ID
+          )
+          replys.value[labReviewData.data[i].ID] = labReplyData.data
+        }
+        // LGTM情報の取得
+        if (localStorage.isLogin) {
+          for (const i in labReviewData.data) {
+            const id = labReviewData.data[i].ID
+            const reviewLgtmData = await axios.get(
+              "/lgtm/lab/" + id + "/" + localStorage.userID
+            )
+            // ユーザはLGTMしているか?
+            if (reviewLgtmData.data.length == 0) {
+              reviewLgtm.value[id] = false
+            } else {
+              reviewLgtm.value[id] = true
+            }
+          }
+        }
+        // ログインしていない場合LGTMボタンをdisabledにする
+        if (!store.state.auth) {
+          const lgtmButtons = document.getElementsByClassName('lgtm')
+          for (let i = 0; i < lgtmButtons.length; i++) {
+            lgtmButtons[i].classList.add("disabled")
+          }
+        }
       } catch (e) {
         console.log(e)
       }
-    }
+      // ロード画面を解除
+      loading.value = false
+    })
 
     const submitReply = async (id) => {
       try {
@@ -218,17 +200,22 @@ export default {
       }
     }
 
+    // 見出しの処理
+    store.dispatch("setJumbotron", labName.value + "のレビュー")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
+
     return {
       auth,
+      labCode,
       labName,
-      reviews,
+      review,
       replys,
-      reviewBody,
       replyBody,
       reviewLgtm,
       reviewLgtmCount,
       loading,
-      submitReview,
       submitReply,
       displayReplyForm,
       updateReviewLgtm,

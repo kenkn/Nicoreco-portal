@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="h3 mb-3 fw-normal">ユーザー情報確認・変更</h1>
+    <h1 class="h3 mb-3 fw-normal d-md-none">ユーザー情報確認・変更</h1>
     <VeeForm @submit="submit" :validation-schema="schema">
       <table class="table">
         <tbody>
@@ -64,7 +64,7 @@
 </template>
  
 <script>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -78,6 +78,7 @@ export default {
     ErrorMessage,
   },
   setup() {
+    const store       = useStore()
     const email       = localStorage.email
     const userID      = localStorage.userID
     const displayName = ref(localStorage.displayName)
@@ -98,6 +99,12 @@ export default {
       //   errMessage.value = e.response.data.message
       // }
     }
+
+    // 見出しの処理
+    store.dispatch("setJumbotron", "ユーザー情報確認・変更")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
 
     return {
       email,
