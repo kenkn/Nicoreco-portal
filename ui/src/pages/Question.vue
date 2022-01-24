@@ -23,7 +23,7 @@
         <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
-        <span class="text-secondary m-0 pl-3">質問日時: {{ FormatDate(question.CreatedAt) }} </span><br>
+        <span class="text-secondary m-0 pl-3">質問日時: {{ formatDate(question.CreatedAt) }} </span><br>
         <div v-if='!questionLgtm' class="mt-1">
           <button @click="updateQuestionLgtm" id="lgtm" class="btn btn-outline-primary lgtm">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
@@ -52,7 +52,7 @@
             <!-- デバッグ用 TODO 消す -->
             <span class="text-secondary m-0">ID: {{ answer.ID }} </span>
             <span class="text-secondary m-0">回答者: {{ answer.user_id }} </span>
-            <span class="text-secondary m-0 pl-3">回答日時: {{ FormatDate(answer.CreatedAt) }} </span>
+            <span class="text-secondary m-0 pl-3">回答日時: {{ formatDate(answer.CreatedAt) }} </span>
             <div v-if="!answerLgtm[answer.ID]" class="mt-1">
               <button @click="updateAnswerLgtm(answer.ID)" id="lgtm" class="btn btn-outline-primary lgtm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
@@ -79,7 +79,7 @@
               <div class="border p-2 ml-5 mb-2 shadow-sm">
                 <p>{{ reply.body }}</p>
                 <span class="text-secondary m-0">返信者: {{ reply.user_id }} </span>
-                <span class="text-secondary m-0 pl-3">返信日時: {{ FormatDate(reply.CreatedAt) }} </span><br>
+                <span class="text-secondary m-0 pl-3">返信日時: {{ formatDate(reply.CreatedAt) }} </span><br>
               </div>
             </div>
           </template>
@@ -130,7 +130,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import subjectData from '../data/subject-data.json'
 import Loader from "@/components/Loader"
-import FormatDate from '@/functions/FormatDate'
+import formatDate from "../functions/formatDate.js"
 
 export default {
   name: "Question",
@@ -330,7 +330,7 @@ export default {
       updateQuestionLgtm,
       updateAnswerLgtm,
       displayReplyForm,
-      FormatDate,
+      formatDate,
     }
   }
 };

@@ -44,7 +44,7 @@
               </svg>
               {{ review.lgtm }}
             </span>
-            <span>投稿日時: {{ FormatDate(review.CreatedAt) }}</span>
+            <span>投稿日時: {{ formatDate(review.CreatedAt) }}</span>
           </router-link>
         </div>
       </div>
@@ -65,7 +65,7 @@ import { useStore } from 'vuex'
 import axios from 'axios'
 import labData from '../data/lab-data.json'
 import Loader from "@/components/Loader"
-import FormatDate from '@/functions/FormatDate'
+import formatDate from "../functions/formatDate.js"
 
 export default {
   name: "labReviews",
@@ -116,7 +116,7 @@ export default {
       labCode,
       reviews,
       loading,
-      FormatDate,
+      formatDate,
     }
   }
 }
