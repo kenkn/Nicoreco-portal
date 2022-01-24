@@ -43,7 +43,7 @@
               </svg>
               {{ question.lgtm }}
             </span>
-            <span>投稿日時: {{ FormatDate(question.CreatedAt) }}</span>
+            <span>投稿日時: {{ formatDate(question.CreatedAt) }}</span>
           </router-link>
         </div>
       </div>
@@ -64,7 +64,7 @@ import { useStore } from 'vuex'
 import axios from 'axios'
 import subjectData from '../data/subject-data.json'
 import Loader from "@/components/Loader"
-import FormatDate from '@/functions/FormatDate'
+import formatDate from "../functions/formatDate.js"
 
 export default {
   name: "Questions",
@@ -118,7 +118,7 @@ export default {
       questions,
       answer,
       loading,
-      FormatDate,
+      formatDate,
     }
   }
 }

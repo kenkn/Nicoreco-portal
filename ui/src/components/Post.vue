@@ -24,14 +24,14 @@
           </svg>
           {{ post.lgtm }}
         </span>
-        <span>投稿日時: {{ FormatDate(post.updatedAt) }}</span>
+        <span>投稿日時: {{ formatDate(post.updatedAt) }}</span>
       </div>
     </div>
   </router-link>
 </template>
 
 <script>
-import FormatDate from '@/functions/FormatDate'
+import formatDate from "../functions/formatDate.js"
 
 export default {
   name: "MyPosts",
@@ -53,7 +53,7 @@ export default {
   },
   setup() {
     return{
-      FormatDate
+      formatDate
     }
   }
 }
