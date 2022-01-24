@@ -7,9 +7,12 @@
       <!-- 質問部分 -->
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
-        <p>
-          {{ question.body }}
-        </p>
+        
+        <div v-for="(qBody, idx) in questionBodies" :key="idx">
+          <p>{{ qBody }}</p>
+          <p v-html="questionCodeBodies[idx]"/>
+        </div>
+
         <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
@@ -119,7 +122,9 @@ import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import Loader from "@/components/Loader"
-import FormatDate from '@/functions/FormatDate'
+import FormatDate from '../functions/FormatDate'
+import hljs from 'highlight.js';
+import 'highlight.js/styles/xcode.css';
 
 export default {
   name: "Question",
@@ -132,6 +137,8 @@ export default {
     const router          = useRouter()
     const auth            = computed(() => store.state.auth)
     const question        = ref({}) // questionの内容
+    const questionBodies     = ref([])
+    const questionCodeBodies = ref([])
     const answers         = ref([]) // 投稿されているanswerの集合
     const answerBody      = ref("") // 投稿時のanswerの文章
     const replys          = ref({}) // 投稿されているreplyの集合
@@ -165,6 +172,24 @@ export default {
       } catch (e) {
         console.log(e)
       }
+
+      const splitedBody = question.value.body.split('```')
+      for (const i in splitedBody) {
+        if (i%2) {
+          // const re = /(?<=\n)([\s\S]*)(?=\n)/
+          // TODO
+          // preタグで表示させたい〜〜〜！(現状だと改行がキモい)
+          const code = splitedBody[i]
+          const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
+          questionCodeBodies.value.push(highlightedCode)
+        } else {
+          questionBodies.value.push(splitedBody[i])
+        }
+      }
+      if (questionBodies.value.length > questionCodeBodies.value.length) {
+        questionCodeBodies.value.push('')
+      }
+
       // ロード画面を解除
       loading.value = false 
     })
@@ -242,6 +267,8 @@ export default {
     return {
       auth,
       question,
+      questionBodies,
+      questionCodeBodies,
       answers,
       replys,
       answerBody,
