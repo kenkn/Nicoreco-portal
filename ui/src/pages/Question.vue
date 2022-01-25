@@ -131,6 +131,7 @@ import Loader from "@/components/Loader"
 import FormatDate from '@/functions/FormatDate'
 import hljs from 'highlight.js';
 import 'highlight.js/styles/xcode.css';
+import getCodeContent from '../functions/getCodeContent'
 
 export default {
   name: "Question",
@@ -187,19 +188,19 @@ export default {
           // const re = /(?<=\n)([\s\S]*)(?=\n)/
           // TODO
           // preタグで表示させたい〜〜〜！(現状だと改行がキモい)
-          let sliceIndex = 0
-          for (let cidx = 0; cidx < splitedQuestionBody[i].length; cidx++) {
-            // console.log(splitedAnswerBody[i][cidx])
-            if (splitedQuestionBody[i][cidx] == ' ') {
-              continue
-            } else if (splitedQuestionBody[i][cidx] == '\n') {
-              sliceIndex = cidx + 1
-              break
-            } else {
-              break
-            }
-          }
-          const code = splitedQuestionBody[i].slice(sliceIndex)
+          // let sliceIndex = 0
+          // for (let cidx = 0; cidx < splitedQuestionBody[i].length; cidx++) {
+          //   // console.log(splitedAnswerBody[i][cidx])
+          //   if (splitedQuestionBody[i][cidx] == ' ') {
+          //     continue
+          //   } else if (splitedQuestionBody[i][cidx] == '\n') {
+          //     sliceIndex = cidx + 1
+          //     break
+          //   } else {
+          //     break
+          //   }
+          // }
+          const code = getCodeContent(splitedQuestionBody[i])
           const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
           questionCodeBodies.value.push(highlightedCode)
         } else {
@@ -213,18 +214,18 @@ export default {
         const splitedAnswerBody = answers.value[i].answer.body.split('```')
         for (const j in splitedAnswerBody) {
           if (j % 2 == 1) {
-            let sliceIndex = 0
-            for (let cidx = 0; cidx < splitedAnswerBody[j].length; cidx++) {
-              if (splitedAnswerBody[j][cidx] == ' ') {
-                continue
-              } else if (splitedAnswerBody[j][cidx] == '\n') {
-                sliceIndex = cidx + 1
-                break
-              } else {
-                break
-              }
-            }
-            const code = splitedAnswerBody[j].slice(sliceIndex)
+            // let sliceIndex = 0
+            // for (let cidx = 0; cidx < splitedAnswerBody[j].length; cidx++) {
+            //   if (splitedAnswerBody[j][cidx] == ' ') {
+            //     continue
+            //   } else if (splitedAnswerBody[j][cidx] == '\n') {
+            //     sliceIndex = cidx + 1
+            //     break
+            //   } else {
+            //     break
+            //   }
+            // }
+            const code = getCodeContent(splitedAnswerBody[j])
             const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
             aCode.push(highlightedCode)
           } else {
