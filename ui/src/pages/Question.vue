@@ -39,14 +39,12 @@
       <div class="mt-5 border border-dark bg-white rounded">
         <h1 class="p-4 display-6 border-bottom border-dark">{{ answers.length }}件の回答</h1>
   
-        <div v-for="(answer, idx) in answers" :key="idx" class="border-bottom border-dark p-4 mt-2">
+        <div v-for="answer in answers" :key="answer.ID" class="border-bottom border-dark p-4 mt-2">
           <!-- <h1>{{answer}}</h1> -->
           <div class="border p-3 mb-2 shadow-sm">
-            <!-- <h4>{{ answer.answer.body }}</h4> -->
-
-            <div v-for="(aBody, aidx) in answerBodies[idx]" :key="aidx">
-              <p>{{ answerBodies[idx][aidx] }}</p>
-              <pre v-html="answerCodeBodies[idx][aidx]"/>
+            <div v-for="(aBody, aidx) in answerBodies[answer.answer.ID]" :key="aidx">
+              <p>{{ aBody }}</p>
+              <pre v-html="answerCodeBodies[answer.answer.ID][aidx]"/>
             </div>
             <!-- デバッグ用 TODO 消す -->
             <span class="text-secondary m-0">ID: {{ answer.answer.ID }} </span>
@@ -76,7 +74,11 @@
                 <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
               </svg>
               <div class="border p-2 ml-5 mb-2 shadow-sm">
-                <p>{{ reply.body }}</p>
+                <!-- <p>{{ reply.body }}</p> -->
+                <div v-for="(rBody, ridx) in replyBodies[reply.ID]" :key="ridx">
+                  <p>{{ rBody }}</p>
+                  <pre v-html="replyCodeBodies[reply.ID][ridx]"/>
+                </div>
                 <span class="text-secondary m-0">返信者: {{ reply.replyer_id }} </span>
                 <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
               </div>
@@ -129,9 +131,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import Loader from "@/components/Loader"
 import FormatDate from '@/functions/FormatDate'
-import hljs from 'highlight.js';
-import 'highlight.js/styles/xcode.css';
-import getCodeContent from '../functions/getCodeContent'
+import extractBodyCode from '../functions/extractBodyCode'
 
 export default {
   name: "Question",
@@ -144,18 +144,21 @@ export default {
     const router             = useRouter()
     const auth               = computed(() => store.state.auth)
     const question           = ref({}) // questionの内容
-    const questionBodies     = ref([])
-    const questionCodeBodies = ref([])
+    const questionBodies     = ref([]) // questionの非コード部分
+    const questionCodeBodies = ref([]) // questionのコード部分
     const answers            = ref([]) // 投稿されているanswerの集合
-    const answerBodies       = ref([])
-    const answerCodeBodies   = ref([])
-    const postAnswerBody     = ref("") // 投稿時のanswerの文章
+    const answerBodies       = ref([]) // answerの非コード部分
+    const answerCodeBodies   = ref([]) // answerのコード部分
     const replys             = ref({}) // 投稿されているreplyの集合
+    const replyBodies        = ref([])
+    const replyCodeBodies    = ref([])
+    const postAnswerBody     = ref("") // 投稿時のanswerの文章
     const replyBody          = ref([]) // 投稿時のreplyの文章
     const questionLgtm       = ref()   // ユーザがquestionをLGTMしているかどうか
     const loading            = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
 
     onMounted(async () => {
+      // --------------------- question情報取得開始 ---------------------
       try {
         let questionData
         if (!store.state.auth) {
@@ -181,61 +184,31 @@ export default {
       } catch (e) {
         console.log(e)
       }
+      // --------------------- question情報取得終了 ---------------------
 
-      const splitedQuestionBody = question.value.body.split('```')
-      for (const i in splitedQuestionBody) {
-        if (i % 2 == 1) {
-          // const re = /(?<=\n)([\s\S]*)(?=\n)/
-          // TODO
-          // preタグで表示させたい〜〜〜！(現状だと改行がキモい)
-          // let sliceIndex = 0
-          // for (let cidx = 0; cidx < splitedQuestionBody[i].length; cidx++) {
-          //   // console.log(splitedAnswerBody[i][cidx])
-          //   if (splitedQuestionBody[i][cidx] == ' ') {
-          //     continue
-          //   } else if (splitedQuestionBody[i][cidx] == '\n') {
-          //     sliceIndex = cidx + 1
-          //     break
-          //   } else {
-          //     break
-          //   }
-          // }
-          const code = getCodeContent(splitedQuestionBody[i])
-          const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
-          questionCodeBodies.value.push(highlightedCode)
-        } else {
-          questionBodies.value.push(splitedQuestionBody[i])
+      // ---------------------- コードハイライト開始 ----------------------
+      // question文のコードハイライト
+      const [bodies, codes] = extractBodyCode(question.value.body)
+      questionBodies.value = bodies
+      questionCodeBodies.value = codes
+
+      // answer文，reply文のコードハイライト
+      for (let i = 0; i < answers.value.length; ++i) {
+        const ansID = answers.value[i].answer.ID
+        const ansContent = answers.value[i].answer.body
+        const [ansBodies, ansCodes] = extractBodyCode(ansContent)
+        answerBodies.value[ansID] = ansBodies
+        answerCodeBodies.value[ansID] = ansCodes
+
+        for (let j = 0; j < answers.value[i].reply.length; ++j) {
+          const repID = answers.value[i].reply[j].ID
+          const repContent = answers.value[i].reply[j].body
+          const [repBodies, repCodes] = extractBodyCode(repContent)
+          replyBodies.value[repID] = repBodies
+          replyCodeBodies.value[repID] = repCodes
         }
       }
-
-      for (const i in answers.value) {
-        let aBodies = []
-        let aCode = []
-        const splitedAnswerBody = answers.value[i].answer.body.split('```')
-        for (const j in splitedAnswerBody) {
-          if (j % 2 == 1) {
-            // let sliceIndex = 0
-            // for (let cidx = 0; cidx < splitedAnswerBody[j].length; cidx++) {
-            //   if (splitedAnswerBody[j][cidx] == ' ') {
-            //     continue
-            //   } else if (splitedAnswerBody[j][cidx] == '\n') {
-            //     sliceIndex = cidx + 1
-            //     break
-            //   } else {
-            //     break
-            //   }
-            // }
-            const code = getCodeContent(splitedAnswerBody[j])
-            const highlightedCode = '<p style="background-color: #eee">' + hljs.highlightAuto(code).value + '</p>'
-            aCode.push(highlightedCode)
-          } else {
-            aBodies.push(splitedAnswerBody[j])
-          }
-        }
-        answerBodies.value.push(aBodies)
-        answerCodeBodies.value.push(aCode)
-      }
-
+      // ---------------------- コードハイライト終了 ----------------------
       // ロード画面を解除
       loading.value = false 
     })
@@ -319,6 +292,8 @@ export default {
       answerBodies,
       answerCodeBodies,
       replys,
+      replyBodies,    
+      replyCodeBodies,
       postAnswerBody,
       replyBody,
       questionLgtm,
