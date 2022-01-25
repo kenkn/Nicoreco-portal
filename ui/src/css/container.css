@@ -1,0 +1,15 @@
+.container{
+    max-width: 100%;
+}
+/* xl */
+@media (min-width: 1200px) {  
+    .container{
+        max-width: 900px;
+    }
+  }
+/* xxl */
+@media (min-width: 1400px) {  
+    .container{
+        max-width: 950px;
+    }
+  }

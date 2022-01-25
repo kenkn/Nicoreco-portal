@@ -4,6 +4,16 @@
     <Loader v-if="loading"></Loader>
     <!-- コンテンツ -->
     <div v-else>
+      <h1 class="pb-3 d-inline-block display-5 d-md-none">{{ subjectName }}の質問</h1>
+      <!-- 一覧ページへのリンク -->
+        <div class="mb-2 ml-2">
+          <router-link :to="'/question/' + subjectCode">
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+           </svg>
+           {{ subjectName }}の質問一覧に戻る
+          </router-link>
+        </div>
       <!-- 質問部分 -->
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
@@ -16,7 +26,7 @@
         <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
-        <span class="text-secondary m-0 pl-3">質問日時: {{ question.CreatedAt }} </span><br>
+        <span class="text-secondary m-0 pl-3">質問日時: {{ formatDate(question.CreatedAt) }} </span><br>
         <div v-if='!questionLgtm' class="mt-1">
           <button @click="updateQuestionLgtm" id="lgtm" class="btn btn-outline-primary lgtm">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
@@ -39,17 +49,16 @@
       <div class="mt-5 border border-dark bg-white rounded">
         <h1 class="p-4 display-6 border-bottom border-dark">{{ answers.length }}件の回答</h1>
   
-        <div v-for="answer in answers" :key="answer.ID" class="border-bottom border-dark p-4 mt-2">
-          <!-- <h1>{{answer}}</h1> -->
+        <div v-for="(answer, idx) in answers" :key="idx" class="border-bottom border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
             <div v-for="(aBody, aidx) in answerBodies[answer.answer.ID]" :key="aidx">
               <p>{{ aBody }}</p>
               <pre v-html="answerCodeBodies[answer.answer.ID][aidx]"/>
             </div>
-            <!-- デバッグ用 TODO 消す -->
+            
             <span class="text-secondary m-0">ID: {{ answer.answer.ID }} </span>
             <span class="text-secondary m-0">回答者: {{ answer.answer.answerer_id }} </span>
-            <span class="text-secondary m-0 pl-3">回答日時: {{ answer.answer.CreatedAt }} </span>
+            <span class="text-secondary m-0 pl-3">回答日時: {{ formatDate(answer.answer.CreatedAt) }} </span>
             <div v-if="!answer.islgtmed" class="mt-1">
               <button @click="updateAnswerLgtm(idx)" id="lgtm" class="btn btn-outline-primary lgtm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
@@ -74,13 +83,12 @@
                 <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
               </svg>
               <div class="border p-2 ml-5 mb-2 shadow-sm">
-                <!-- <p>{{ reply.body }}</p> -->
                 <div v-for="(rBody, ridx) in replyBodies[reply.ID]" :key="ridx">
                   <p>{{ rBody }}</p>
                   <pre v-html="replyCodeBodies[reply.ID][ridx]"/>
                 </div>
                 <span class="text-secondary m-0">返信者: {{ reply.replyer_id }} </span>
-                <span class="text-secondary m-0 pl-3">返信日時: {{ reply.CreatedAt }} </span><br>
+                <span class="text-secondary m-0 pl-3">返信日時: {{ formatDate(reply.CreatedAt) }} </span><br>
               </div>
             </div>
           </template>
@@ -125,13 +133,14 @@
 </template>
  
 <script>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import subjectData from '../data/subject-data.json'
 import Loader from "@/components/Loader"
-import FormatDate from '@/functions/FormatDate'
 import extractBodyCode from '../functions/extractBodyCode'
+import formatDate from "../functions/formatDate.js"
 
 export default {
   name: "Question",
@@ -143,6 +152,8 @@ export default {
     const route              = useRoute()
     const router             = useRouter()
     const auth               = computed(() => store.state.auth)
+    const subjectName        = ref("")
+    const subjectCode        = route.params.subject // 授業コード
     const question           = ref({}) // questionの内容
     const questionBodies     = ref([]) // questionの非コード部分
     const questionCodeBodies = ref([]) // questionのコード部分
@@ -156,6 +167,16 @@ export default {
     const replyBody          = ref([]) // 投稿時のreplyの文章
     const questionLgtm       = ref()   // ユーザがquestionをLGTMしているかどうか
     const loading            = ref(true) // ロード中であるか(mountedの最後にロード画面を解除)
+
+    // URLから科目を取得
+    const subject = subjectData.find((subject) => subject.code == subjectCode)
+    // subjectDataの中に一致するSubjectがない場合は404
+    if (subject === undefined) {
+      store.dispatch("setIsNotFound", true)
+    }
+    else {
+      subjectName.value = subject.name
+    }
 
     onMounted(async () => {
       // --------------------- question情報取得開始 ---------------------
@@ -269,7 +290,6 @@ export default {
       }
       answers.value[idx].islgtmed = !answers.value[idx].islgtmed
 
-      console.log(answers.value[idx].answer.ID)
       try {
         await axios.put("/lgtm/answer/" + String(answers.value[idx].answer.ID))
       } catch (e) {
@@ -283,8 +303,16 @@ export default {
       document.getElementById("reply-form-" + answerid).style.display = "block";
     }
 
+    // 見出しの処理
+    store.dispatch("setJumbotron", subjectName.value + "の質問")
+    onBeforeUnmount(() =>
+      store.dispatch("setJumbotron", "")
+    )
+
     return {
       auth,
+      subjectCode,
+      subjectName,
       question,
       questionBodies,
       questionCodeBodies,
@@ -303,7 +331,7 @@ export default {
       updateQuestionLgtm,
       updateAnswerLgtm,
       displayReplyForm,
-      FormatDate,
+      formatDate,
     }
   }
 };
