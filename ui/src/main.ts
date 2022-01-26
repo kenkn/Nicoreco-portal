@@ -6,12 +6,13 @@ import axios from 'axios'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 import "@/css/container.css"
+import VueMathjax from 'vue-mathjax-next';
 
 // /api/registerにリクエスト飛ばすためのやつ
 axios.defaults.baseURL = 'http://localhost:80/api/'
 axios.defaults.withCredentials = true
 
-createApp(App).use(store).use(router).mount('#app')
+createApp(App).use(store).use(router).use(VueMathjax).mount('#app')
 
 const loginCheck = async () => {
     if (localStorage.isLogin == "true") {
