@@ -17,6 +17,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "vue-mathjax-next": [
+        "types/vue-mathjax-next"
       ]
     },
     "lib": [
@@ -32,7 +35,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-  ],
+, "src/functions/getCodeContent.js"  ],
   "exclude": [
     "node_modules"
   ]
