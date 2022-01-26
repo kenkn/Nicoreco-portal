@@ -69,7 +69,7 @@ export default {
         // localStorageの情報を更新
         localStorage.displayName = userData.data.display_name
         localStorage.userID = userData.data.user_id
-        localStorage.grade = userData.data.Grade
+        localStorage.grade = userData.data.grade
         localStorage.email = userData.data.email
         localStorage.isLogin = true
         store.dispatch("setAuth", true)
