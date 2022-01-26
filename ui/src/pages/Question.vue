@@ -18,12 +18,12 @@
       <div id="question" class="p-3 border border-dark bg-white rounded">
         <p class="fs-3 fw-bold">{{ question.title }}</p>
         
-        <div v-for="(qBody, idx) in questionBodies" :key="idx">
-          <p>{{ qBody }}</p>
-          <pre v-html="questionCodeBodies[idx]"/>
+        <div v-for="(content, key) in questionContents" :key="key">
+          <vue-mathjax v-if="content.attr==='math'" :formula="content.body" />
+          <pre v-else-if="content.attr==='code'" v-html="content.body"/>
+          <p v-else>{{ content.body }}</p>
         </div>
 
-        <!-- デバッグ用 TODO 消す -->
         <span class="text-secondary m-0">ID: {{ question.ID }} </span>
         <span class="text-secondary m-0">質問者: {{ question.questioner_id }} </span>
         <span class="text-secondary m-0 pl-3">質問日時: {{ formatDate(question.CreatedAt) }} </span><br>
@@ -51,9 +51,10 @@
   
         <div v-for="(answer, idx) in answers" :key="idx" class="border-bottom border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
-            <div v-for="(aBody, aidx) in answerBodies[answer.answer.ID]" :key="aidx">
-              <p>{{ aBody }}</p>
-              <pre v-html="answerCodeBodies[answer.answer.ID][aidx]"/>
+            <div v-for="(content, key) in answerContents[answer.answer.ID]" :key="key">
+              <vue-mathjax v-if="content.attr==='math'" :formula="content.body" />
+              <pre v-else-if="content.attr==='code'" v-html="content.body"/>
+              <p v-else>{{ content.body }}</p>
             </div>
             
             <span class="text-secondary m-0">ID: {{ answer.answer.ID }} </span>
@@ -83,9 +84,12 @@
                 <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
               </svg>
               <div class="border p-2 ml-5 mb-2 shadow-sm">
-                <div v-for="(rBody, ridx) in replyBodies[reply.ID]" :key="ridx">
-                  <p>{{ rBody }}</p>
-                  <pre v-html="replyCodeBodies[reply.ID][ridx]"/>
+                <div v-for="(content, ridx) in replyContents[reply.ID]" :key="ridx">
+                  <vue-mathjax v-if="content.attr==='math'" :formula="content.body" />
+                  <pre v-else-if="content.attr==='code'" v-html="content.body"/>
+                  <p v-else>{{ content.body }}</p>
+                  <!-- <p>{{ rBody }}</p>
+                  <pre v-html="replyCodeBodies[reply.ID][ridx]"/> -->
                 </div>
                 <span class="text-secondary m-0">返信者: {{ reply.replyer_id }} </span>
                 <span class="text-secondary m-0 pl-3">返信日時: {{ formatDate(reply.CreatedAt) }} </span><br>
@@ -139,7 +143,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import subjectData from '../data/subject-data.json'
 import Loader from "@/components/Loader"
-import extractBodyCode from '../functions/extractBodyCode'
+import extractHighlightParts from '../functions/extractHighlightParts'
 import formatDate from "../functions/formatDate.js"
 
 export default {
@@ -155,14 +159,11 @@ export default {
     const subjectName        = ref("")
     const subjectCode        = route.params.subject // 授業コード
     const question           = ref({}) // questionの内容
-    const questionBodies     = ref([]) // questionの非コード部分
-    const questionCodeBodies = ref([]) // questionのコード部分
+    const questionContents   = ref([])
     const answers            = ref([]) // 投稿されているanswerの集合
-    const answerBodies       = ref([]) // answerの非コード部分
-    const answerCodeBodies   = ref([]) // answerのコード部分
+    const answerContents     = ref([])
     const replys             = ref({}) // 投稿されているreplyの集合
-    const replyBodies        = ref([])
-    const replyCodeBodies    = ref([])
+    const replyContents      = ref([])
     const postAnswerBody     = ref("") // 投稿時のanswerの文章
     const replyBody          = ref([]) // 投稿時のreplyの文章
     const questionLgtm       = ref()   // ユーザがquestionをLGTMしているかどうか
@@ -208,25 +209,16 @@ export default {
       // --------------------- question情報取得終了 ---------------------
 
       // ---------------------- コードハイライト開始 ----------------------
-      // question文のコードハイライト
-      const [bodies, codes] = extractBodyCode(question.value.body)
-      questionBodies.value = bodies
-      questionCodeBodies.value = codes
+      questionContents.value = extractHighlightParts(question.value.body)
 
-      // answer文，reply文のコードハイライト
       for (let i = 0; i < answers.value.length; ++i) {
         const ansID = answers.value[i].answer.ID
         const ansContent = answers.value[i].answer.body
-        const [ansBodies, ansCodes] = extractBodyCode(ansContent)
-        answerBodies.value[ansID] = ansBodies
-        answerCodeBodies.value[ansID] = ansCodes
-
+        answerContents.value[ansID] = extractHighlightParts(ansContent)
         for (let j = 0; j < answers.value[i].reply.length; ++j) {
           const repID = answers.value[i].reply[j].ID
           const repContent = answers.value[i].reply[j].body
-          const [repBodies, repCodes] = extractBodyCode(repContent)
-          replyBodies.value[repID] = repBodies
-          replyCodeBodies.value[repID] = repCodes
+          replyContents.value[repID] = extractHighlightParts(repContent)
         }
       }
       // ---------------------- コードハイライト終了 ----------------------
@@ -235,6 +227,7 @@ export default {
     })
 
     const submitAnswer = async () => {
+      // answerの投稿
       try {
         await axios.post("answer/post", {
           parent_id : route.params.question_id,
@@ -249,6 +242,7 @@ export default {
     }
 
     const submitReply = async (id) => {
+      // answerに対するreplyの投稿
       try {
         await axios.post("reply/post", {
           question_id : route.params.question_id,
@@ -314,14 +308,11 @@ export default {
       subjectCode,
       subjectName,
       question,
-      questionBodies,
-      questionCodeBodies,
+      questionContents,
       answers,
-      answerBodies,
-      answerCodeBodies,
+      answerContents,
       replys,
-      replyBodies,    
-      replyCodeBodies,
+      replyContents,
       postAnswerBody,
       replyBody,
       questionLgtm,
