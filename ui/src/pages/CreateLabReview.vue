@@ -60,7 +60,7 @@ export default {
         try {
           await axios.post("lab/review/post", {
             lab             : labCode,
-            lab_reviewer_id : localStorage.userID,
+            user_id : localStorage.userID,
             body            : body.value
           })
           // レビュー一覧ページへ

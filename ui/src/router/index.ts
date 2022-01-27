@@ -13,6 +13,7 @@ import LabReviews from '../pages/LabReviews.vue'
 import LabReview from '../pages/LabReview.vue'
 import CreateLabReview from '../pages/CreateLabReview.vue'
 import Profile from '../pages/Profile.vue'
+import Search from '../pages/Search.vue'
 import NotFound from '../components/NotFound.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -44,6 +45,8 @@ const routes: Array<RouteRecordRaw> = [
       else router.push("/login")
     } 
   },
+  // 検索結果表示ページ
+  { path: '/search', component: Search} ,
   // 404ページ
   { path: '/:catchAll', component: NotFound, name: 'NotFound'}
 ]

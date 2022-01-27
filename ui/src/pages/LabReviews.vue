@@ -27,7 +27,7 @@
         <!-- list -->
         <div class="list-group">
           <router-link v-for="review in reviews" :key="review.ID" v-bind:to="$route.path  + '/' + review.ID" class="list-group-item list-group-item-action p-4">
-            <div class="fw-bold text-break pr-3 pb-4">
+            <div class="fw-bold mr-3 mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
               {{ review.body }}
             </div>
             <span class="badge bg-light text-dark text-muted mr-1">
