@@ -89,7 +89,7 @@ export default {
       store.dispatch("setIsNotFound", true)
     }
     else{
-      subjectName.value =subject.name
+      subjectName.value = subject.name
     }
 
     // 科目に対する質問一覧を取得
