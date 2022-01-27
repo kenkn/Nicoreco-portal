@@ -33,4 +33,5 @@ func Setup(app *fiber.App) {
 	route.Get("/lab/reply/:lab_review_id", controllers.GetLabReply)
 	route.Get("/lgtm/lab/:lab_review_id/:user_id", controllers.IsLabReviewLgtmed)
 	route.Post("/lgtm/lab", controllers.LgtmLabReview)
+	route.Get("/search/+", controllers.Search)
 }

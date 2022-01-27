@@ -7,7 +7,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./api:/go/src/api/
+      - ./api:/go/src/api
       # wsl2の環境によって最後の/がいらない
       # - ./api:/go/src/api
     command: >
