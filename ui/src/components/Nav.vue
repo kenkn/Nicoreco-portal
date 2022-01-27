@@ -10,6 +10,9 @@
             </router-link>
           </li>
         </ul>
+        <ul class="navbar-nav d-none d-md-inline mr5">
+          <SearchForm />
+        </ul>
         <ul class="navbar-nav my-sm-0">
           <!-- ログイン済なら表示 -->
           <template v-if="auth">
@@ -98,13 +101,15 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import UserIconMenu from "@/components/UserIconMenu"
+import SearchForm from '@/components/SearchForm'
 import logo from '@/assets/img/logo.png'
 import bell from '@/assets/img/bell.png'
 
 export default {
   name: "Nav",
   components: {
-    UserIconMenu
+    UserIconMenu,
+    SearchForm
   },
   setup() {
     const store = useStore()
