@@ -5,7 +5,7 @@
     <!-- コンテンツ -->
     <div v-else>
       <!-- 検索結果の投稿一覧(投稿がある場合) -->
-      <div v-if="posts!=null">
+      <div v-if="!(posts.length===0)">
         <div class="list-group" ref="listGroup">
           <Post v-for="post in posts" :key="post.id" :post="post"></Post>
         </div>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { useRoute } from 'vue-router'
 import Post from "@/components/Post"
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
@@ -34,6 +35,7 @@ export default {
   },
   setup() {
     const store = useStore()
+    const route = useRoute()
     const loading   = ref(true) // ロード中であるか
     const posts     = ref([]) //質問・回答・レビューの一覧
     // TODO 検索処理に変更
@@ -42,7 +44,7 @@ export default {
       // 質問一覧を取得
       const questions = ref([]) //質問一覧
       try {
-        const url = "questions/1061520060" // TODO 自分の質問を取得するurlに変更
+        const url = "/search/" + route.query["q"] // TODO 自分の質問を取得するurlに変更
         const { data } = await axios.get(url)
         questions.value = data
         // 取得した質問をpostに格納
