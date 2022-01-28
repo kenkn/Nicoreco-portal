@@ -121,7 +121,17 @@ export default {
         ).catch(error => {
           console.log(error)
         })
-        review.value = labReviewData.data[0] // 仮で先頭のレビューのみを表示中
+
+        // TODO 一時的なエラー回避
+        let q_idx
+
+        for (const i in labReviewData.data) {
+          if (labReviewData.data[i].ID == route.params.review_id) {
+            q_idx = i
+          }
+        }
+
+        review.value = labReviewData.data[q_idx] // 仮で先頭のレビューのみを表示中
         for (const i in labReviewData.data) {
           reviewLgtmCount.value[labReviewData.data[i].ID] = labReviewData.data[i].lgtm
         }
