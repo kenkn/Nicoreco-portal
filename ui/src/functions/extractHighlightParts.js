@@ -3,53 +3,22 @@ import 'highlight.js/styles/xcode.css';
 
 export default function extractHighlightPart(bodyStr) {
     let contents = []
-    let isMathjaxStarted
+    // let isMathjaxStarted
     let isCodeStarted
     let textStartIdx = 0
-    let mathjaxStartIdx
+    // let mathjaxStartIdx
     let codeStartIdx
     let content
 
     const initStarted = () => {
-        isMathjaxStarted = false
+        // isMathjaxStarted = false
         isCodeStarted = false
     }
 
     initStarted()
 
     for (let i = 0; i < (bodyStr.length-2); ++i) {
-        if (bodyStr.slice(i, i+2) === "$$") {
-            // mathjax pattern
-            // ex.) '$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$'
-            if (isCodeStarted === true) {
-                continue
-            }
-            if (isMathjaxStarted === false) {
-                isMathjaxStarted = true
-                mathjaxStartIdx = i
-            } else {
-                initStarted()
-                const text = bodyStr.slice(textStartIdx, mathjaxStartIdx)
-                content = {
-                    attr: "text",
-                    body: text,
-                }
-                textStartIdx = i + 3
-                contents.push(content)
-
-                const math = getCodeContent(bodyStr.slice(mathjaxStartIdx, i+2))
-                content = {
-                    attr: "math",
-                    body: math,
-                }
-                contents.push(content)
-            }
-        }
         if (bodyStr.slice(i, i+3) === '```') {
-            // code pattern
-            if (isMathjaxStarted === true) {
-                continue
-            }
             if (isCodeStarted === false) {
                 isCodeStarted = true
                 codeStartIdx = i
