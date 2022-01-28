@@ -19,7 +19,7 @@
         <p class="fs-3 fw-bold">{{ question.title }}</p>
         
         <div v-for="(content, key) in questionContents" :key="key">
-          <vue-mathjax v-if="content.attr==='math'" :formula="content.body" />
+          <vue-mathjax v-if="content.attr==='math'||content.attr==='text'" :formula="content.body" />
           <pre v-else-if="content.attr==='code'" v-html="content.body"/>
         </div>
 
@@ -51,7 +51,7 @@
         <div v-for="(answer, idx) in answers" :key="idx" class="border-bottom border-dark p-4 mt-2">
           <div class="border p-3 mb-2 shadow-sm">
             <div v-for="(content, key) in answerContents[answer.answer.ID]" :key="key">
-              <vue-mathjax v-if="content.attr==='math'" :formula="content.body" />
+              <vue-mathjax v-if="content.attr==='math'||content.attr==='text'" :formula="content.body" />
               <pre v-else-if="content.attr==='code'" v-html="content.body"/>
             </div>
             
@@ -83,7 +83,7 @@
               </svg>
               <div class="border p-2 ml-5 mb-2 shadow-sm">
                 <div v-for="(content, ridx) in replyContents[reply.ID]" :key="ridx">
-                  <vue-mathjax v-if="content.attr==='math'" :formula="content.body" />
+                  <vue-mathjax v-if="content.attr==='math'||content.attr==='text'" :formula="content.body" />
                   <pre v-else-if="content.attr==='code'" v-html="content.body"/>
                   <!-- <p>{{ rBody }}</p>
                   <pre v-html="replyCodeBodies[reply.ID][ridx]"/> -->
