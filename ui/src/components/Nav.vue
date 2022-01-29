@@ -71,6 +71,9 @@
             <li class="nav-item">
               <router-link to="/" class="nav-link" @click="closeNav">雑談</router-link>
             </li>
+            <li class="nav-item">
+              <router-link to="/links" class="nav-link" @click="closeNav">リンク集</router-link>
+            </li>
             <!-- ログイン済なら表示 -->
             <template v-if="auth">
               <li class="nav-item">
