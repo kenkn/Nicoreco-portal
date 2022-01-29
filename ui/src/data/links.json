@@ -1,0 +1,27 @@
+[
+    {
+        "name": "就学支援システム",
+        "url": "https://www.kyoumu.jimu.yamaguchi-u.ac.jp/portal/"
+    },
+    {
+        "name": "moodle",
+        "url": "https://mdcs4h.cc.yamaguchi-u.ac.jp/moodle/"
+    },
+    {
+        "name": "山口大学Webメール",
+        "url": "https://webmail.cc.yamaguchi-u.ac.jp/"
+    },
+    {
+        "name": "山口大学ホームページ",
+        "url": "http://www.yamaguchi-u.ac.jp/"
+    },
+    {
+        "name": "山口大学工学部ホームページ",
+        "url": "https://www.eng.yamaguchi-u.ac.jp/"
+    },
+    {
+        "name": "山口大学知能情報工学科ホームページ",
+        "url": "http://www.yamaguchi-u.ac.jp/"
+    }
+
+]
