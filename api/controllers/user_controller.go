@@ -198,3 +198,21 @@ func Login(c *fiber.Ctx) error {
 	})
 
 }
+
+// /logout (GET)
+// 機能 : ログアウト機能
+// 戻り値 : 成功メッセージ(JSON)
+func Logout(c *fiber.Ctx) error {
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",                         // tokenを空にする
+		Expires:  time.Now().Add(-time.Hour), // マイナス値を入れて期限切れ
+		HTTPOnly: true,
+	}
+ 
+	c.Cookie(&cookie)
+	return c.JSON(fiber.Map{
+		"message": "ログアウトに成功しました",
+	})
+}
+ 

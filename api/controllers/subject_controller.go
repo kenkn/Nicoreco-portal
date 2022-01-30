@@ -46,13 +46,16 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
-	if err != nil || !token.Valid {
-		isGetLgtmled = false
-	}
 
-	claims := token.Claims.(*utils.Claims)
-	// User IDを取得
-	userID := claims.Issuer
+	var userID string
+	if err != nil || !token.Valid {
+		// ログインしてない時
+		isGetLgtmled = false
+		userID = ""
+	} else {
+		claims := token.Claims.(*utils.Claims)
+		userID = claims.Issuer
+	}
 
 	// Question情報及びuserがLGTMedか否かの取得
 	var question models.Question
