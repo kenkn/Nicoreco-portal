@@ -79,6 +79,7 @@ export default {
   },
   setup() {
     const store       = useStore()
+    const router      = useRouter()
     const email       = localStorage.email
     const userID      = localStorage.userID
     const displayName = ref(localStorage.displayName)
@@ -89,15 +90,17 @@ export default {
     const schema = yup.object({
       displayName: yup.string().required("この項目は必須です"),
       grade: yup.string().required("学年を選択して下さい"),
-    });
-    // TODO 変更時の処理
+    })
+    
     const submit = async () => {
-      this.loading = true
-      // try {
-      // } catch (e) {
-      //   this.loading = false
-      //   errMessage.value = e.response.data.message
-      // }
+      loading = true
+      await axios.put("/user", {
+        display_name : displayName.value,
+        grade        : grade.value
+      })
+      localStorage.userID = displayName.value
+      localStorage.grade = grade.value
+      router.push('/')
     }
 
     // 見出しの処理
