@@ -28,10 +28,8 @@ func Setup(app *fiber.App) {
 	route.Post("/reply/post", controllers.PostReply)
 	route.Post("/lab/review/post", controllers.PostLabReview)
 	route.Get("/lab/reviews/:lab", controllers.GetLabReviews)
-	route.Get("/lab/review/:id", controllers.LabReview)
+	route.Get("/lab/:id", controllers.GetLabReviewInfo)
 	route.Post("/lab/reply/post", controllers.PostLabReply)
-	route.Get("/lab/reply/:lab_review_id", controllers.GetLabReply)
-	route.Get("/lgtm/lab/:lab_review_id/:user_id", controllers.IsLabReviewLgtmed)
-	route.Post("/lgtm/lab", controllers.LgtmLabReview)
+	route.Put("/lgtm/lab/:lab_review_id", controllers.LgtmLabReview)
 	route.Get("/search/+", controllers.Search)
 }
