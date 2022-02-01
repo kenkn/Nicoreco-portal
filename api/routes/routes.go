@@ -17,6 +17,7 @@ func Setup(app *fiber.App) {
 	route.Post("/register", controllers.Register)
 	route.Post("/login", controllers.Login)
 	route.Get("/user", controllers.User)
+	route.Put("/user", controllers.UpdateUserInfo)
 	route.Post("/forgot", controllers.Forgot)
 	route.Post("/reset", controllers.Reset)
 	route.Get("/questions/:subject", controllers.GetQuestions)
