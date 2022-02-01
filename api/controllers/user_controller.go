@@ -49,6 +49,52 @@ func User(c *fiber.Ctx) error {
 
 }
 
+// /user (PUT)
+// 機能 : ユーザ情報の更新
+// 受信するJSON :
+//  * display_name : 更新後の表示名
+//  * grade        : 更新後の学年
+// 戻り値 : 更新後のユーザ情報のJSON
+// 例外発行 :
+// 	* リクエストデータのパースに失敗した場合
+//  * 認証されていないユーザからのリクエストだった場合
+//  * データが欠けている場合
+func UpdateUserInfo(c *fiber.Ctx) error {
+	data, err := utils.ParseData(c)
+	if err != nil {
+		return err
+	}
+
+	// CookieからJWTを取得(Loginにて保存したユーザ情報)
+	cookie := c.Cookies("jwt")
+	// JWTtoken取得
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid {
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "認証されていません．",
+		})
+	}
+	claims := token.Claims.(*utils.Claims)
+	userID := claims.Issuer
+
+	newName, isDisplayNameThere := data["display_name"]
+	newGrade, isGradeThere := data["grade"]
+	if !isDisplayNameThere || !isGradeThere {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "display_nameまたはgradeが欠けています",
+		})
+	}
+
+	var user models.User
+	database.DB.Model(&user).Where("user_id", userID).Update("display_name", newName).Update("grade", newGrade)
+
+	return c.JSON(user)
+}
+
 // /register (POST)
 // 機能 : ユーザの登録
 // 受信するJSON :
@@ -56,9 +102,9 @@ func User(c *fiber.Ctx) error {
 //  * email            : 登録するメールアドレス
 //  * password         : ユーザが入力したパスワード
 //  * password_confirm : ユーザが入力したパスワード(確認用)
-// 戻り値 : ユーザ情報のJSON(User型)
+// 戻り値 : ユーザ情報のJSON
 // 例外発行 :
-// 	* リクエストデータのパースに失敗した場合に例外を発行
+// 	* リクエストデータのパースに失敗した場合
 func Register(c *fiber.Ctx) error {
 
 	data, err := utils.ParseData(c)
@@ -215,4 +261,3 @@ func Logout(c *fiber.Ctx) error {
 		"message": "ログアウトに成功しました",
 	})
 }
- 
