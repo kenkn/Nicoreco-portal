@@ -41,7 +41,7 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	// GETの内容を取得
 	id := c.Params("id")
 	cookie := c.Cookies("jwt")
-	isGetLgtmled := true
+	isGetLgtmled := false
 	// JWTtoken取得
 	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
@@ -50,16 +50,23 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 	var userID string
 	if err != nil || !token.Valid {
 		// ログインしてない時
-		isGetLgtmled = false
 		userID = ""
 	} else {
+		isGetLgtmled = true
 		claims := token.Claims.(*utils.Claims)
 		userID = claims.Issuer
 	}
 
 	// Question情報及びuserがLGTMedか否かの取得
 	var question models.Question
-	database.DB.Where("id = ?", id).First(&question)
+	res := database.DB.Where("id = ?", id).First(&question)
+	if res.Error != nil {
+		c.Status(404)
+		return c.JSON(fiber.Map{
+			"message": "存在しない質問IDです",
+		})
+	}
+
 	isQuestionLgtmed := false
 	if isGetLgtmled {
 		var lgtmQuestion models.LgtmQuestion
