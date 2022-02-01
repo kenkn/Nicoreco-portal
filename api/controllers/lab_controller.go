@@ -91,8 +91,12 @@ func GetLabReviewInfo(c *fiber.Ctx) error {
 		}
 	}
 
+	labReply := []models.LabReply{}
+	database.DB.Where("lab_review_id = ?", id).Find(&labReply)
+
 	return c.JSON(fiber.Map{
 		"lab_review": labReview,
+		"reply":      labReply,
 		"islgtmed":   isLabReviewLgtmed,
 	});
 }
