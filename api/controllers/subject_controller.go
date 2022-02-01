@@ -211,10 +211,10 @@ func LgtmAnswer(c *fiber.Ctx) error {
 		return c.JSON(answer)
 	} else {
 		// LGTM情報がない場合
-		parent_id, _ := strconv.Atoi(answerID)
-		answer_id_uint := uint(parent_id)
+		parentID, _ := strconv.Atoi(answerID)
+		uintAnswerID := uint(parentID)
 		lgtm := models.LgtmAnswer{
-			AnswerID: answer_id_uint,
+			AnswerID: uintAnswerID,
 			LgtmerID: userID,
 			IsLgtmed: true,
 		}
@@ -356,11 +356,11 @@ func PostReply(c *fiber.Ctx) error {
 	question_id, _ := strconv.Atoi(data["question_id"])
 	uintQuestionID := uint(question_id)
 	answer_id, _ := strconv.Atoi(data["parent_id"])
-	answer_id_uint := uint(answer_id)
+	uintAnswerID := uint(answer_id)
 
 	reply := models.Reply{
 		QuestionID: uintQuestionID,
-		AnswerID:   answer_id_uint,
+		AnswerID:   uintAnswerID,
 		ReplyerID:  data["user_id"],
 		Body:       data["body"],
 		Lgtm:       0,
