@@ -38,7 +38,7 @@ const routes: Array<RouteRecordRaw> = [
   // 新規レビューの作成ページ
   { path: '/lab/:professor/create', component: CreateLabReview },
   // ラボのレビュ詳細ーページ
-  { path: '/lab/:professor/:review_id', component: LabReview },
+  { path: '/lab/:professor/:labReviewID', component: LabReview },
   // プロフィールページ
   { path: '/profile', component: Profile, 
     beforeEnter: (to, from, next) => {
