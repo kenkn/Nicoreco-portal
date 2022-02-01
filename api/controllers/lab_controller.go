@@ -215,21 +215,14 @@ func PostLabReply(c *fiber.Ctx) error {
 
 // }
 
-// /lgtm/lab (POST)
+// /lgtm/lab/:lab_review_id (PUT)
 // 機能 : 研究室レビューのLGTM数を加算する
-// 受信するJSON :
-//  * jwt 	  		: JWTトークン
-//  * lab_review_id : LGTMする研究室レビューのID
-//  * user_id 		: LGTMしたユーザーID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
-//  * リクエストデータのパースに失敗した場合に例外を発行
+//  * リクエストデータのパースに失敗した場合
 func LgtmLabReview(c *fiber.Ctx) error {
 
-	data, err := utils.ParseData(c)
-	if err != nil {
-		return err
-	}
+	labReviewID := c.Params("lab_review_id")
 
 	// CookieからJWTを取得(Loginにて保存したユーザ情報)
 	cookie := c.Cookies("jwt")
@@ -243,29 +236,59 @@ func LgtmLabReview(c *fiber.Ctx) error {
 			"message": "認証されていません．",
 		})
 	}
+	claims := token.Claims.(*utils.Claims)
+	userID := claims.Issuer
 
-	// 既にLGTMされているならDBから削除して、LGTMされてないなら新たにDBに加える
-	lgtmData := []models.LgtmLabReview{}
-	database.DB.Where("lgtmer_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtmData)
+	var lgtmData models.LgtmLabReview
+	res := database.DB.Where("lgtmer_id = ?", userID).Where("lab_review_id = ?", labReviewID).First(&lgtmData)
 
-	if len(lgtmData) > 0 {
-		database.DB.Where("lgtmer_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&lgtmData[0])
+	if res.Error == nil {
+		// LGTM情報が既にある場合
+		llr := models.LgtmLabReview{}
+		database.DB.Model(&llr).Where("lgtmer_id = ?", userID).Where("lab_review_id = ?", labReviewID).Update("is_lgtmed", !(lgtmData.IsLgtmed))
+
+		var labReview models.LabReview
+		database.DB.Where("id = ?", labReviewID).First(&labReview)
+		if lgtmData.IsLgtmed {
+			database.DB.Model(&labReview).Where("id = ?", labReviewID).Update("lgtm", labReview.Lgtm-1)
+		} else {
+			database.DB.Model(&labReview).Where("id = ?", labReviewID).Update("lgtm", labReview.Lgtm+1)
+		}
+
+		return c.JSON(labReview)
 	} else {
-		parent_id, _ := strconv.Atoi(data["lab_review_id"])
-		lab_review_id_uint := uint(parent_id)
+		parent_id, _ := strconv.Atoi(labReviewID)
+		uintLabReviewID := uint(parent_id)
 		lgtm := models.LgtmLabReview{
-			LabReviewID: lab_review_id_uint,
-			LgtmerID:    data["user_id"],
+			LabReviewID: uintLabReviewID,
+			LgtmerID: userID,
+			IsLgtmed: true,
 		}
 		database.DB.Create(&lgtm)
+		var labReview models.LabReview
+		database.DB.Where("id = ?", labReviewID).First(&labReview)
+		database.DB.Model(&labReview).Where("id = ?", labReviewID).Update("lgtm", labReview.Lgtm+1)
+	
+		return c.JSON(labReview)
 	}
+	// if len(lgtmData) > 0 {
+	// 	database.DB.Where("lgtmer_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&lgtmData[0])
+	// } else {
+	// 	parent_id, _ := strconv.Atoi(data["lab_review_id"])
+	// 	lab_review_id_uint := uint(parent_id)
+	// 	lgtm := models.LgtmLabReview{
+	// 		LabReviewID: lab_review_id_uint,
+	// 		LgtmerID:    data["user_id"],
+	// 	}
+	// 	database.DB.Create(&lgtm)
+	// }
 
-	// LGTMの更新
-	lgtms := []models.LgtmLabReview{}
-	database.DB.Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtms)
-	var labReview models.LabReview
-	database.DB.Model(&labReview).Where("id = ?", data["lab_review_id"]).Update("lgtm", len(lgtms))
+	// // LGTMの更新
+	// lgtms := []models.LgtmLabReview{}
+	// database.DB.Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtms)
+	// var labReview models.LabReview
+	// database.DB.Model(&labReview).Where("id = ?", data["lab_review_id"]).Update("lgtm", len(lgtms))
 
-	return c.JSON(labReview)
+	// return c.JSON(labReview)
 
 }
