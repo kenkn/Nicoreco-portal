@@ -107,6 +107,7 @@ import UserIconMenu from "@/components/UserIconMenu"
 import SearchForm from '@/components/SearchForm'
 import logo from '@/assets/img/logo.png'
 import bell from '@/assets/img/bell.png'
+import axios from 'axios'
 
 export default {
   name: "Nav",
@@ -132,12 +133,13 @@ export default {
       store.dispatch("setAuth", false)
       store.dispatch("setDisplayName", '')
       store.dispatch("setGrade", '')
+      await axios.get("/logout")
       router.push("/login")
     }
     // ナビが開いている場合は閉じる
     const closeNav = () => {
       const navBtn = document.getElementById('nav-btn')
-      if(navBtn.getAttribute('aria-expanded') === 'true'){
+      if (navBtn.getAttribute('aria-expanded') === 'true') {
         navBtn.click()
       }
     }
