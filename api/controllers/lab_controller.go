@@ -36,21 +36,6 @@ func GetLabReviews(c *fiber.Ctx) error {
 
 }
 
-// /lab/review/:id (GET)
-// 機能 : 研究室レビューの詳細情報取得
-// 戻り値 : 研究室レビューの詳細情報のJSON
-func LabReview(c *fiber.Ctx) error {
-
-	// GETの内容を取得
-	id := c.Params("id")
-
-	var review models.LabReview
-	database.DB.Where("id = ?", id).First(&review)
-
-	return c.JSON(review)
-
-}
-
 // /lab/:id (GET)
 // 機能 : 研究室レビューの詳細情報取得
 // <user>が"unauthorized"の時は非ログイン時であるためLGTMedはFalseとする
@@ -144,21 +129,6 @@ func PostLabReview(c *fiber.Ctx) error {
 
 }
 
-// /lab/reply/:id (GET)
-// 機能 : 研究室レビューのリプライ情報取得
-// 戻り値 : 研究室レビューのリプライ情報のJSON
-func GetLabReply(c *fiber.Ctx) error {
-
-	// GETの内容を取得
-	lab_review_id := c.Params("lab_review_id")
-
-	replys := []models.LabReply{}
-	database.DB.Where("lab_review_id = ?", lab_review_id).Find(&replys)
-
-	return c.JSON(replys)
-
-}
-
 // /lab/reply/post (POST)
 // 機能 : 研究室レビューのリプライ投稿
 // 受信するJSON :
@@ -201,23 +171,6 @@ func PostLabReply(c *fiber.Ctx) error {
 	return c.JSON(reply)
 
 }
-
-// /lgtm/lab/:lab_review_id/:user_id (GET)
-// 機能 : LGTMされたどうかの判定(labReview用)
-// 戻り値 : LGTM情報のJSON
-// func IsLabReviewLgtmed(c *fiber.Ctx) error {
-
-// 	// GETの内容を取得
-// 	lab_review_id := c.Params("lab_review_id")
-// 	user_id := c.Params("user_id")
-
-// 	// 質問を全検索してリストで取得
-// 	lgtm := []models.LgtmLabReview{}
-// 	database.DB.Where("lgtmer_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).Find(&lgtm)
-
-// 	return c.JSON(lgtm)
-
-// }
 
 // /lgtm/lab/:lab_review_id (PUT)
 // 機能 : 研究室レビューのLGTM数を加算する
@@ -275,24 +228,4 @@ func LgtmLabReview(c *fiber.Ctx) error {
 	
 		return c.JSON(labReview)
 	}
-	// if len(lgtmData) > 0 {
-	// 	database.DB.Where("lgtmer_id = ?", data["user_id"]).Where("lab_review_id = ?", data["lab_review_id"]).Delete(&lgtmData[0])
-	// } else {
-	// 	parent_id, _ := strconv.Atoi(data["lab_review_id"])
-	// 	lab_review_id_uint := uint(parent_id)
-	// 	lgtm := models.LgtmLabReview{
-	// 		LabReviewID: lab_review_id_uint,
-	// 		LgtmerID:    data["user_id"],
-	// 	}
-	// 	database.DB.Create(&lgtm)
-	// }
-
-	// // LGTMの更新
-	// lgtms := []models.LgtmLabReview{}
-	// database.DB.Where("lab_review_id = ?", data["lab_review_id"]).Find(&lgtms)
-	// var labReview models.LabReview
-	// database.DB.Model(&labReview).Where("id = ?", data["lab_review_id"]).Update("lgtm", len(lgtms))
-
-	// return c.JSON(labReview)
-
 }
