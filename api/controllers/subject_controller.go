@@ -9,7 +9,6 @@ import (
 	"auth-api/database"
 	"auth-api/models"
 	"auth-api/utils"
-	"log"
 
 	"strconv"
 
@@ -115,7 +114,7 @@ func GetQuestionInfo(c *fiber.Ctx) error {
 //  * id 	  : LGTMする質問のID
 // 戻り値 : LGTMした質問のJSON
 // 例外発行 :
-//  * リクエストデータのパースに失敗した場合に例外を発行
+//  * リクエストデータのパースに失敗した場合
 func LgtmQuestion(c *fiber.Ctx) error {
 
 	questionID := c.Params("question_id")
@@ -157,9 +156,9 @@ func LgtmQuestion(c *fiber.Ctx) error {
 	} else {
 		// LGTM情報がない場合
 		parent_id, _ := strconv.Atoi(questionID)
-		question_id_uint := uint(parent_id)
+		uintQuestionID := uint(parent_id)
 		lgtm := models.LgtmQuestion{
-			QuestionID: question_id_uint,
+			QuestionID: uintQuestionID,
 			LgtmerID:   userID,
 			IsLgtmed:   true,
 		}
@@ -204,7 +203,6 @@ func LgtmAnswer(c *fiber.Ctx) error {
 		var answer models.Answer
 		database.DB.Where("id = ?", answerID).First(&answer)
 		if lgtmData.IsLgtmed {
-			log.Println("minus")
 			database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", answer.Lgtm-1)
 		} else {
 			database.DB.Model(&answer).Where("id = ?", answerID).Update("lgtm", answer.Lgtm+1)
@@ -305,10 +303,10 @@ func PostAnswer(c *fiber.Ctx) error {
 	}
 
 	question_id, _ := strconv.Atoi(data["parent_id"])
-	question_id_uint := uint(question_id)
+	uintQuestionID := uint(question_id)
 
 	answer := models.Answer{
-		QuestionID: question_id_uint,
+		QuestionID: uintQuestionID,
 		AnswererID: data["user_id"],
 		Body:       data["body"],
 		Lgtm:       0,
@@ -356,12 +354,12 @@ func PostReply(c *fiber.Ctx) error {
 	}
 
 	question_id, _ := strconv.Atoi(data["question_id"])
-	question_id_uint := uint(question_id)
+	uintQuestionID := uint(question_id)
 	answer_id, _ := strconv.Atoi(data["parent_id"])
 	answer_id_uint := uint(answer_id)
 
 	reply := models.Reply{
-		QuestionID: question_id_uint,
+		QuestionID: uintQuestionID,
 		AnswerID:   answer_id_uint,
 		ReplyerID:  data["user_id"],
 		Body:       data["body"],
