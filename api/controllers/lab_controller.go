@@ -51,6 +51,52 @@ func LabReview(c *fiber.Ctx) error {
 
 }
 
+// /lab/:id (GET)
+// 機能 : 研究室レビューの詳細情報取得
+// <user>が"unauthorized"の時は非ログイン時であるためLGTMedはFalseとする
+// 戻り値 : 研究室レビューのJSON
+func GetLabReviewInfo(c *fiber.Ctx) error {
+	id := c.Params("id")
+	cookie := c.Cookies("jwt")
+	isGetLgtmled := false
+	token, err := jwt.ParseWithClaims(cookie, &utils.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+
+	var userID string
+	if err != nil || !token.Valid {
+		// ログインしてない時
+		userID = ""
+	} else {
+		isGetLgtmled = true
+		claims := token.Claims.(*utils.Claims)
+		userID = claims.Issuer
+	}
+
+	var labReview models.LabReview
+	res := database.DB.Where("id = ?", id).First(&labReview)
+	if res.Error != nil {
+		c.Status(404)
+		return c.JSON(fiber.Map{
+			"message": "存在しない研究室レビューIDです",
+		})
+	}
+
+	isLabReviewLgtmed := false
+	if isGetLgtmled {
+		var lgtmLabReview models.LgtmLabReview
+		res := database.DB.Where("lab_review_id = ?", id).Where("lgtmer_id", userID).First(&lgtmLabReview)
+		if res.Error == nil && lgtmLabReview.IsLgtmed {
+			isLabReviewLgtmed = true
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"lab_review": labReview,
+		"islgtmed":   isLabReviewLgtmed,
+	});
+}
+
 // /lab/review/post (POST)
 // 機能 : 研究室レビューの投稿
 // 受信するJSON :
@@ -155,19 +201,19 @@ func PostLabReply(c *fiber.Ctx) error {
 // /lgtm/lab/:lab_review_id/:user_id (GET)
 // 機能 : LGTMされたどうかの判定(labReview用)
 // 戻り値 : LGTM情報のJSON
-func IsLabReviewLgtmed(c *fiber.Ctx) error {
+// func IsLabReviewLgtmed(c *fiber.Ctx) error {
 
-	// GETの内容を取得
-	lab_review_id := c.Params("lab_review_id")
-	user_id := c.Params("user_id")
+// 	// GETの内容を取得
+// 	lab_review_id := c.Params("lab_review_id")
+// 	user_id := c.Params("user_id")
 
-	// 質問を全検索してリストで取得
-	lgtm := []models.LgtmLabReview{}
-	database.DB.Where("lgtmer_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).Find(&lgtm)
+// 	// 質問を全検索してリストで取得
+// 	lgtm := []models.LgtmLabReview{}
+// 	database.DB.Where("lgtmer_id = ?", user_id).Where("lab_review_id = ?", lab_review_id).Find(&lgtm)
 
-	return c.JSON(lgtm)
+// 	return c.JSON(lgtm)
 
-}
+// }
 
 // /lgtm/lab (POST)
 // 機能 : 研究室レビューのLGTM数を加算する
