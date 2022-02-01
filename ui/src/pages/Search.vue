@@ -39,7 +39,7 @@ export default {
     const loading   = ref(true) // ロード中であるか
     const posts     = ref([]) //質問・回答・レビューの一覧
     // TODO 検索処理に変更
-    onMounted(async () => {
+    onMounted (async () => {
       loading.value = true
       // 質問一覧を取得
       const questions = ref([]) //質問一覧
@@ -48,7 +48,7 @@ export default {
         const { data } = await axios.get(url)
         questions.value = data
         // 取得した質問をpostに格納
-        for(let question of questions.value) {
+        for (let question of questions.value) {
           let post = {
             id: question.ID,
             target: 'question',
@@ -73,7 +73,6 @@ export default {
     onBeforeUnmount(() =>
       store.dispatch("setJumbotron", "")
     )
-
 
     return {
       loading,
