@@ -115,11 +115,12 @@ func Register(c *fiber.Ctx) error {
 	// IDとパスワードの存在チェック
 	_, isDisplayNameThere := data["display_name"]
 	_, isUserIDThere := data["user_id"]
+	_, isEmailThere := data["email"]
 	_, isPasswordThere := data["password"]
 	_, isPasswordConfirmThere := data["password_confirm"]
 
 	// ID,パスワードの存在チェック
-	if !isDisplayNameThere || !isUserIDThere || !isPasswordThere || !isPasswordConfirmThere {
+	if !isDisplayNameThere || !isUserIDThere || !isEmailThere || !isPasswordThere || !isPasswordConfirmThere {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "IDまたはパスワードが欠けています",
