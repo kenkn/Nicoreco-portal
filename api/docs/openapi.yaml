@@ -1,0 +1,76 @@
+openapi: 3.1.0
+
+info:
+  title: Nicoreco Portal Service
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:80/api
+
+paths:
+  /register:
+    post:
+      summery: User Register endpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                  required: true
+                user_id:
+                  type: string
+                  required: true
+                email:
+                  type: string
+                  required: true
+                grade: 
+                  type: string
+                  required: true
+                password:
+                  type: string
+                  required: true
+                password_confirm:
+                  type: string
+                  required: true
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/user'
+        '400':
+          description: 400 response
+
+
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        ID:
+          type: integer
+        user_id:
+          type: string
+        display_name:
+          type: string
+        email:
+          type: string
+        grade: 
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
