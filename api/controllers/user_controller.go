@@ -99,7 +99,9 @@ func UpdateUserInfo(c *fiber.Ctx) error {
 // 機能 : ユーザの登録
 // 受信するJSON :
 //  * display_name     : ユーザの表示名
+//  * user_id		   : ユーザID
 //  * email            : 登録するメールアドレス
+//  * grade 		   : 学年
 //  * password         : ユーザが入力したパスワード
 //  * password_confirm : ユーザが入力したパスワード(確認用)
 // 戻り値 : ユーザ情報のJSON
@@ -116,11 +118,12 @@ func Register(c *fiber.Ctx) error {
 	_, isDisplayNameThere := data["display_name"]
 	_, isUserIDThere := data["user_id"]
 	_, isEmailThere := data["email"]
+	_, isGradeThere := data["grade"]
 	_, isPasswordThere := data["password"]
 	_, isPasswordConfirmThere := data["password_confirm"]
 
 	// ID,パスワードの存在チェック
-	if !isDisplayNameThere || !isUserIDThere || !isEmailThere || !isPasswordThere || !isPasswordConfirmThere {
+	if !isDisplayNameThere || !isUserIDThere || !isEmailThere || !isGradeThere || !isPasswordThere || !isPasswordConfirmThere {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "IDまたはパスワードが欠けています",
